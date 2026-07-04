@@ -39,7 +39,7 @@
       short_name: "新廊 LG", 
       start_url: ".", 
       display: "standalone",
-      background_color: "#ffffff", 
+      background_color: "#f8fafc", 
       theme_color: "#2563eb",
       icons: [{ src: "https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png", sizes: "192x192 512x512", type: "image/png", purpose: "any maskable" }]
     };
@@ -88,7 +88,7 @@
     body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
   </style>
 </head>
-<body class="bg-[#F8FAFC] dark:bg-[#090E17] text-slate-800 dark:text-slate-100 transition-colors duration-500 flex flex-col min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-500 flex flex-col min-h-screen">
   <div id="root" class="flex flex-col flex-1"></div>
 
   <script type="text/babel" data-presets="react" data-type="module">
@@ -111,27 +111,8 @@
     // 🔴 步骤2: 隐藏的管理员密码
     const ADMIN_PIN = "8888"; 
 
-    // 容错用的本地回退数据 (Fallback Data)
-    const mockFallbackData = {
-      apps: [
-        { id: '1', category: 'admin', icon: 'Settings', url: 'https://example.com', zhTitle: '教师教务系统', zhDesc: '处理日常教务、编排代课与获取内部高层通告。', msTitle: 'Sistem Pengurusan Guru', msDesc: 'Notis dalaman & jadual waktu.', order: 0, clicks: 1248, createdAt: Date.now() - 86400000 },
-        { id: '2', category: 'kurikulum', icon: 'MonitorPlay', url: 'https://example.com', zhTitle: '线上教学资源库', zhDesc: '各科目的教案 (RPH)、教学课件库与在线题库。', msTitle: 'Hab Sumber Kurikulum', msDesc: 'Pangkalan data RPH & bahan PdP.', order: 1, clicks: 3850, createdAt: Date.now() },
-        { id: '3', category: 'hem', icon: 'Users', url: 'https://example.com', zhTitle: 'APDM 系统', zhDesc: '记录每日学生出缺席、健康状态与行为纪律。', msTitle: 'Sistem APDM / SSDM', msDesc: 'Pengurusan kehadiran & disiplin.', order: 2, clicks: 5310, createdAt: Date.now() - 1000000000 },
-        { id: '4', category: 'koko', icon: 'Trophy', url: 'https://example.com', zhTitle: 'PAJSK 录入系统', zhDesc: '管理并录入兼修课程分数、学会出勤与比赛成绩。', msTitle: 'Sistem PAJSK', msDesc: 'Pengurusan markah kokurikulum.', order: 3, clicks: 950, createdAt: Date.now() - 500000000 },
-        { id: '5', category: 'admin', icon: '🌍', url: 'https://example.com', zhTitle: '学校官网后台', zhDesc: '更新学校门户网站、校报发布与社交媒体内容分发。', msTitle: 'Portal Admin', msDesc: 'Kemas kini portal sekolah.', order: 4, clicks: 230, createdAt: Date.now() - 900000000 }
-      ],
-      settings: {
-        announcement: { active: true, zh: '全体会议提醒：今日下午 2:00 召开年终校务会议', ms: 'Peringatan: Mesyuarat Guru pada 2:00 PM hari ini' },
-        event: { active: true, zh: 'UASA 考卷提交截止', ms: 'Tarikh Tutup Kertas Soalan UASA', date: '2026-11-15' }
-      }
-    };
-
+    // 真正的去中心化请求 (无本地 Mock 数据)
     const apiRequest = async (action, data = {}) => {
-      if (GAS_API_URL.includes("XXXXXXXXXXXXXXXX")) {
-        console.warn("未配置真实的 GAS_API_URL，系统已自动切换至本地模拟数据进行预览。");
-        return new Promise(resolve => setTimeout(() => resolve(action === 'getInitialData' ? mockFallbackData : true), 500));
-      }
-
       try {
         const response = await fetch(GAS_API_URL, {
           method: "POST",
@@ -142,8 +123,8 @@
         if (result.status === 'success') return result.data;
         else throw new Error(result.message);
       } catch (error) {
-        console.error("API Request Failed, fallback to mock data:", error);
-        return action === 'getInitialData' ? mockFallbackData : true;
+        console.error("API Request Failed:", error);
+        throw error;
       }
     };
 
@@ -193,8 +174,8 @@
         eventSetup: '倒计时设置', eventTitleZh: '事件名称 (中)', eventTitleMs: '事件名称 (马)', eventDate: '目标日期',
         countdown: '校务倒计时', daysLeft: '天', todayIs: '就是今天！', passed: '已结束',
         toastSaved: '已同步', toastDeleted: '应用已删除', toastPinned: '已加入置顶', toastUnpinned: '已取消置顶',
-        offlineMsg: '未连接到互联网，当前使用离线缓存模式。', searchResults: '搜索结果', recentAccess: '最近访问',
-        pinTitle: '输入系统密码', pinPlaceholder: '••••', pinError: '密码错误，请重试', unlock: '解锁'
+        offlineMsg: '未连接到云端，正使用本地缓存。', searchResults: '搜索结果', recentAccess: '最近访问',
+        pinTitle: '输入系统密码', pinPlaceholder: '••••', pinError: '密码错误，请重试', unlock: '解锁', copied: '已复制链接', copyFailed: '复制失败'
       },
       ms: {
         schoolName: 'SJK (C) Ladang Grisek', appTitle: 'Pusat Aplikasi', searchPlaceholder: 'Cari sistem...', adminActive: 'Tadbir Sistem',
@@ -206,7 +187,7 @@
         countdown: 'Kiraan Detik', daysLeft: 'Hari Lagi', todayIs: 'Hari ini!', passed: 'Telah Berlalu',
         toastSaved: 'Berjaya disegerakkan', toastDeleted: 'Telah dipadam', toastPinned: 'Telah dipin', toastUnpinned: 'Pin dibuang',
         offlineMsg: 'Tiada sambungan internet. Mod luar talian aktif.', searchResults: 'Hasil Carian', recentAccess: 'Baru Digunakan',
-        pinTitle: 'Masukkan PIN', pinPlaceholder: '••••', pinError: 'PIN salah, cuba lagi', unlock: 'Buka'
+        pinTitle: 'Masukkan PIN', pinPlaceholder: '••••', pinError: 'PIN salah, cuba lagi', unlock: 'Buka', copied: 'Pautan disalin', copyFailed: 'Gagal disalin'
       }
     };
 
@@ -231,7 +212,7 @@
 
       return (
         <div ref={dropdownRef} className="relative w-full z-50">
-          <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${isDarkMode ? 'bg-slate-900/60 hover:bg-slate-800 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 border-slate-200'} ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}>
+          <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 border-slate-200'} ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}>
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-slate-700 text-blue-400' : 'bg-white text-blue-600'}`}>
                 <i className={`ph-fill ${iconMap[value] || 'ph-squares-four'} text-xl`}></i>
@@ -257,7 +238,6 @@
     };
 
     const renderIcon = (iconVal, isList) => {
-      // 在网格模式下，图标相对减小，以适应3或4列
       const sizeClass = isList ? 'text-[1.5rem]' : 'text-[1.8rem] sm:text-[2.2rem]';
       if (!iconVal) return <i className={`ph-fill ph-squares-four ${sizeClass}`}></i>;
       if (iconVal.startsWith('http') || iconVal.startsWith('data:image')) return <img src={iconVal} alt="icon" className="w-full h-full object-cover rounded-[inherit] scale-[0.85]" />;
@@ -265,7 +245,7 @@
       return <span className={isList ? 'text-[1.5rem]' : 'text-[1.8rem] sm:text-[2.2rem]'}>{iconVal}</span>;
     };
 
-    // 🔥 新增：智能实时时钟钩子，时间中加入不换行空格（\u00A0）
+    // 智能实时时钟钩子，时间中加入不换行空格（\u00A0）
     const useSmartClock = (lang) => {
       const [time, setTime] = useState(new Date());
 
@@ -279,7 +259,6 @@
         const m = time.getMinutes().toString().padStart(2, '0');
         const ampm = h >= 12 ? 'PM' : 'AM';
         const displayH = h % 12 || 12;
-        // \u00A0 (Non-breaking space) 确保时间格式不断行
         const timeStr = `${displayH}:${m}\u00A0${ampm}`;
 
         const year = time.getFullYear();
@@ -300,10 +279,10 @@
 
     const getAmbientClasses = (isDarkMode) => {
       const h = new Date().getHours();
-      if (h >= 5 && h < 12) return isDarkMode ? ['bg-orange-900/20', 'bg-amber-900/20'] : ['bg-orange-400/20', 'bg-amber-400/20'];
-      if (h >= 12 && h < 17) return isDarkMode ? ['bg-blue-900/20', 'bg-cyan-900/20'] : ['bg-blue-400/20', 'bg-cyan-400/20'];
-      if (h >= 17 && h < 19) return isDarkMode ? ['bg-purple-900/30', 'bg-rose-900/30'] : ['bg-purple-400/20', 'bg-rose-400/20'];
-      return isDarkMode ? ['bg-indigo-900/30', 'bg-blue-900/20'] : ['bg-indigo-400/20', 'bg-blue-400/20'];
+      if (h >= 5 && h < 12) return isDarkMode ? ['bg-orange-900/10', 'bg-amber-900/10'] : ['bg-orange-400/20', 'bg-amber-400/20'];
+      if (h >= 12 && h < 17) return isDarkMode ? ['bg-blue-900/10', 'bg-cyan-900/10'] : ['bg-blue-400/20', 'bg-cyan-400/20'];
+      if (h >= 17 && h < 19) return isDarkMode ? ['bg-purple-900/10', 'bg-rose-900/10'] : ['bg-purple-400/20', 'bg-rose-400/20'];
+      return isDarkMode ? ['bg-indigo-900/10', 'bg-blue-900/10'] : ['bg-indigo-400/20', 'bg-blue-400/20'];
     };
 
     function App() {
@@ -336,7 +315,6 @@
         else { setPinError(true); setPinInput(''); vibrate([30,50,30]);}
       };
 
-
       const [apps, setApps] = useState([]);
       const [announcement, setAnnouncement] = useState({ active: false, zh: '', ms: '' });
       const [schoolEvent, setSchoolEvent] = useState({ active: false, zh: '', ms: '', date: '' });
@@ -348,7 +326,6 @@
       const [searchQuery, setSearchQuery] = useState('');
       const [activeTab, setActiveTab] = useState('all');
       
-      // 启用防断行的智能时钟
       const currentDateTimeStr = useSmartClock(lang);
 
       const [viewMode, setViewMode] = useState(() => {
@@ -358,7 +335,7 @@
 
       const [isOffline, setIsOffline] = useState(!navigator.onLine);
       useEffect(() => {
-        const handleOnline = () => { setIsOffline(false); setIsSyncing(true); server.getInitialData().then(() => setIsSyncing(false)); };
+        const handleOnline = () => { setIsOffline(false); setIsSyncing(true); server.getInitialData().then(() => setIsSyncing(false)).catch(()=>{setIsSyncing(false);}); };
         const handleOffline = () => setIsOffline(true);
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
@@ -509,8 +486,6 @@
         if (isIOS) localStorage.setItem('sjkc_superapp_ios_prompted', 'true');
       };
 
-      const greeting = lang === 'zh' ? '欢迎回来' : 'Selamat Kembali';
-
       const togglePin = (e, appId) => {
         e.preventDefault(); e.stopPropagation(); vibrate(20);
         const isPinned = pinnedIds.includes(appId);
@@ -528,6 +503,31 @@
         if (!isOffline) {
           setApps(apps.map(a => a.id === app.id ? { ...a, clicks: a.clicks + 1 } : a));
           server.recordClick(app.id);
+        }
+      };
+
+      // 🔥 新增：底层兼容的复制链接函数
+      const handleCopyUrl = (url) => {
+        vibrate(20);
+        try {
+          const textArea = document.createElement("textarea");
+          textArea.value = url;
+          // 防止手机屏幕滚动
+          textArea.style.top = "0";
+          textArea.style.left = "0";
+          textArea.style.position = "fixed";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) {
+             showToast(currentT.copied, 'success');
+          } else {
+             showToast(currentT.copyFailed, 'error');
+          }
+        } catch (err) {
+          showToast(currentT.copyFailed, 'error');
         }
       };
 
@@ -659,7 +659,6 @@
 
       const ambientClasses = getAmbientClasses(isDarkMode);
 
-      // 🔥 核心调整: 网格模式排布逻辑和内容删减
       const renderAppCard = (app, index, isPinnedSection = false, isSearchList = false) => {
         const isPinned = pinnedIds.includes(app.id);
         const showNewBadge = (Date.now() - app.createdAt) < (7 * 24 * 60 * 60 * 1000);
@@ -689,15 +688,10 @@
               ${isList && !isKeyboardFocused && 'hover:scale-[1.01] active:scale-[0.99]'}`}
             style={{ animationDelay: `${index * 30}ms` }}
           >
-
-            {/* 🔴 移除网格模式下的置顶和QR按钮，完全交给列表模式展示 */}
-            
-            {/* 卡片主体 */}
             <a href={app.url} target="_blank" rel="noopener noreferrer" onClick={(e) => handleAppClick(e, app)} className={`flex-1 flex cursor-pointer z-10 no-underline w-full ${isList ? 'flex-row items-center gap-4 sm:gap-5 pr-10 sm:pr-0' : 'flex-col items-center justify-start gap-2 sm:gap-3'}`}>
               <div className={`${isList ? 'w-12 h-12 rounded-[0.9rem]' : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl'} flex items-center justify-center relative shadow-sm transition-transform duration-300 group-hover:scale-105 group-active:scale-95 shrink-0
                 ${isDarkMode ? 'bg-gradient-to-b from-slate-700 to-slate-800 border border-slate-600 text-blue-400 group-hover:border-blue-500 group-hover:text-blue-300 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'bg-gradient-to-b from-white to-blue-50/50 border border-blue-100/50 text-blue-600 group-hover:border-blue-200 group-hover:shadow-blue-500/20'}`}>
                 {renderIcon(app.icon, isList)}
-                {/* 最新角标在网格和列表都有，保留以示提醒 */}
                 {showNewBadge && <span className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md animate-pulse flex items-center gap-0.5 border border-white dark:border-slate-800"><i className="ph-fill ph-sparkle"></i></span>}
               </div>
               
@@ -706,10 +700,7 @@
                   <h3 className={`font-extrabold tracking-tight ${isList ? 'text-[1.05rem] mb-0.5' : 'text-[0.7rem] sm:text-[0.8rem] leading-tight line-clamp-2'} w-full ${isDarkMode ? 'text-slate-100 group-hover:text-blue-400' : 'text-slate-800 group-hover:text-blue-600'}`}>{app[lang]?.title || ''}</h3>
                   {isKeyboardFocused && isList && <span className="hidden sm:flex text-[0.6rem] font-bold px-1.5 py-0.5 rounded bg-blue-500 text-white animate-pulse shrink-0">↵ Enter</span>}
                 </div>
-                {/* 🔴 仅在列表模式下显示完整说明 */}
-                {isList && (
-                  <p className={`text-[0.85rem] font-medium leading-relaxed opacity-75 mt-0.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-500'}`}>{app[lang]?.desc || ''}</p>
-                )}
+                {isList && <p className={`text-[0.85rem] font-medium leading-relaxed opacity-75 mt-0.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-500'}`}>{app[lang]?.desc || ''}</p>}
               </div>
             </a>
             
@@ -719,19 +710,19 @@
                 <button onClick={(e) => togglePin(e, app.id)} className={`p-2.5 rounded-xl transition-colors ${isPinned ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/30' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}><i className={`ph-fill ph-star text-[1.1rem] sm:text-lg ${isPinned ? 'drop-shadow-sm' : ''}`}></i></button>
                 <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(20); setQrApp(app); }} className="p-2.5 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-bold ph-qr-code text-[1.1rem] sm:text-lg"></i></button>
                 {isAdmin && !isPinnedSection && (
-                  <div className="flex items-center gap-0.5 sm:gap-1 pl-2 sm:pl-3 border-l border-slate-200 dark:border-slate-700">
-                    <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-pencil-simple text-base sm:text-lg"></i></button>
-                    <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-trash text-base sm:text-lg"></i></button>
+                  <div className="hidden sm:flex items-center gap-1 pl-3 border-l border-slate-200 dark:border-slate-700">
+                    <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-pencil-simple text-lg"></i></button>
+                    <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-trash text-lg"></i></button>
                   </div>
                 )}
               </div>
             )}
 
-            {/* 网格模式下仅显示极为微小的管理员编辑按钮 (避免阻挡图标) */}
+            {/* 网格模式下管理员编辑按钮（手机常显，电脑悬停） */}
             {!isList && isAdmin && !isPinnedSection && (
-              <div className={`flex absolute top-1 right-1 items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 p-1 rounded-xl z-20 shadow-sm backdrop-blur-xl ${isDarkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-slate-100'}`}>
-                <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-1 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors"><i className="ph-fill ph-pencil-simple text-sm"></i></button>
-                <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} className="p-1 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition-colors"><i className="ph-fill ph-trash text-sm"></i></button>
+              <div className={`flex absolute -top-1 -right-1 sm:top-1 sm:right-1 items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 p-1 rounded-xl z-20 shadow-sm backdrop-blur-xl ${isDarkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-slate-100'}`}>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors"><i className="ph-fill ph-pencil-simple text-[1rem] sm:text-sm"></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(40); setAppToDelete(app.id); }} className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition-colors"><i className="ph-fill ph-trash text-[1rem] sm:text-sm"></i></button>
               </div>
             )}
           </div>
@@ -782,7 +773,7 @@
           )}
 
           <header className={`sticky top-0 z-40 pt-safe-top transition-all duration-300 ${(announcement.active && (announcement[lang] || announcement.zh)) || isOffline ? 'pt-16 sm:pt-20' : ''}`}>
-            <div className={`backdrop-blur-2xl border-b transition-colors duration-500 ${isDarkMode ? 'bg-[#090E17]/70 border-slate-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' : 'bg-white/60 border-slate-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]'}`}>
+            <div className={`backdrop-blur-2xl border-b transition-colors duration-500 ${isDarkMode ? 'bg-slate-900/80 border-slate-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' : 'bg-white/60 border-slate-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]'}`}>
               <div className="max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
                 <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                   <div className="flex items-center gap-4 select-none transition-transform cursor-pointer group" onClick={handleLogoClick}>
@@ -793,7 +784,6 @@
                       <h1 className={`text-xl sm:text-[1.6rem] font-extrabold tracking-tight leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{lang === 'zh' ? '新廊华小' : 'SJK (C) Ladang Grisek'}</h1>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap sm:flex-nowrap">
                         <p className="text-[0.8rem] font-bold text-blue-500 flex items-center gap-1 uppercase tracking-widest opacity-90 shrink-0">{currentT.appTitle}</p>
-                        {/* 🔥 添加了 whitespace-nowrap 防断行，并引入无断行时间显示 */}
                         <span className={`text-[0.65rem] sm:text-[0.8rem] font-medium inline-block px-1.5 sm:px-2 border-l border-slate-300 dark:border-slate-600 whitespace-nowrap ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{currentDateTimeStr}</span>
                         {isSyncing && !isOffline && <i className="ph-bold ph-arrows-clockwise text-blue-400 animate-spin text-[0.7rem]" title="后台同步中"></i>}
                       </div>
@@ -876,26 +866,25 @@
             )}
 
             {schoolEvent.active && eventStatus && activeTab === 'all' && !searchQuery && (
-              <div className={`mb-6 sm:mb-10 p-4 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border overflow-hidden relative shadow-sm sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-waterfall ${isDarkMode ? 'bg-slate-800/50 backdrop-blur-2xl border-slate-700' : 'bg-white/60 backdrop-blur-2xl border-slate-100 shadow-[inset_0_1px_1px_rgba(255,255,255,1)]'}`}>
-                <div className={`absolute -right-10 -top-10 w-48 h-48 rounded-full blur-[80px] opacity-30 pointer-events-none ${isDarkMode ? 'bg-blue-600' : 'bg-blue-400'}`}></div>
+              <div className={`mb-8 sm:mb-10 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border overflow-hidden relative shadow-sm sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-waterfall ${isDarkMode ? 'bg-slate-800/50 backdrop-blur-2xl border-slate-700' : 'bg-white/60 backdrop-blur-2xl border-slate-100 sm:shadow-[inset_0_1px_1px_rgba(255,255,255,1)]'}`}>
+                <div className={`absolute -right-10 -top-10 w-32 h-32 sm:w-48 sm:h-48 rounded-full blur-[60px] sm:blur-[80px] opacity-30 pointer-events-none ${isDarkMode ? 'bg-blue-600' : 'bg-blue-400'}`}></div>
                 <div className="flex flex-row items-center justify-between gap-3 sm:gap-6 relative z-10">
-                  <div className="flex items-center gap-3 sm:gap-5 flex-1 min-w-0 text-left">
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-[1rem] sm:rounded-[1.2rem] flex items-center justify-center shrink-0 border shadow-inner ${isDarkMode ? 'bg-slate-700 text-blue-400 border-slate-600' : 'bg-gradient-to-br from-white to-blue-50 text-blue-600 border-blue-100'}`}><i className="ph-bold ph-calendar-star text-2xl sm:text-[2rem]"></i></div>
+                  <div className="flex items-center gap-3 sm:gap-5 w-auto text-left">
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.2rem] flex items-center justify-center shrink-0 border shadow-inner ${isDarkMode ? 'bg-slate-700 text-blue-400 border-slate-600' : 'bg-gradient-to-br from-white to-blue-50 text-blue-600 border-blue-100'}`}><i className="ph-bold ph-calendar-star text-2xl sm:text-[2rem]"></i></div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-[0.65rem] sm:text-[0.8rem] font-bold tracking-widest uppercase mb-0.5 sm:mb-1.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{currentT.countdown}</p>
-                      <h3 className={`text-base sm:text-[1.7rem] font-extrabold tracking-tight leading-tight mb-0.5 sm:mb-1 truncate sm:whitespace-normal ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{schoolEvent[lang] || schoolEvent.zh}</h3>
-                      <p className={`text-[0.75rem] sm:text-[0.9rem] font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{schoolEvent.date}</p>
+                      <h3 className={`text-base sm:text-[1.7rem] font-extrabold tracking-tight leading-tight truncate sm:mb-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{schoolEvent[lang] || schoolEvent.zh}</h3>
+                      <p className={`hidden sm:block text-[0.9rem] font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{schoolEvent.date}</p>
                     </div>
                   </div>
-                  <div className={`text-center px-4 py-2.5 sm:px-10 sm:py-4 rounded-xl sm:rounded-[1.5rem] border min-w-[75px] sm:min-w-[140px] shadow-inner shrink-0 ${isDarkMode ? 'bg-slate-900/80 border-slate-700/80' : 'bg-slate-50/80 border-slate-200/60'}`}>
-                    <span className={`block text-2xl sm:text-5xl font-black tabular-nums tracking-tighter ${eventStatus.color}`}><AnimatedNumber value={eventStatus.num}/></span>
-                    <span className={`block text-[0.65rem] sm:text-[0.85rem] font-bold mt-0.5 sm:mt-1.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{eventStatus.text}</span>
+                  <div className={`text-center px-4 sm:px-10 py-2 sm:py-4 rounded-xl sm:rounded-[1.5rem] border min-w-[70px] sm:min-w-[140px] shadow-inner shrink-0 ${isDarkMode ? 'bg-slate-900/80 border-slate-700/80' : 'bg-slate-50/80 border-slate-200/60'}`}>
+                    <span className={`block text-2xl sm:text-5xl font-black tabular-nums tracking-tighter leading-none ${eventStatus.color}`}><AnimatedNumber value={eventStatus.num}/></span>
+                    <span className={`block text-[0.6rem] sm:text-[0.85rem] font-bold mt-1 sm:mt-1.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{eventStatus.text}</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 🔥 改进的骨架屏 - 响应式匹配 3 / 4 / 6 / 8 列网格 */}
             {loading ? (
               <div className={`gap-3 sm:gap-4 lg:gap-5 animate-pulse ${viewMode === 'list' ? 'flex flex-col' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8'}`}>
                 {[1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
@@ -925,7 +914,6 @@
                       <h2 className="text-lg sm:text-[1.35rem] font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-magnifying-glass text-blue-500"></i> {currentT.searchResults}</h2>
                       <span className={`text-xs font-bold px-3 py-1 rounded-full ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}>{filteredApps.length} Results</span>
                     </div>
-                    {/* 🔥 改进的网格包装器 (3-8列自适应) */}
                     <div className={`${viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 lg:gap-5'}`}>{filteredApps.map((app, index) => renderAppCard(app, index, false, true))}</div>
                   </section>
                 ) : (
@@ -967,7 +955,7 @@
           )}
           {isFabOpen && <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[80] sm:hidden" onClick={() => setIsFabOpen(false)}></div>}
 
-          <footer className={`mt-auto border-t py-12 px-4 ${isDarkMode ? 'border-slate-800 bg-[#090E17]' : 'border-slate-200 bg-white'}`}>
+          <footer className={`mt-auto border-t py-12 px-4 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}>
             <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-8">
               <div className="flex items-center gap-3 select-none opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
                 <img src="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png" alt="Logo" className="w-9 h-9" />
@@ -992,6 +980,7 @@
             </div>
           </footer>
 
+          {/* 🔥 改进的 QR 码弹窗 - 包含一键复制功能 */}
           {qrApp && (
             <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setQrApp(null)}>
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center relative animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`} onClick={e => e.stopPropagation()}>
@@ -1000,9 +989,19 @@
                   {renderIcon(qrApp.icon, true)}
                 </div>
                 <h2 className="text-xl font-extrabold tracking-tight text-center mb-2 leading-tight px-4">{qrApp.zh?.title || currentT.qrTitle}</h2>
-                <p className="text-[0.85rem] text-center font-medium mb-8 opacity-70">{currentT.qrDesc}</p>
-                <div className="p-5 bg-white rounded-3xl shadow-inner border border-slate-100"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrApp.url)}&margin=0`} alt="QR" className="w-52 h-52 object-contain mix-blend-multiply" /></div>
-                <div className={`mt-8 w-full py-4 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm border shadow-inner ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}><i className="ph-bold ph-link text-lg text-blue-500"></i><span className="truncate max-w-[200px]">{qrApp.url.replace(/^https?:\/\//,'')}</span></div>
+                <div className="p-5 bg-white rounded-3xl shadow-inner border border-slate-100 mt-4"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrApp.url)}&margin=0`} alt="QR" className="w-52 h-52 object-contain mix-blend-multiply" /></div>
+                
+                {/* 带有一键复制按钮的链接栏 */}
+                <div className={`mt-8 w-full p-2 rounded-2xl flex items-center justify-between font-bold text-sm border shadow-inner ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="flex items-center gap-2 overflow-hidden px-3 text-blue-500">
+                    <i className="ph-bold ph-link text-lg shrink-0"></i>
+                    <span className="truncate">{qrApp.url.replace(/^https?:\/\//,'')}</span>
+                  </div>
+                  <button onClick={() => handleCopyUrl(qrApp.url)} className={`shrink-0 p-2.5 rounded-xl transition-all active:scale-90 ${isDarkMode ? 'bg-slate-800 text-blue-400 hover:bg-slate-700 border border-slate-700' : 'bg-white text-blue-600 shadow-sm border border-slate-200 hover:bg-blue-50'}`} title="一键复制链接">
+                    <i className="ph-bold ph-copy text-lg"></i>
+                  </button>
+                </div>
+
               </div>
             </div>
           )}
