@@ -32,20 +32,8 @@
   <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-  <!-- PWA Dynamic Manifest (Android/PWA 桌面图标) - 使用校徽 -->
-  <script>
-    const manifest = {
-      name: "SJK(C) Ladang Grisek Staff Portal", 
-      short_name: "新廊 LG", 
-      start_url: ".", 
-      display: "standalone",
-      background_color: "#f8fafc", 
-      theme_color: "#2563eb",
-      icons: [{ src: "https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png", sizes: "192x192 512x512", type: "image/png", purpose: "any maskable" }]
-    };
-    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-    document.write(`<link rel="manifest" href="${URL.createObjectURL(blob)}">`);
-  </script>
+  <!-- Static manifest: required for dependable installed-PWA behaviour. -->
+  <link rel="manifest" href="./manifest.webmanifest">
 
   <!-- Import Map -->
   <script type="importmap">
@@ -86,6 +74,14 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.65);
+      outline-offset: 3px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-500 flex flex-col min-h-screen">
@@ -108,16 +104,16 @@
     // 🔴 步骤1: 请在这里填入您在 Google Apps Script 部署后得到的 Web App URL
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbypof7i8UG4x4GxEaT5Mw5u_WPtvJHTT9FYnX0lGtgklahugJtfaRtPipKGc9jxrLrP/exec";
 
-    // 🔴 步骤2: 隐藏的管理员密码
-    const ADMIN_PIN = "8888"; 
+    // The server owns credential checks and must validate this short-lived token for
+    // every write action. Never place an administrator PIN in this client.
+    const getAdminToken = () => sessionStorage.getItem('sjkc_admin_token') || '';
 
-    // 真正的去中心化请求 (无本地 Mock 数据)
     const apiRequest = async (action, data = {}) => {
       try {
         const response = await fetch(GAS_API_URL, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" }, 
-          body: JSON.stringify({ action, data })
+          body: JSON.stringify({ action, data, token: getAdminToken() })
         });
         const result = await response.json();
         if (result.status === 'success') return result.data;
@@ -130,6 +126,7 @@
 
     const server = {
       getInitialData: () => apiRequest('getInitialData', {}),
+      authenticateAdmin: (pin) => apiRequest('authenticateAdmin', { pin }),
       saveApp: (data) => apiRequest('saveApp', data),
       deleteApp: (id) => apiRequest('deleteApp', { id }),
       recordClick: (id) => apiRequest('recordClick', { id }),
@@ -285,23 +282,56 @@
       return isDarkMode ? ['bg-indigo-900/10', 'bg-blue-900/10'] : ['bg-indigo-400/20', 'bg-blue-400/20'];
     };
 
+    const useModalKeyboard = (isOpen, onClose) => {
+      useEffect(() => {
+        if (!isOpen) return;
+        const previousFocus = document.activeElement;
+        const timer = setTimeout(() => {
+          const dialog = document.querySelector('[role="dialog"]');
+          dialog?.querySelector('input, button, select, textarea, [tabindex]:not([tabindex="-1"])')?.focus();
+        }, 0);
+        const handleKeyDown = (event) => {
+          if (event.key === 'Escape') { event.preventDefault(); onClose(); return; }
+          if (event.key !== 'Tab') return;
+          const dialog = document.querySelector('[role="dialog"]');
+          const focusable = [...(dialog?.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') || [])];
+          if (!focusable.length) return;
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => { clearTimeout(timer); document.removeEventListener('keydown', handleKeyDown); previousFocus?.focus?.(); };
+      }, [isOpen]);
+    };
+
     function App() {
       const [isAdmin, setIsAdmin] = useState(() => {
-        try { return localStorage.getItem('sjkc_superapp_admin') === 'true'; } catch { return false; }
+        try { return !!getAdminToken() && Number(sessionStorage.getItem('sjkc_admin_expires_at')) > Date.now(); } catch { return false; }
       });
-      useEffect(() => {
-         if(isAdmin) localStorage.setItem('sjkc_superapp_admin', 'true');
-         else localStorage.removeItem('sjkc_superapp_admin');
-      }, [isAdmin]);
 
       const [clickCount, setClickCount] = useState(0);
       const clickTimeoutRef = useRef(null);
       const [showPinModal, setShowPinModal] = useState(false);
       const [pinInput, setPinInput] = useState('');
       const [pinError, setPinError] = useState(false);
+      const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+      const endAdminSession = () => {
+        sessionStorage.removeItem('sjkc_admin_token');
+        sessionStorage.removeItem('sjkc_admin_expires_at');
+        setIsAdmin(false);
+      };
+
+      useEffect(() => {
+        if (!isAdmin) return;
+        const expiresAt = Number(sessionStorage.getItem('sjkc_admin_expires_at'));
+        const timer = setTimeout(endAdminSession, Math.max(0, expiresAt - Date.now()));
+        return () => clearTimeout(timer);
+      }, [isAdmin]);
 
       const handleLogoClick = () => {
-        if (isAdmin) { setIsAdmin(false); return; }
+        if (isAdmin) { endAdminSession(); return; }
         setClickCount(prev => prev + 1);
         if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
         clickTimeoutRef.current = setTimeout(() => setClickCount(0), 1000);
@@ -309,10 +339,18 @@
 
       useEffect(() => { if (clickCount >= 5) { setShowPinModal(true); setClickCount(0); } }, [clickCount]);
 
-      const handlePinSubmit = (e) => {
+      const handlePinSubmit = async (e) => {
         e.preventDefault();
-        if (pinInput === ADMIN_PIN) { setIsAdmin(true); setShowPinModal(false); setPinInput(''); setPinError(false); vibrate(50);} 
-        else { setPinError(true); setPinInput(''); vibrate([30,50,30]);}
+        setIsAuthenticating(true);
+        try {
+          const session = await server.authenticateAdmin(pinInput);
+          if (!session?.token || !session?.expiresAt) throw new Error('Invalid session response');
+          sessionStorage.setItem('sjkc_admin_token', session.token);
+          sessionStorage.setItem('sjkc_admin_expires_at', String(new Date(session.expiresAt).getTime()));
+          setIsAdmin(true); setShowPinModal(false); setPinInput(''); setPinError(false); vibrate(50);
+        } catch (error) {
+          setPinError(true); setPinInput(''); vibrate([30,50,30]);
+        } finally { setIsAuthenticating(false); }
       };
 
       const [apps, setApps] = useState([]);
@@ -320,9 +358,16 @@
       const [schoolEvent, setSchoolEvent] = useState({ active: false, zh: '', ms: '', date: '' });
       const [loading, setLoading] = useState(true);
       const [isSyncing, setIsSyncing] = useState(false);
+      const [syncError, setSyncError] = useState('');
+      const [lastSyncedAt, setLastSyncedAt] = useState(() => localStorage.getItem('sjkc_last_synced_at') || '');
+      const [refreshNonce, setRefreshNonce] = useState(0);
       
-      const [lang, setLang] = useState('zh');
-      const [isDarkMode, setIsDarkMode] = useState(false);
+      const [lang, setLang] = useState(() => {
+        try { return localStorage.getItem('sjkc_language') || 'zh'; } catch { return 'zh'; }
+      });
+      const [isDarkMode, setIsDarkMode] = useState(() => {
+        try { return localStorage.getItem('sjkc_dark_mode') === 'true'; } catch { return false; }
+      });
       const [searchQuery, setSearchQuery] = useState('');
       const [activeTab, setActiveTab] = useState('all');
       
@@ -335,7 +380,7 @@
 
       const [isOffline, setIsOffline] = useState(!navigator.onLine);
       useEffect(() => {
-        const handleOnline = () => { setIsOffline(false); setIsSyncing(true); server.getInitialData().then(() => setIsSyncing(false)).catch(()=>{setIsSyncing(false);}); };
+        const handleOnline = () => setIsOffline(false);
         const handleOffline = () => setIsOffline(true);
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
@@ -386,6 +431,11 @@
 
       const currentT = t[lang];
 
+      useEffect(() => {
+        document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'ms';
+        localStorage.setItem('sjkc_language', lang);
+      }, [lang]);
+
       const searchInputRef = useRef(null);
       const [isSearchFocused, setIsSearchFocused] = useState(false);
       const [kbIndex, setKbIndex] = useState(-1);
@@ -426,6 +476,7 @@
       useEffect(() => {
         if (isDarkMode) document.documentElement.classList.add('dark');
         else document.documentElement.classList.remove('dark');
+        localStorage.setItem('sjkc_dark_mode', String(isDarkMode));
       }, [isDarkMode]);
 
       useEffect(() => {
@@ -443,6 +494,8 @@
         }
 
         if (!isOffline) {
+          setIsSyncing(true);
+          setSyncError('');
           server.getInitialData().then(res => {
             let loadedApps = res.apps || [];
             loadedApps.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -456,9 +509,13 @@
             }
             setLoading(false); setIsSyncing(false);
             localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps: loadedApps, settings: res.settings }));
+            const syncedAt = new Date().toISOString();
+            setLastSyncedAt(syncedAt);
+            localStorage.setItem('sjkc_last_synced_at', syncedAt);
           }).catch(err => {
             console.error("无法连接到云端数据库:", err);
             setLoading(false); setIsSyncing(false);
+            setSyncError(lang === 'zh' ? '无法连接云端，正在显示上次保存的内容。' : 'Unable to reach the cloud. Showing your last saved content.');
           });
         }
 
@@ -466,8 +523,14 @@
         if (isIosDevice && !window.navigator.standalone && !localStorage.getItem('sjkc_pwa_ios')) {
           setIsIOS(true); setShowInstallPrompt(true);
         }
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); setDeferredPrompt(e); setShowInstallPrompt(true); });
-      }, [isOffline]);
+        const handleBeforeInstallPrompt = (e) => { e.preventDefault(); setDeferredPrompt(e); setShowInstallPrompt(true); };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      }, [isOffline, refreshNonce]);
+
+      useEffect(() => {
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(error => console.warn('Service worker registration failed:', error));
+      }, []);
 
       const handleInstallClick = async () => {
         if (deferredPrompt) {
@@ -534,7 +597,7 @@
       const ConfirmModal = ({ isOpen, onClose, onConfirm, title, desc }) => {
         if (!isOpen) return null;
         return (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose}>
+          <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose}>
             <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'}`} onClick={e=>e.stopPropagation()}>
               <div className="w-16 h-16 rounded-[1.5rem] bg-rose-500/10 text-rose-500 flex items-center justify-center mb-6 shadow-inner"><i className="ph-fill ph-trash text-3xl"></i></div>
               <h3 className={`text-[1.35rem] font-extrabold tracking-tight mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
@@ -549,6 +612,16 @@
       };
       
       const [appToDelete, setAppToDelete] = useState(null);
+      const isAnyModalOpen = showPinModal || isAppModalOpen || isAnnModalOpen || isEventModalOpen || isDataModalOpen || !!qrApp || !!appToDelete;
+      useModalKeyboard(isAnyModalOpen, () => {
+        if (showPinModal) setShowPinModal(false);
+        else if (appToDelete) setAppToDelete(null);
+        else if (qrApp) setQrApp(null);
+        else if (isAppModalOpen) setIsAppModalOpen(false);
+        else if (isAnnModalOpen) setIsAnnModalOpen(false);
+        else if (isEventModalOpen) setIsEventModalOpen(false);
+        else if (isDataModalOpen) setIsDataModalOpen(false);
+      });
       const handleDeleteConfirm = async () => {
         if (appToDelete) {
           setApps(apps.filter(a => a.id !== appToDelete));
@@ -596,17 +669,29 @@
         const newId = editingApp ? editingApp.id : Date.now().toString();
         const appData = { ...formData, id: newId, order: editingApp ? editingApp.order : apps.filter(a => a.category === formData.category).length, clicks: editingApp ? editingApp.clicks : 0, createdAt: editingApp ? editingApp.createdAt : Date.now() };
         const frontendApp = { ...appData, zh: { title: appData.zhTitle, desc: appData.zhDesc }, ms: { title: appData.msTitle, desc: appData.msDesc } };
-        
-        setApps(editingApp ? apps.map(a => a.id === newId ? frontendApp : a) : [...apps, frontendApp]);
-        setIsAppModalOpen(false); setIsFabOpen(false);
-        if(!isOffline) await server.saveApp(appData);
-        setIsSaving(false); showToast(isOffline ? '保存至本地缓存，联网后同步' : currentT.toastSaved, isOffline ? 'error' : 'success');
+        try {
+          if(!isOffline) await server.saveApp(appData);
+          const nextApps = editingApp ? apps.map(a => a.id === newId ? frontendApp : a) : [...apps, frontendApp];
+          setApps(nextApps);
+          localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps: nextApps, settings: { announcement, event: schoolEvent } }));
+          setIsAppModalOpen(false); setIsFabOpen(false);
+          showToast(currentT.toastSaved, 'success');
+        } catch (error) {
+          console.error('Unable to save app:', error);
+          showToast(lang === 'zh' ? '保存失败，请检查网络后重试。' : 'Save failed. Check your connection and try again.', 'error');
+        } finally { setIsSaving(false); }
       };
 
       const handleSaveSetting = async (e, type, data, setModal) => {
-        e.preventDefault(); setIsSaving(true); setModal(false); setIsFabOpen(false);
-        if(!isOffline) await server.saveSettings(type, data);
-        setIsSaving(false); showToast(isOffline ? '保存至本地缓存，联网后同步' : currentT.toastSaved, isOffline ? 'error' : 'success');
+        e.preventDefault(); setIsSaving(true);
+        try {
+          if(!isOffline) await server.saveSettings(type, data);
+          localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps, settings: { announcement, event: schoolEvent } }));
+          setModal(false); setIsFabOpen(false); showToast(currentT.toastSaved, 'success');
+        } catch (error) {
+          console.error('Unable to save setting:', error);
+          showToast(lang === 'zh' ? '保存失败，请检查网络后重试。' : 'Save failed. Check your connection and try again.', 'error');
+        } finally { setIsSaving(false); }
       };
 
       const handleExportCSV = () => {
@@ -688,7 +773,7 @@
               ${isList && !isKeyboardFocused && 'hover:scale-[1.01] active:scale-[0.99]'}`}
             style={{ animationDelay: `${index * 30}ms` }}
           >
-            <a href={app.url} target="_blank" rel="noopener noreferrer" onClick={(e) => handleAppClick(e, app)} className={`flex-1 flex cursor-pointer z-10 no-underline w-full ${isList ? 'flex-row items-center gap-4 sm:gap-5 pr-10 sm:pr-0' : 'flex-col items-center justify-start gap-2 sm:gap-3'}`}>
+            <a href={app.url} target="_blank" rel="noopener noreferrer" aria-label={`${app[lang]?.title || 'App'} — ${app[lang]?.desc || 'Open app'} (opens in a new tab)`} onClick={(e) => handleAppClick(e, app)} className={`flex-1 flex cursor-pointer z-10 no-underline w-full ${isList ? 'flex-row items-center gap-4 sm:gap-5 pr-10 sm:pr-0' : 'flex-col items-center justify-start gap-2 sm:gap-3'}`}>
               <div className={`${isList ? 'w-12 h-12 rounded-[0.9rem]' : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl'} flex items-center justify-center relative shadow-sm transition-transform duration-300 group-hover:scale-105 group-active:scale-95 shrink-0
                 ${isDarkMode ? 'bg-gradient-to-b from-slate-700 to-slate-800 border border-slate-600 text-blue-400 group-hover:border-blue-500 group-hover:text-blue-300 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'bg-gradient-to-b from-white to-blue-50/50 border border-blue-100/50 text-blue-600 group-hover:border-blue-200 group-hover:shadow-blue-500/20'}`}>
                 {renderIcon(app.icon, isList)}
@@ -707,12 +792,12 @@
             {/* 列表模式下的控制区 (包含置顶和QR) */}
             {isList && (
               <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <button onClick={(e) => togglePin(e, app.id)} className={`p-2.5 rounded-xl transition-colors ${isPinned ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/30' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}><i className={`ph-fill ph-star text-[1.1rem] sm:text-lg ${isPinned ? 'drop-shadow-sm' : ''}`}></i></button>
-                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(20); setQrApp(app); }} className="p-2.5 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-bold ph-qr-code text-[1.1rem] sm:text-lg"></i></button>
+                <button onClick={(e) => togglePin(e, app.id)} aria-label={isPinned ? `Remove ${app[lang]?.title || 'app'} from pinned` : `Pin ${app[lang]?.title || 'app'}`} aria-pressed={isPinned} className={`p-2.5 rounded-xl transition-colors ${isPinned ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/30' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}><i aria-hidden="true" className={`ph-fill ph-star text-[1.1rem] sm:text-lg ${isPinned ? 'drop-shadow-sm' : ''}`}></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(20); setQrApp(app); }} aria-label={`Show QR code for ${app[lang]?.title || 'app'}`} className="p-2.5 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-bold ph-qr-code text-[1.1rem] sm:text-lg"></i></button>
                 {isAdmin && !isPinnedSection && (
                   <div className="hidden sm:flex items-center gap-1 pl-3 border-l border-slate-200 dark:border-slate-700">
-                    <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-pencil-simple text-lg"></i></button>
-                    <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"><i className="ph-fill ph-trash text-lg"></i></button>
+                    <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} aria-label={`Edit ${app[lang]?.title || 'app'}`} className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-fill ph-pencil-simple text-lg"></i></button>
+                    <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} aria-label={`Delete ${app[lang]?.title || 'app'}`} className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-fill ph-trash text-lg"></i></button>
                   </div>
                 )}
               </div>
@@ -721,8 +806,8 @@
             {/* 网格模式下管理员编辑按钮（手机常显，电脑悬停） */}
             {!isList && isAdmin && !isPinnedSection && (
               <div className={`flex absolute -top-1 -right-1 sm:top-1 sm:right-1 items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 p-1 rounded-xl z-20 shadow-sm backdrop-blur-xl ${isDarkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-slate-100'}`}>
-                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors"><i className="ph-fill ph-pencil-simple text-[1rem] sm:text-sm"></i></button>
-                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(40); setAppToDelete(app.id); }} className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition-colors"><i className="ph-fill ph-trash text-[1rem] sm:text-sm"></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} aria-label={`Edit ${app[lang]?.title || 'app'}`} className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors"><i aria-hidden="true" className="ph-fill ph-pencil-simple text-[1rem] sm:text-sm"></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(40); setAppToDelete(app.id); }} aria-label={`Delete ${app[lang]?.title || 'app'}`} className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition-colors"><i aria-hidden="true" className="ph-fill ph-trash text-[1rem] sm:text-sm"></i></button>
               </div>
             )}
           </div>
@@ -736,16 +821,16 @@
 
           {/* 隐藏的管理员密码输入框 */}
           {showPinModal && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all animate-in fade-in">
+            <div role="dialog" aria-modal="true" aria-label={currentT.pinTitle} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all animate-in fade-in">
               <div className={`rounded-[2rem] shadow-2xl w-full max-w-sm p-8 animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-slate-800 border border-slate-700 text-white' : 'bg-white border border-slate-100 text-slate-800'}`}>
                 <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500"><i className="ph-bold ph-lock-key text-[2rem]"></i></div>
                 <h2 className="text-xl font-extrabold text-center mb-6">{currentT.pinTitle}</h2>
                 <form onSubmit={handlePinSubmit}>
-                  <input type="password" autoFocus required value={pinInput} onChange={e => {setPinInput(e.target.value); setPinError(false);}} className={`w-full text-center tracking-[0.8em] text-2xl font-black border-2 rounded-2xl py-4 focus:outline-none transition-all ${pinError ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : isDarkMode ? 'bg-slate-900/50 border-slate-700 focus:border-blue-500 text-white' : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white shadow-inner'}`} placeholder={currentT.pinPlaceholder} maxLength={4} />
-                  {pinError && <p className="text-rose-500 text-[0.85rem] text-center mt-3 font-bold animate-bounce">{currentT.pinError}</p>}
+                  <input type="password" autoFocus required value={pinInput} onChange={e => {setPinInput(e.target.value); setPinError(false);}} aria-describedby={pinError ? 'admin-pin-error' : undefined} className={`w-full text-center tracking-[0.8em] text-2xl font-black border-2 rounded-2xl py-4 focus:outline-none transition-all ${pinError ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : isDarkMode ? 'bg-slate-900/50 border-slate-700 focus:border-blue-500 text-white' : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white shadow-inner'}`} placeholder={currentT.pinPlaceholder} maxLength={4} />
+                  {pinError && <p id="admin-pin-error" role="alert" className="text-rose-500 text-[0.85rem] text-center mt-3 font-bold animate-bounce">{currentT.pinError}</p>}
                   <div className="flex gap-3 mt-8">
-                    <button type="button" onClick={() => {setShowPinModal(false); setPinError(false); setPinInput('');}} className={`flex-1 py-3.5 font-bold rounded-xl transition-colors ${isDarkMode ? 'bg-slate-700/50 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>{currentT.cancel}</button>
-                    <button type="submit" className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all">{currentT.unlock}</button>
+                    <button type="button" disabled={isAuthenticating} onClick={() => {setShowPinModal(false); setPinError(false); setPinInput('');}} className={`flex-1 py-3.5 font-bold rounded-xl transition-colors ${isDarkMode ? 'bg-slate-700/50 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>{currentT.cancel}</button>
+                    <button type="submit" disabled={isAuthenticating} className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-60">{isAuthenticating ? <i className="ph-bold ph-spinner ph-spin text-xl" aria-label="Signing in"></i> : currentT.unlock}</button>
                   </div>
                 </form>
               </div>
@@ -786,14 +871,15 @@
                         <p className="text-[0.8rem] font-bold text-blue-500 flex items-center gap-1 uppercase tracking-widest opacity-90 shrink-0">{currentT.appTitle}</p>
                         <span className={`text-[0.65rem] sm:text-[0.8rem] font-medium inline-block px-1.5 sm:px-2 border-l border-slate-300 dark:border-slate-600 whitespace-nowrap ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{currentDateTimeStr}</span>
                         {isSyncing && !isOffline && <i className="ph-bold ph-arrows-clockwise text-blue-400 animate-spin text-[0.7rem]" title="后台同步中"></i>}
+                        {!isSyncing && lastSyncedAt && <span className={`hidden lg:inline text-[0.7rem] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} title={new Date(lastSyncedAt).toLocaleString()}>{lang === 'zh' ? '已同步' : 'Synced'}</span>}
                       </div>
                     </div>
                   </div>
 
                   <div className="sm:hidden flex gap-1.5">
-                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className={`w-9 h-9 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400' : 'bg-white/80 border-slate-200 text-blue-600'}`}><i className={`ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
-                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} className={`w-9 h-9 rounded-full font-bold text-[0.8rem] border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white/80 border-slate-200 text-slate-600'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
-                    <button onClick={() => { vibrate(20); setIsDarkMode(!isDarkMode); }} className={`w-9 h-9 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400' : 'bg-white/80 border-slate-200 text-slate-600'}`}><i className={isDarkMode ? "ph-fill ph-moon text-lg" : "ph-fill ph-sun text-lg"}></i></button>
+                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400' : 'bg-white/80 border-slate-200 text-blue-600'}`}><i aria-hidden="true" className={`ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
+                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} aria-label={`Switch to ${lang === 'zh' ? 'Bahasa Melayu' : 'Chinese'}`} className={`w-11 h-11 rounded-full font-bold text-[0.8rem] border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white/80 border-slate-200 text-slate-600'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
+                    <button onClick={() => { vibrate(20); setIsDarkMode(!isDarkMode); }} aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`} aria-pressed={isDarkMode} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400' : 'bg-white/80 border-slate-200 text-slate-600'}`}><i aria-hidden="true" className={isDarkMode ? "ph-fill ph-moon text-lg" : "ph-fill ph-sun text-lg"}></i></button>
                   </div>
                 </div>
 
@@ -815,27 +901,28 @@
                     <input 
                       ref={searchInputRef} type="text" placeholder={currentT.searchPlaceholder} value={searchQuery} 
                       onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} onBlur={() => setIsSearchFocused(false)}
+                      aria-label={currentT.searchPlaceholder}
                       className={`w-full pl-11 pr-12 py-2.5 rounded-full text-[0.95rem] outline-none font-medium appearance-none transition-all shadow-inner focus:ring-4 focus:ring-blue-500/15 ${isDarkMode ? 'bg-slate-900/80 border border-slate-700/50 text-white placeholder-slate-500 focus:border-blue-500' : 'bg-slate-100 border border-slate-200/60 text-slate-800 focus:bg-white focus:border-blue-400'}`} 
                     />
-                    {searchQuery && <button onMouseDown={(e)=>{e.preventDefault(); setSearchQuery('');}} className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i className="ph-fill ph-x-circle"></i></button>}
+                    {searchQuery && <button onMouseDown={(e)=>{e.preventDefault(); setSearchQuery('');}} aria-label="Clear search" className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i aria-hidden="true" className="ph-fill ph-x-circle"></i></button>}
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 opacity-50 pointer-events-none">
                       <span className={`text-[0.6rem] font-bold border rounded px-1.5 py-0.5 ${isDarkMode ? 'border-slate-600 text-slate-300' : 'border-slate-300 text-slate-500'}`}>{shortcutKey}</span>
                     </div>
                   </div>
 
                   <div className="hidden sm:flex gap-2 shrink-0">
-                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-blue-600 hover:bg-white'}`} title="切换视图模式"><i className={`text-xl ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
-                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} className={`w-11 h-11 rounded-full font-bold text-sm border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
-                    <button onClick={() => setIsDarkMode(!isDarkMode)} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}><i className={`text-xl ph-fill ${isDarkMode ? "ph-moon" : "ph-sun"}`}></i></button>
+                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-blue-600 hover:bg-white'}`} title="切换视图模式"><i aria-hidden="true" className={`text-xl ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
+                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} aria-label={`Switch to ${lang === 'zh' ? 'Bahasa Melayu' : 'Chinese'}`} className={`w-11 h-11 rounded-full font-bold text-sm border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
+                    <button onClick={() => setIsDarkMode(!isDarkMode)} aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`} aria-pressed={isDarkMode} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}><i aria-hidden="true" className={`text-xl ph-fill ${isDarkMode ? "ph-moon" : "ph-sun"}`}></i></button>
                   </div>
                 </div>
               </div>
               
               {!searchQuery && (
                 <div className="w-full max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 pb-4 overflow-x-auto hide-scrollbar mt-1 animate-in fade-in duration-300">
-                  <div className="flex gap-2 sm:gap-3 w-max min-w-full">
+                  <div className="flex gap-2 sm:gap-3 w-max min-w-full" role="tablist" aria-label="Application categories">
                     {['all', 'pinned', 'admin', 'kurikulum', 'hem', 'koko', 'other'].map(tab => (
-                      <button key={tab} onClick={() => { vibrate(15); setActiveTab(tab); }} className={`px-6 py-2.5 rounded-full text-[0.9rem] font-bold whitespace-nowrap flex items-center gap-1.5 outline outline-1 outline-transparent transition-all duration-300 ${activeTab === tab ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20 outline-blue-500/50 scale-105' : isDarkMode ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'bg-slate-100/70 text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm'}`}>
+                      <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => { vibrate(15); setActiveTab(tab); }} className={`px-6 py-2.5 rounded-full text-[0.9rem] font-bold whitespace-nowrap flex items-center gap-1.5 outline outline-1 outline-transparent transition-all duration-300 ${activeTab === tab ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20 outline-blue-500/50 scale-105' : isDarkMode ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'bg-slate-100/70 text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm'}`}>
                         {tab === 'pinned' && <i className={`ph-fill ph-star ${activeTab === tab ? '' : 'text-amber-400'}`}></i>}
                         {currentT.tabs[tab]}
                       </button>
@@ -847,6 +934,12 @@
           </header>
 
           <main className={`flex-1 max-w-[80rem] w-full mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 pb-24 sm:pb-12 relative transition-all duration-500 ${isSearchFocused && searchQuery ? 'z-50' : 'z-10'}`}>
+            {syncError && !isOffline && (
+              <section role="alert" className={`mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border ${isDarkMode ? 'bg-rose-950/30 border-rose-900/60 text-rose-200' : 'bg-rose-50 border-rose-100 text-rose-800'}`}>
+                <div className="flex items-center gap-3 text-sm font-semibold"><i className="ph-fill ph-warning-circle text-xl shrink-0"></i><span>{syncError}</span></div>
+                <button onClick={() => setRefreshNonce(value => value + 1)} className="shrink-0 min-h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm active:scale-95 transition-transform">{lang === 'zh' ? '重新连接' : 'Retry'}</button>
+              </section>
+            )}
             
             {isAdmin && !searchQuery && (
               <div className={`hidden sm:flex mb-10 p-6 rounded-[1.5rem] border shadow-lg backdrop-blur-2xl animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-blue-900/10 border-blue-900/50' : 'bg-white/60 border-blue-100/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]'}`}>
@@ -856,9 +949,9 @@
                     <div><span className={`font-extrabold tracking-tight block text-lg ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>{currentT.adminActive}</span><span className="text-[0.85rem] opacity-70 flex items-center gap-1 mt-0.5 font-medium"><i className="ph-bold ph-arrows-out-line-vertical"></i> {activeTab === 'all' && viewMode === 'list' ? currentT.dragInfo : '在“全部”标签+列表视图下可拖拽排序'}</span></div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button onClick={() => setIsDataModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-purple-900/20 text-purple-400 border-purple-800/40 hover:bg-purple-900/40' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'}`}><i className="ph-fill ph-chart-pie-slice text-xl"></i> Data</button>
-                    <button onClick={() => setIsAnnModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-amber-900/20 text-amber-400 border-amber-800/40 hover:bg-amber-900/40' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'}`}><i className="ph-fill ph-megaphone text-xl"></i> Notis</button>
-                    <button onClick={() => setIsEventModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-emerald-900/20 text-emerald-400 border-emerald-800/40 hover:bg-emerald-900/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}><i className="ph-fill ph-calendar text-xl"></i> Event</button>
+                    <button onClick={() => setIsDataModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-purple-900/20 text-purple-400 border-purple-800/40 hover:bg-purple-900/40' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'}`}><i className="ph-fill ph-chart-pie-slice text-xl"></i> {lang === 'zh' ? '数据' : 'Data'}</button>
+                    <button onClick={() => setIsAnnModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-amber-900/20 text-amber-400 border-amber-800/40 hover:bg-amber-900/40' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'}`}><i className="ph-fill ph-megaphone text-xl"></i> {lang === 'zh' ? '通知' : 'Notis'}</button>
+                    <button onClick={() => setIsEventModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-emerald-900/20 text-emerald-400 border-emerald-800/40 hover:bg-emerald-900/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}><i className="ph-fill ph-calendar text-xl"></i> {lang === 'zh' ? '活动' : 'Event'}</button>
                     <button onClick={() => { setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); }} className="flex justify-center items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl shadow-lg shadow-blue-600/20 font-bold active:scale-95 transition-transform text-[0.95rem]"><i className="ph-bold ph-plus text-xl"></i> {currentT.addApp}</button>
                   </div>
                 </div>
@@ -902,6 +995,7 @@
               <div className={`text-center py-20 rounded-[2rem] border-2 border-dashed flex flex-col items-center justify-center animate-in fade-in ${isDarkMode ? 'bg-slate-800/20 border-slate-700/50' : 'bg-white/40 border-slate-200'}`}>
                 <i className="ph-fill ph-ghost text-[4rem] text-slate-400 mb-4 opacity-50"></i>
                 <h3 className="text-lg font-extrabold text-slate-500 mb-2">{searchQuery ? currentT.noResult : currentT.emptyState}</h3>
+                {searchQuery && <button onClick={() => setSearchQuery('')} className="mt-2 min-h-11 px-5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-transform">{lang === 'zh' ? '清除搜索' : 'Clear search'}</button>}
                 {isAdmin && !searchQuery && (
                   <button onClick={() => { setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); }} className="mt-4 px-5 py-2.5 rounded-full font-bold text-sm bg-blue-600 text-white shadow-lg active:scale-95 transition-transform flex items-center gap-2"><i className="ph-bold ph-plus"></i> {currentT.addApp}</button>
                 )}
@@ -982,7 +1076,7 @@
 
           {/* 🔥 改进的 QR 码弹窗 - 包含一键复制功能 */}
           {qrApp && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setQrApp(null)}>
+            <div role="dialog" aria-modal="true" aria-label="QR code" className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setQrApp(null)}>
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center relative animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`} onClick={e => e.stopPropagation()}>
                 <button onClick={() => setQrApp(null)} className={`absolute top-5 right-5 p-2 rounded-full ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}><i className="ph-bold ph-x text-lg"></i></button>
                 <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center mb-5 shadow-sm border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-blue-400' : 'bg-gradient-to-br from-white to-blue-50 border-blue-100 text-blue-600'}`}>
@@ -1007,7 +1101,7 @@
           )}
 
           {isDataModalOpen && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200 bottom-sheet">
+            <div role="dialog" aria-modal="true" aria-label="Analytics" className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200 bottom-sheet">
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-4xl p-6 sm:p-8 relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] ${isDarkMode ? 'bg-[#090E17] border border-slate-800' : 'bg-slate-50 border border-slate-200'}`}>
                 <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-6 sm:hidden shrink-0"></div>
                 <div className="flex justify-between items-center mb-6 shrink-0">
@@ -1073,7 +1167,7 @@
           <style>{`@media (max-width: 640px) { .bottom-sheet { align-items: flex-end !important; padding: 0 !important; } .bottom-sheet > div { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; max-height: 92vh; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; } @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } } }`}</style>
           
           {isAppModalOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+            <div role="dialog" aria-modal="true" aria-label={editingApp ? currentT.editApp : currentT.addApp} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-2xl p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 flex flex-col ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
                 <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden shrink-0"></div>
                 <div className="flex justify-between items-center mb-6 shrink-0"><h2 className="text-xl font-extrabold tracking-tight">{editingApp ? currentT.editApp : currentT.addApp}</h2><button onClick={() => setIsAppModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
@@ -1132,7 +1226,7 @@
           )}
 
           {isAnnModalOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+            <div role="dialog" aria-modal="true" aria-label={currentT.announcementSetup} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
                 <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden"></div>
                 <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-megaphone text-amber-500 text-2xl"></i> {currentT.announcementSetup}</h2><button onClick={() => setIsAnnModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
@@ -1149,7 +1243,7 @@
           )}
 
           {isEventModalOpen && (
-            <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+            <div role="dialog" aria-modal="true" aria-label={currentT.eventSetup} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
               <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
                 <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden"></div>
                 <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-calendar text-emerald-500 text-2xl"></i> {currentT.eventSetup}</h2><button onClick={() => setIsEventModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
@@ -1175,3 +1269,4 @@
   </script>
 </body>
 </html>
+
