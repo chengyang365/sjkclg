@@ -1,0 +1,16 @@
+{
+  "name": "SJK(C) Ladang Grisek Staff Portal",
+  "short_name": "新廊 LG",
+  "start_url": "./lg-app-center-optimized.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "icons": [{
+    "src": "https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png",
+    "sizes": "192x192 512x512",
+    "type": "image/png",
+    "purpose": "any maskable"
+  }]
+}
+
