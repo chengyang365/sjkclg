@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title desc">
+  <title id="title">MPT4 评估前准备流程图</title><desc id="desc">2026年10月5日 MPT4 评估前准备流程摘要。</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#f8fafc"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity=".1"/></filter></defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <g font-family="Arial,'Microsoft YaHei',sans-serif">
+    <text x="540" y="88" text-anchor="middle" font-size="28" font-weight="700" fill="#2563eb">新廊华小 · SJK (C) LADANG GRISEK</text>
+    <text x="540" y="155" text-anchor="middle" font-size="48" font-weight="900" fill="#0f172a">MPT4 评估前准备流程图</text>
+    <rect x="330" y="205" width="420" height="64" rx="32" fill="#2563eb"/><text x="540" y="247" text-anchor="middle" font-size="25" font-weight="700" fill="white">2026年10月5日 · 星期一</text>
+    <g filter="url(#s)"><rect x="90" y="335" width="900" height="155" rx="28" fill="white"/><circle cx="170" cy="412" r="45" fill="#dbeafe"/><text x="170" y="423" text-anchor="middle" font-size="30" font-weight="900" fill="#2563eb">1</text><text x="245" y="395" font-size="25" font-weight="900" fill="#2563eb">7:30 – 8:00 早上</text><text x="245" y="441" font-size="31" font-weight="800" fill="#0f172a">周会与 MPT4 简短说明</text></g>
+    <path d="M540 490v55" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <g filter="url(#s)"><rect x="90" y="545" width="900" height="155" rx="28" fill="white"/><circle cx="170" cy="622" r="45" fill="#dcfce7"/><text x="170" y="633" text-anchor="middle" font-size="30" font-weight="900" fill="#16a34a">2</text><text x="245" y="605" font-size="25" font-weight="900" fill="#16a34a">8:00 早上 – 完成</text><text x="245" y="651" font-size="31" font-weight="800" fill="#0f172a">课室及考场准备</text></g>
+    <path d="M540 700v55" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <g filter="url(#s)"><rect x="90" y="755" width="900" height="285" rx="28" fill="white"/><text x="540" y="812" text-anchor="middle" font-size="28" font-weight="900" fill="#0f172a">三个同步进行的安排</text>
+      <rect x="125" y="850" width="250" height="145" rx="20" fill="#eff6ff"/><text x="250" y="890" text-anchor="middle" font-size="22" font-weight="900" fill="#1d4ed8">四年级学生</text><text x="250" y="932" text-anchor="middle" font-size="25" font-weight="800" fill="#0f172a">留在礼堂</text><text x="250" y="968" text-anchor="middle" font-size="17" fill="#475569">激励与评估前准备</text>
+      <rect x="415" y="850" width="250" height="145" rx="20" fill="#f0fdf4"/><text x="540" y="890" text-anchor="middle" font-size="22" font-weight="900" fill="#15803d">三、五及六年级</text><text x="540" y="932" text-anchor="middle" font-size="25" font-weight="800" fill="#0f172a">返回课室</text><text x="540" y="968" text-anchor="middle" font-size="17" fill="#475569">整理课室与复习</text>
+      <rect x="705" y="850" width="250" height="145" rx="20" fill="#fff7ed"/><text x="830" y="890" text-anchor="middle" font-size="22" font-weight="900" fill="#c2410c">MPT4 考场</text><text x="830" y="932" text-anchor="middle" font-size="25" font-weight="800" fill="#0f172a">准备考场</text><text x="830" y="968" text-anchor="middle" font-size="17" fill="#475569">老师 + 8–10 名学生</text></g>
+    <path d="M540 1040v55" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <g filter="url(#s)"><rect x="90" y="1095" width="900" height="155" rx="28" fill="#1e3a8a"/><circle cx="170" cy="1172" r="45" fill="#60a5fa"/><text x="170" y="1183" text-anchor="middle" font-size="30" font-weight="900" fill="white">3</text><text x="245" y="1155" font-size="25" font-weight="900" fill="#bfdbfe">下课前／下课后</text><text x="245" y="1201" font-size="31" font-weight="800" fill="white">四年级学生移动演练</text></g>
+    <text x="540" y="1310" text-anchor="middle" font-size="21" font-weight="700" fill="#64748b">评估开始前，确保考场、路线及文件准备妥当。</text>
+  </g>
+</svg>
+
