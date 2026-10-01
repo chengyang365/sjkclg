@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title desc">
+  <title id="title">Aliran Persediaan Pra-MPT4</title>
+  <desc id="desc">Ringkasan persediaan Pra-MPT4 pada 5 Oktober 2026.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eff6ff"/><stop offset="1" stop-color="#f8fafc"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity=".1"/></filter>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <text x="540" y="90" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" font-weight="700" fill="#2563eb">SJK (C) LADANG GRISEK</text>
+  <text x="540" y="145" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="900" fill="#0f172a">ALIRAN PERSEDIAAN</text>
+  <text x="540" y="198" text-anchor="middle" font-family="Arial,sans-serif" font-size="44" font-weight="900" fill="#0f172a">PRA-MPT4</text>
+  <rect x="345" y="230" width="390" height="60" rx="30" fill="#2563eb"/>
+  <text x="540" y="270" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="white">5 OKTOBER 2026 · ISNIN</text>
+
+  <g font-family="Arial,sans-serif" filter="url(#shadow)">
+    <rect x="90" y="345" width="900" height="150" rx="28" fill="white"/>
+    <circle cx="170" cy="420" r="45" fill="#dbeafe"/><text x="170" y="431" text-anchor="middle" font-size="30" font-weight="900" fill="#2563eb">1</text>
+    <text x="245" y="402" font-size="25" font-weight="900" fill="#2563eb">7:30 – 8:00 PAGI</text>
+    <text x="245" y="445" font-size="30" font-weight="800" fill="#0f172a">Perhimpunan &amp; Taklimat Ringkas</text>
+
+    <path d="M540 495v52" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <rect x="90" y="545" width="900" height="150" rx="28" fill="white"/>
+    <circle cx="170" cy="620" r="45" fill="#dcfce7"/><text x="170" y="631" text-anchor="middle" font-size="30" font-weight="900" fill="#16a34a">2</text>
+    <text x="245" y="602" font-size="25" font-weight="900" fill="#16a34a">8:00 PAGI – SELESAI</text>
+    <text x="245" y="645" font-size="30" font-weight="800" fill="#0f172a">Penyediaan Bilik Darjah</text>
+
+    <path d="M540 695v52" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <rect x="90" y="745" width="900" height="285" rx="28" fill="white"/>
+    <text x="540" y="800" text-anchor="middle" font-size="28" font-weight="900" fill="#0f172a">TIGA ALIRAN SERENTAK</text>
+    <rect x="125" y="840" width="250" height="145" rx="20" fill="#eff6ff"/><text x="250" y="880" text-anchor="middle" font-size="21" font-weight="900" fill="#1d4ed8">TAHUN 4</text><text x="250" y="920" text-anchor="middle" font-size="23" font-weight="800" fill="#0f172a">Kekal di Dewan</text><text x="250" y="953" text-anchor="middle" font-size="17" fill="#475569">Motivasi &amp; persediaan</text>
+    <rect x="415" y="840" width="250" height="145" rx="20" fill="#f0fdf4"/><text x="540" y="880" text-anchor="middle" font-size="21" font-weight="900" fill="#15803d">TAHUN 3, 5 &amp; 6</text><text x="540" y="920" text-anchor="middle" font-size="23" font-weight="800" fill="#0f172a">Kembali ke Kelas</text><text x="540" y="953" text-anchor="middle" font-size="17" fill="#475569">Susun kelas &amp; ulang kaji</text>
+    <rect x="705" y="840" width="250" height="145" rx="20" fill="#fff7ed"/><text x="830" y="880" text-anchor="middle" font-size="21" font-weight="900" fill="#c2410c">BILIK MPT4</text><text x="830" y="920" text-anchor="middle" font-size="23" font-weight="800" fill="#0f172a">Siapkan Bilik</text><text x="830" y="953" text-anchor="middle" font-size="17" fill="#475569">Guru + 8–10 murid</text>
+
+    <path d="M540 1030v52" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+    <rect x="90" y="1080" width="900" height="150" rx="28" fill="#1e3a8a"/>
+    <circle cx="170" cy="1155" r="45" fill="#60a5fa"/><text x="170" y="1166" text-anchor="middle" font-size="30" font-weight="900" fill="white">3</text>
+    <text x="245" y="1137" font-size="25" font-weight="900" fill="#bfdbfe">SEBELUM / SELEPAS REHAT</text>
+    <text x="245" y="1180" font-size="30" font-weight="800" fill="white">Latihan Pergerakan Tahun 4</text>
+  </g>
+  <text x="540" y="1300" text-anchor="middle" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#64748b">Pastikan bilik, laluan dan dokumen lengkap sebelum pentaksiran.</text>
+</svg>
+
