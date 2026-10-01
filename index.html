@@ -282,6 +282,205 @@
       return isDarkMode ? ['bg-indigo-900/10', 'bg-blue-900/10'] : ['bg-indigo-400/20', 'bg-blue-400/20'];
     };
 
+    const MPT4_DATA = {
+      school: 'SJK (C) LADANG GRISEK',
+      title: 'MPT4 2026',
+      subtitle: 'Panduan Pengurusan Sepanjang Pentaksiran',
+      date: '6 – 8 Oktober 2026',
+      breakTime: '9:45 – 10:15 pagi',
+      highlights: [
+        { kicker: 'ARAS 3', title: 'KAWASAN LARANGAN', icon: 'ph-prohibit', tone: 'warning', description: 'Selain petugas pentaksiran MPT4, guru dan murid tidak dibenarkan melalui kawasan bilik pentaksiran atau menggunakan tandas di Aras 3.' },
+        { kicker: 'TANGGA TENGAH', title: 'LALUAN KHAS', icon: 'ph-stairs', tone: 'info', description: 'Untuk petugas pentaksiran dan murid Tahun 4 sahaja.' },
+        { kicker: 'WAKTU REHAT', title: '9:45 – 10:15 PAGI', icon: 'ph-fork-knife', tone: 'neutral', description: 'Waktu rehat bagi semua murid sepanjang pentaksiran MPT4.' },
+        { kicker: 'JAGA KETENTERAMAN', title: 'SUASANA SENYAP', icon: 'ph-speaker-slash', tone: 'neutral', description: 'Pastikan pergerakan dan aktiviti PdP tidak mengganggu pentaksiran.' }
+      ],
+      timeline: [
+        { time: '7:00 PAGI', title: 'Berkumpul di Dewan' },
+        { time: '7:25 PAGI', title: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas', secondary: true },
+        { time: '7:40 PAGI', title: 'Murid Tahun 4 mula beratur menuju ke Bilik Pentaksiran' },
+        { time: '9:30 PAGI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' },
+        { time: '9:45 – 10:15 PAGI', title: 'Waktu Rehat' },
+        { time: '10:15 PAGI', title: 'Berkumpul dan beratur di Dewan' },
+        { time: '10:25 PAGI', title: 'Bergerak ke Bilik Pentaksiran' },
+        { time: '12:15 TENGAH HARI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' }
+      ],
+      accordions: [
+        {
+          id: 'A', title: 'PERATURAN SEPANJANG TEMPOH PENTAKSIRAN',
+          intro: 'Diminta semua guru memaklumkan perkara-perkara berikut kepada murid kelas masing-masing.',
+          groups: [
+            { title: '1. Kawasan Larangan dan Pergerakan Murid', items: [
+              'Sepanjang tempoh pentaksiran, Aras 3 merupakan Kawasan Larangan.',
+              'Tangga tengah dikhaskan untuk kegunaan petugas pentaksiran dan murid Tahun 4 sahaja.',
+              'Selain petugas pentaksiran MPT4, semua guru dan murid tidak dibenarkan melalui kawasan bilik pentaksiran atau menggunakan tandas di Aras 3.',
+              'Murid hanya dibenarkan menggunakan tandas di Aras 1 dan Aras 2.',
+              'Selain Ketua Kelas, murid lain tidak dibenarkan pergi ke pejabat.',
+              'Guru diminta mengurangkan kekerapan serta bilangan murid yang keluar dari kelas pada satu-satu masa semasa PBD/UASA/PdP.'
+            ]},
+            { title: '2. Aktiviti yang Ditangguhkan', lead: 'Sepanjang tempoh pentaksiran:', emphasis: 'Semua aktiviti di luar bilik darjah serta penggunaan bilik-bilik khas ditangguhkan.' }
+          ]
+        },
+        {
+          id: 'B', title: 'PERINGATAN KEPADA SEMUA GURU', groups: [
+            { title: '1. Kawalan Murid', items: [
+              'Guru yang bertugas hendaklah berada di lokasi yang ditetapkan serta membantu mengawal pergerakan dan disiplin murid sepanjang tempoh pentaksiran.',
+              'Guru bertugas harian hendaklah menjaga semua murid di dewan sehingga murid Tahun 3, 5 dan 6 beratur masuk ke kelas.'
+            ]},
+            { title: '2. Suasana Kelas', paragraphs: [
+              'Guru hendaklah memastikan murid sentiasa tertib dan kelas berada dalam keadaan senyap agar tidak mengganggu pentaksiran yang sedang dijalankan.',
+              'Aktiviti yang menghasilkan bunyi bising, termasuk bacaan kuat atau bacaan beramai-ramai, hendaklah dielakkan.'
+            ]},
+            { title: '3. Pengurusan Waktu Rehat', lead: 'Sepanjang pentaksiran MPT4, waktu rehat bagi semua murid ialah:', emphasis: '9:45 pagi – 10:15 pagi', items: [
+              'Guru waktu ke-5 hendaklah mengiringi murid ke kantin.',
+              'Selepas rehat, murid hendaklah berbaris di dewan.',
+              'Guru waktu ke-6 hendaklah berada di dewan tepat pada 10:15 pagi untuk membawa murid kembali ke bilik darjah.'
+            ]}
+          ]
+        },
+        {
+          id: 'C', title: 'PENGURUSAN DAN PERGERAKAN MURID TAHUN 4',
+          intro: 'Rujuk garis masa di atas untuk jadual pergerakan penuh murid Tahun 4.',
+          groups: [{ items: [
+            '7:00 pagi — Berkumpul di dewan.',
+            '7:40 pagi — Mula beratur menuju ke bilik pentaksiran.',
+            '9:30 pagi — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.',
+            '9:45 pagi – 10:15 pagi — Waktu rehat.',
+            '10:15 pagi — Berkumpul dan beratur di dewan selepas waktu rehat.',
+            '10:25 pagi — Mula beratur menuju ke bilik pentaksiran.',
+            '12:15 tengah hari — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.'
+          ], emphasis: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas pada 7:25 pagi.' }]
+        },
+        {
+          id: 'D', title: 'GURU BERTUGAS MENJAGA MURID TAHUN 4', petugas: {
+            primary: ['GPK HEM', 'SuP', 'Guru Disiplin', 'Guru Bimbingan dan Kaunseling (B&K)'],
+            supporting: ['Guru Kelas 4A', 'Guru Kelas 4D', 'Guru Pendidikan Islam'],
+            note: 'Guru membantu bertugas apabila tidak mempunyai tugas mengajar atau mengawas pentaksiran di kelas lain.'
+          }
+        }
+      ],
+      dutyTimes: [
+        { label: 'SESI PAGI', time: '7:00 – 7:45 pagi', icon: 'ph-sun-horizon' },
+        { label: 'SELEPAS INSTRUMEN / REHAT', time: '9:30 – 10:25 pagi', icon: 'ph-sun' },
+        { label: 'SESI TENGAH HARI', time: '12:15 tengah hari – 1:00 tengah hari', icon: 'ph-clock' }
+      ],
+      duties: [
+        'Berada di dewan untuk mengawal disiplin dan pergerakan murid.',
+        '30 minit sebelum pentaksiran bermula, membawa murid ke tangga menuju ke bilik pentaksiran.',
+        'Bersedia di tangga berhampiran bilik pentaksiran selepas setiap instrumen pentaksiran selesai untuk membawa murid kembali ke dewan.',
+        'Murid masuk ke bilik pentaksiran mengikut arahan dan prosedur yang ditetapkan. Guru bertugas tidak perlu mengiringi murid masuk ke dalam bilik pentaksiran.'
+      ],
+      documents: { guideUrl: '', infographicUrl: '' },
+      footer: 'Kerjasama dan perhatian semua guru amat dihargai bagi memastikan pentaksiran MPT4 berjalan dengan lancar dan teratur serta gangguan kepada calon dapat diminimumkan.'
+    };
+
+    const MPT4Accordion = ({ section, isOpen, onToggle, isDarkMode }) => (
+      <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+        <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={`mpt4-panel-${section.id}`} className="w-full min-h-[64px] px-4 sm:px-6 py-4 flex items-center gap-3 text-left">
+          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}>{section.id}</span>
+          <span className="flex-1 text-sm sm:text-base font-extrabold leading-snug">{section.title}</span>
+          <i aria-hidden="true" className={`ph-bold ph-caret-down text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
+        </button>
+        {isOpen && (
+          <div id={`mpt4-panel-${section.id}`} className={`px-5 sm:px-7 pb-6 border-t ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+            {section.intro && <p className="mt-5 text-sm sm:text-[0.95rem] leading-7 font-semibold opacity-80">{section.intro}</p>}
+            {section.groups?.map((group, groupIndex) => (
+              <div key={groupIndex} className="mt-5">
+                {group.title && <h4 className="font-extrabold text-[0.95rem] mb-3">{group.title}</h4>}
+                {group.lead && <p className="text-sm leading-6 opacity-80 mb-3">{group.lead}</p>}
+                {group.paragraphs?.map((paragraph, index) => <p key={index} className="text-sm leading-7 opacity-80 mb-3">{paragraph}</p>)}
+                {group.emphasis && <div className={`p-4 rounded-xl font-extrabold text-sm leading-6 ${isDarkMode ? 'bg-blue-500/10 text-blue-200' : 'bg-blue-50 text-blue-900'}`}>{group.emphasis}</div>}
+                {group.items && <ul className="space-y-3">{group.items.map((item, index) => <li key={index} className="flex gap-3 text-sm leading-6 opacity-85"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span><span>{item}</span></li>)}</ul>}
+              </div>
+            ))}
+            {section.petugas && (
+              <div className="grid sm:grid-cols-2 gap-4 mt-5">
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><h4 className="font-extrabold mb-3">Petugas Utama</h4><ul className="space-y-2 text-sm">{section.petugas.primary.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-blue-500 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}><h4 className="font-extrabold mb-3">Guru Membantu</h4><ul className="space-y-2 text-sm">{section.petugas.supporting.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-slate-400 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <p className="sm:col-span-2 text-sm leading-6 opacity-75">{section.petugas.note}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+
+    const MPT4Page = ({ onBack, isDarkMode }) => {
+      const [openSection, setOpenSection] = useState(null);
+      const jumpTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const toneClasses = {
+        warning: isDarkMode ? 'bg-rose-950/35 border-rose-900/60' : 'bg-rose-50 border-rose-200',
+        info: isDarkMode ? 'bg-blue-950/30 border-blue-900/50' : 'bg-blue-50 border-blue-100',
+        neutral: isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'
+      };
+
+      return (
+        <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+          <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+            <div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
+              <button type="button" onClick={onBack} aria-label="Kembali ke Pusat Aplikasi" className={`w-11 h-11 rounded-full flex items-center justify-center border shrink-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left text-xl"></i></button>
+              <div className="min-w-0"><p className="text-xs font-bold text-blue-500 uppercase tracking-wider">LG Apps</p><p className="font-extrabold text-sm sm:text-base truncate">Panduan Pengurusan MPT4</p></div>
+            </div>
+          </header>
+
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+            <section className="pt-8 sm:pt-12 text-center" aria-labelledby="mpt4-title">
+              <p className="text-xs sm:text-sm font-extrabold tracking-[0.14em] text-blue-600">{MPT4_DATA.school}</p>
+              <h1 id="mpt4-title" className="mt-3 text-4xl sm:text-5xl font-black tracking-tight">{MPT4_DATA.title}</h1>
+              <p className="mt-2 text-base sm:text-xl font-bold opacity-75">{MPT4_DATA.subtitle}</p>
+              <p className="mt-5 text-xl sm:text-2xl font-black text-blue-600">{MPT4_DATA.date}</p>
+              <span className={`inline-flex mt-4 items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${isDarkMode ? 'bg-emerald-950/30 border-emerald-900/60 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Versi Terkini / 最新版本</span>
+            </section>
+
+            <nav aria-label="Navigasi pantas" className={`sticky top-16 z-40 -mx-4 sm:mx-0 mt-7 px-4 sm:px-0 py-3 overflow-x-auto hide-scrollbar ${isDarkMode ? 'bg-slate-900/95' : 'bg-slate-50/95'} backdrop-blur-xl`}>
+              <div className="flex gap-2 w-max sm:mx-auto">
+                {[['mpt4-utama','Utama'],['mpt4-timeline','Timeline'],['mpt4-panduan','Panduan'],['mpt4-guru','Guru Bertugas']].map(([id,label]) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{label}</button>)}
+              </div>
+            </nav>
+
+            <section id="mpt4-utama" className="scroll-mt-32 pt-7" aria-labelledby="mpt4-important">
+              <div className="mb-5"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 1</p><h2 id="mpt4-important" className="mt-1 text-2xl font-black">Maklumat Penting</h2></div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {MPT4_DATA.highlights.map(item => <article key={item.kicker} className={`p-4 sm:p-5 rounded-2xl border min-w-0 ${toneClasses[item.tone]}`}>
+                  <i aria-hidden="true" className={`ph-fill ${item.icon} text-2xl ${item.tone === 'warning' ? 'text-rose-500' : 'text-blue-500'}`}></i>
+                  <p className="mt-4 text-[0.68rem] sm:text-xs font-black tracking-wider opacity-60">{item.kicker}</p>
+                  <h3 className="mt-1 text-base sm:text-lg font-black leading-tight break-words">{item.title}</h3>
+                  <p className="mt-3 text-xs sm:text-sm leading-5 sm:leading-6 opacity-75">{item.description}</p>
+                </article>)}
+              </div>
+            </section>
+
+            <section id="mpt4-timeline" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-movement">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 2</p><h2 id="mpt4-movement" className="mt-1 text-2xl font-black">Pengurusan Murid Tahun 4</h2></div>
+              <div className={`rounded-3xl border p-5 sm:p-8 ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+                {MPT4_DATA.timeline.map((item, index) => <div key={item.time} className="grid grid-cols-[22px_1fr] gap-4">
+                  <div className="relative flex justify-center"><span className={`mt-1.5 w-3 h-3 rounded-full border-[3px] box-content z-10 ${item.secondary ? 'bg-slate-400 border-slate-200 dark:border-slate-700' : 'bg-blue-600 border-blue-100 dark:border-blue-950'}`}></span>{index < MPT4_DATA.timeline.length - 1 && <span className={`absolute top-5 bottom-0 w-0.5 ${isDarkMode ? 'bg-slate-700' : 'bg-slate-200'}`}></span>}</div>
+                  <div className={`pb-7 ${item.secondary ? 'opacity-60' : ''}`}><time className={`block text-lg sm:text-xl font-black ${item.secondary ? '' : 'text-blue-600 dark:text-blue-400'}`}>{item.time}</time><h3 className="mt-1 text-sm sm:text-base font-extrabold leading-6">{item.title}</h3>{item.note && <p className="mt-1 text-sm opacity-70">{item.note}</p>}</div>
+                </div>)}
+              </div>
+            </section>
+
+            <section id="mpt4-panduan" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-guide">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 3</p><h2 id="mpt4-guide" className="mt-1 text-2xl font-black">Panduan Lengkap</h2></div>
+              <div className="space-y-3">{MPT4_DATA.accordions.map(section => <MPT4Accordion key={section.id} section={section} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} />)}</div>
+            </section>
+
+            <section id="mpt4-guru" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-duty-time">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p><h2 id="mpt4-duty-time" className="mt-1 text-2xl font-black">Waktu Bertugas</h2></div>
+              <div className="grid md:grid-cols-3 gap-3">{MPT4_DATA.dutyTimes.map(slot => <article key={slot.label} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className={`ph-fill ${slot.icon} text-2xl text-blue-500`}></i><p className="mt-4 text-xs font-black tracking-wider opacity-60">{slot.label}</p><p className="mt-1 text-xl font-black">{slot.time}</p></article>)}</div>
+            </section>
+
+            <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">Tugas Guru Bertugas</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{MPT4_DATA.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
+
+            <section className="pt-12" aria-labelledby="mpt4-documents"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 6</p><h2 id="mpt4-documents" className="mt-1 text-2xl font-black">Dokumen & Infografik</h2></div><div className="grid sm:grid-cols-2 gap-3">
+              {[{title:'Panduan Lengkap',label:'Lihat / Muat Turun PDF',url:MPT4_DATA.documents.guideUrl,icon:'ph-file-pdf'},{title:'Infografik Ringkas',label:'Lihat Infografik',url:MPT4_DATA.documents.infographicUrl,icon:'ph-image'}].map(doc => <div key={doc.title} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'}`}><i className={`ph-fill ${doc.icon} text-2xl text-blue-500`}></i><h3 className="mt-3 font-extrabold">{doc.title}</h3>{doc.url ? <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 min-h-11 inline-flex items-center px-4 rounded-xl bg-blue-600 text-white font-bold text-sm">{doc.label}</a> : <button type="button" disabled className="mt-4 min-h-11 px-4 rounded-xl bg-slate-200 dark:bg-slate-700 opacity-60 font-bold text-sm cursor-not-allowed">{doc.label} · Belum tersedia</button>}</div>)}
+            </div></section>
+
+            <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{MPT4_DATA.footer}</p></footer>
+          </main>
+        </div>
+      );
+    };
+
     const useModalKeyboard = (isOpen, onClose) => {
       useEffect(() => {
         if (!isOpen) return;
@@ -368,6 +567,7 @@
       const [isDarkMode, setIsDarkMode] = useState(() => {
         try { return localStorage.getItem('sjkc_dark_mode') === 'true'; } catch { return false; }
       });
+      const [activePage, setActivePage] = useState('home');
       const [searchQuery, setSearchQuery] = useState('');
       const [activeTab, setActiveTab] = useState('all');
       
@@ -814,6 +1014,10 @@
         );
       };
 
+      if (activePage === 'mpt4') {
+        return <MPT4Page onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }} isDarkMode={isDarkMode} />;
+      }
+
       return (
         <div className="min-h-screen relative overflow-x-hidden flex flex-col">
           <Toast {...toast} />
@@ -939,6 +1143,17 @@
                 <div className="flex items-center gap-3 text-sm font-semibold"><i className="ph-fill ph-warning-circle text-xl shrink-0"></i><span>{syncError}</span></div>
                 <button onClick={() => setRefreshNonce(value => value + 1)} className="shrink-0 min-h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm active:scale-95 transition-transform">{lang === 'zh' ? '重新连接' : 'Retry'}</button>
               </section>
+            )}
+
+            {activeTab === 'all' && !searchQuery && (
+              <button type="button" onClick={() => { setActivePage('mpt4'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full mb-8 sm:mb-10 p-5 sm:p-6 rounded-[1.5rem] border text-left flex items-center gap-4 sm:gap-5 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
+                <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-clipboard-text text-3xl"></i></div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap"><h2 className="text-lg sm:text-xl font-black">MPT4 2026</h2><span className={`px-2.5 py-1 rounded-full text-[0.65rem] font-black tracking-wide ${isDarkMode ? 'bg-emerald-950/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>6–8 OKT</span></div>
+                  <p className="mt-1 text-sm sm:text-base font-semibold opacity-65">Panduan Pengurusan</p>
+                </div>
+                <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
+              </button>
             )}
             
             {isAdmin && !searchQuery && (
