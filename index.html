@@ -557,6 +557,21 @@
       }
     };
 
+    const MPT4_TEACHER_NAMES_ZH = {
+      'Cikgu Loh Boon Ping': '罗文彬师',
+      'Cikgu Chong Cheng Yang': '张政扬师',
+      'Cikgu Chiam Ai Ying': '詹爱莹师',
+      'Cikgu Tan Hui Kee': '陈惠琪师',
+      'Cikgu Leong Siew Fern': '梁筱芬师',
+      'Cikgu Ong Wen Jing': '王文静师',
+      'Cikgu Tan Hau Vind': '陈皓运师',
+      'Cikgu Lim Sie Pei': '林诗佩师',
+      'Cikgu Tee Ying Chan': '郑咏珍师',
+      'Cikgu Tan Lee Ching': '陈丽清师',
+      'En Lim Kian Pin': '林建品师',
+      'En Willson Lim': '林伟胜师'
+    };
+
     const MPT4_PREP_ZH = {
       school: '新廊华小 · SJK (C) LADANG GRISEK',
       title: '四年级学习矩阵 MPT4 2026', subtitle: '评估前准备', date: '2026年10月5日（星期一）',
@@ -589,6 +604,17 @@
         infographic:'MPT4 评估前准备流程图', viewInfographic:'查看流程图', downloadInfographic:'下载流程图', coordinators:'考场协调员', preparation:'课室前期准备', deadline:'截止日期', preparationChecklist:'课室前期准备 Checklist', preparationFlow:'10月5日准备日流程', roomAssignments:'MPT4 考场分配', sourceRoom:'原课室', candidates:'考生', teacher:'负责人', desks:'桌子', temporaryPlacement:'临时班级安排', placementNote:'2026年10月6日至8日临时课室安排', usedRoom:'使用课室', prepTeacher:'5/10 负责准备老师', roomChecklist:'考场准备 Checklist', checklistCount:'11 项检查', rehearsal:'四年级学生演练', years356:'三、五及六年级安排', years356Title:'完成课室准备后至下课时间', hallProgramme:'下课后礼堂活动', afterBreak:'下课后', hallIntro:'所有学生在礼堂集合。活动 / 讲座由以下老师负责：', commonAreas:'三楼公共区域', reminder:'评估结束后的重要提醒', close:'关闭'
       }
     };
+
+    // Resolve supplied Chinese names centrally while retaining the BM source names.
+    MPT4_PREP_ZH.coordinators = MPT4_PREP_ZH.coordinators.map(person => ({
+      ...person, name: MPT4_TEACHER_NAMES_ZH[person.name] || person.name
+    }));
+    MPT4_PREP_ZH.roomAssignments = MPT4_PREP_ZH.roomAssignments.map(row =>
+      row.map((value, index) => index === 4 ? (MPT4_TEACHER_NAMES_ZH[value] || value) : value)
+    );
+    MPT4_PREP_ZH.temporaryClassPlacement = MPT4_PREP_DATA.temporaryClassPlacement.map(row =>
+      row.map((value, index) => index === 2 ? (MPT4_TEACHER_NAMES_ZH[value] || value) : value)
+    );
 
     MPT4_PREP_DATA.ui = {
       infographic:'ALIRAN PERSEDIAAN PRA-MPT4', viewInfographic:'Lihat Infografik', downloadInfographic:'Muat Turun Infografik', coordinators:'PENYELARAS', preparation:'PERSEDIAAN AWAL', deadline:'DEADLINE', preparationChecklist:'Checklist Persediaan Awal', preparationFlow:'ALIRAN HARI PERSEDIAAN', roomAssignments:'PEMBAHAGIAN BILIK PENTAKSIRAN', sourceRoom:'Bilik Darjah', candidates:'Calon', teacher:'Guru', desks:'meja', temporaryPlacement:'PENEMPATAN SEMENTARA KELAS', placementNote:'Penempatan pada 6–8 Oktober 2026', usedRoom:'Bilik Digunakan', prepTeacher:'Guru Menjaga Persediaan pada 5/10', roomChecklist:'CHECKLIST BILIK PENTAKSIRAN', checklistCount:'11 perkara untuk disemak', rehearsal:'LATIHAN MURID TAHUN 4', years356:'TAHUN 3, 5 DAN 6', years356Title:'Selepas Selesai Penyediaan – Waktu Rehat', hallProgramme:'PROGRAM DI DEWAN', afterBreak:'Selepas Waktu Rehat', hallIntro:'Semua murid berkumpul di dewan. Program / ceramah dikendalikan oleh:', commonAreas:'KAWASAN UMUM ARAS 3', reminder:'PERINGATAN SELEPAS PENTAKSIRAN', close:'Tutup'
