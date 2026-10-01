@@ -640,31 +640,125 @@
       </div>;
     };
 
+    const DUTY_ROSTER_DAYS = [
+      { id: 'mon', zh: '星期一', ms: 'Isnin' }, { id: 'tue', zh: '星期二', ms: 'Selasa' },
+      { id: 'wed', zh: '星期三', ms: 'Rabu' }, { id: 'thu', zh: '星期四', ms: 'Khamis' },
+      { id: 'fri', zh: '星期五', ms: 'Jumaat' }
+    ];
+
+    const DUTY_ROSTER_SECTIONS = [
+      {
+        id: 'morning-arrival', tone: 'lime', titleZh: '早上时段 · 6:25 a.m. – 7:00 a.m.', titleMs: 'Waktu Pagi · 6:25 a.m. – 7:00 a.m.',
+        noteZh: '6:25–6:45 a.m. 在食堂／礼堂值勤。6:45 后，老师转到礼堂并带学生前往二、三楼。',
+        noteMs: '6:25–6:45 a.m. di kantin/dewan. Selepas 6:45 a.m. guru beralih ke dewan dan bawa murid ke tingkat 2/3.',
+        rows: [
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['LIM SIE PEI','AMNAN','LIM QI YI','ROSE MALATINA','CHONG CHENG YANG'] },
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['WONG SIEW JING','TAN HUI KEE','WINSON','YIP KIM YUN','YAP MIN YAN'] },
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['WILLSON LIM','CHIAM AI YING','TAN LEE CHING','TEE YING CHAN','NABILA'] },
+          { place: '第二层 (Tingkat Dua)', route: '礼堂 → 第二层 · Dewan → Tingkat 2', staff: ['YUSMAIRAN','CHONG WEI NI','OI SWEE CHIEN','LIM KIAN PIN','NADIA'] },
+          { place: '第三层 (Tingkat Tiga)', route: '食堂 → 礼堂 → 第三层 · Kantin → Dewan → Tingkat 3', staff: ['NORHAFIZA','CHIN LEE MEI','ONG WEN JING','LEONG SIEW FEN','TAN HAU VIND'] }
+        ]
+      },
+      {
+        id: 'late-arrival', tone: 'cyan', titleZh: '迟到学生 · 7:00 a.m. – 7:15 a.m.', titleMs: 'Murid yang Lewat · 7:00 a.m. – 7:15 a.m.',
+        rows: [{ place: '校门 (Pintu Sekolah)', group: '校门', staff: ['LIM QI YI','CHIAM AI YING','CHONG WEI NI','RINNY SEAH','LOH BOON PING'] }]
+      },
+      {
+        id: 'recess', tone: 'sky', titleZh: '下课时间 · 9:30 a.m. – 10:00 a.m.', titleMs: 'Waktu Rehat · 9:30 a.m. – 10:00 a.m.',
+        rows: [
+          { place: '第二层 (Tingkat Dua)', staff: ['NORHAFIZA','TAN HUI KEE','LIM QI YI','TEE YING CHAN','NADIA'] },
+          { place: '第三层 (Tingkat Tiga)', staff: ['YUSMAIRAN','CHONG WEI NI','WINSON','ROSE MALATINA','CHONG CHENG YANG'] },
+          { place: '食堂 (Kantin)', group: '食堂', staff: ['WONG SIEW JING','AMNAN','ONG WEN JING','YIP KIM YUN','TAN HAU VIND'] },
+          { place: '食堂 (Kantin)', group: '食堂', staff: ['LIM SIE PEI','CHIAM AI YING','TAN LEE CHING','LIM KIAN PIN','YAP MIN YAN'] },
+          { place: '礼堂 (Dewan)', staff: ['WONG SIEW JING','CHIN LEE MEI','OI SWEE CHIEN','LEONG SIEW FEN','NABILA'] }
+        ]
+      },
+      {
+        id: 'dismissal', tone: 'orange', titleZh: '放学岗位 · 12:50 p.m. 起（星期五 11:25 a.m. 起）', titleMs: 'Tempat Bertugas Balik · 12:50 p.m. (Jumaat mulai 11:25 a.m.)',
+        rows: [
+          { place: '后门 (Pintu Belakang)', group: '后门', staff: ['YUSMAIRAN (K)','CHIN LEE MEI','ONG WEN JING','ROSE MALATINA','NADIA (K)'] },
+          { place: '后门 (Pintu Belakang)', group: '后门', staff: ['WONG SIEW JING','TAN HUI KEE','LIM QI YI (K)','LIM KIAN PIN','YAP MIN YAN'] },
+          { place: '食堂／礼堂后方 (Kantin / Belakang Dewan)', group: '食堂', staff: ['LIM SIE PEI','CHIAM AI YING','TAN LEE CHING','YIP KIM YUN (K)','TAN HAU VIND'] },
+          { place: '电单车／Van／礼堂 (Motor / Van / Dewan)', group: '交通', staff: ['WILLSON LIM','CHONG WEI NI','WINSON','LEONG SIEW FEN','CHONG CHENG YANG'] },
+          { place: '电单车／Van／礼堂 (Motor / Van / Dewan)', group: '交通', staff: ['NORHAFIZA','AMNAN (K)','OI SWEE CHIEN','TEE YING CHAN','NABILA'] }
+        ]
+      }
+    ];
+
     const DutyRosterPage = ({ onBack, isDarkMode, lang }) => {
       const [zoomed, setZoomed] = useState(false);
+      const [query, setQuery] = useState('');
+      const [selectedDay, setSelectedDay] = useState('all');
+      const imageButtonRef = useRef(null);
       useEffect(() => {
         if (!zoomed) return;
+        const previousFocus = document.activeElement;
         const closeOnEscape = event => { if (event.key === 'Escape') setZoomed(false); };
         document.addEventListener('keydown', closeOnEscape);
-        return () => document.removeEventListener('keydown', closeOnEscape);
+        return () => { document.removeEventListener('keydown', closeOnEscape); previousFocus?.focus?.(); };
       }, [zoomed]);
       const isZh = lang === 'zh';
       const title = isZh ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)';
-      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+      const copy = isZh ? {
+        search: '搜索老师或地点', allDays: '所有星期', results: '项安排', day: '星期',
+        original: '查看原始值勤表图片', tapZoom: '查看完整原图（点击放大）',
+        back: '返回应用中心', zoom: '放大查看值勤表', close: '关闭', download: '下载值勤表',
+        none: '没有符合条件的值勤安排', noRows: '此筛选条件下没有安排',
+        keyNote: '原表中的 (K) 标记已保留。地点名称同时显示中文和马来文，方便对照原表。'
+      } : {
+        search: 'Cari nama guru atau lokasi', allDays: 'Semua hari', results: 'tugasan', day: 'Hari',
+        original: 'Lihat imej jadual asal', tapZoom: 'Lihat jadual asal penuh (klik untuk besarkan)',
+        back: 'Kembali ke Pusat Aplikasi', zoom: 'Besarkan jadual', close: 'Tutup', download: 'Muat Turun Jadual',
+        none: 'Tiada tugasan yang sepadan', noRows: 'Tiada tugasan untuk penapis ini',
+        keyNote: 'Tanda (K) daripada jadual asal dikekalkan. Nama lokasi dipaparkan dalam bahasa Cina dan Melayu untuk rujukan.'
+      };
+      const queryText = query.trim().toLocaleLowerCase();
+      const sections = DUTY_ROSTER_SECTIONS.map(section => ({
+        ...section,
+        rows: section.rows.filter(row => !queryText || `${row.place} ${row.route || ''} ${row.staff.join(' ')}`.toLocaleLowerCase().includes(queryText))
+      })).filter(section => section.rows.length);
+      const totalRows = sections.reduce((count, section) => count + section.rows.length, 0);
+      const shell = isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900';
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const tone = { lime: isDarkMode ? 'border-lime-800 bg-lime-950/30' : 'border-lime-200 bg-lime-50', cyan: isDarkMode ? 'border-cyan-800 bg-cyan-950/30' : 'border-cyan-200 bg-cyan-50', sky: isDarkMode ? 'border-sky-800 bg-sky-950/30' : 'border-sky-200 bg-sky-50', orange: isDarkMode ? 'border-orange-800 bg-orange-950/30' : 'border-orange-200 bg-orange-50' };
+      return <div className={`min-h-screen ${shell}`}>
         <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
           <div className="max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
-            <button type="button" onClick={onBack} aria-label={isZh ? '返回应用中心' : 'Kembali ke Pusat Aplikasi'} className={`w-11 h-11 rounded-full border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left"></i></button>
+            <button type="button" onClick={onBack} aria-label={copy.back} className={`w-11 h-11 rounded-full border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left"></i></button>
             <div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><h1 className="font-extrabold truncate">{title}</h1></div>
-            <a href={MPT4_ASSETS.dutyRoster} download className="min-h-11 px-3 sm:px-4 rounded-full bg-blue-600 text-white inline-flex items-center gap-2 font-bold text-sm"><i className="ph-bold ph-download-simple"></i><span className="hidden sm:inline">{isZh ? '下载值勤表' : 'Muat Turun Jadual'}</span></a>
+            <a href={MPT4_ASSETS.dutyRoster} download className="min-h-11 px-3 sm:px-4 rounded-full bg-blue-600 text-white inline-flex items-center gap-2 font-bold text-sm"><i className="ph-bold ph-download-simple"></i><span className="hidden sm:inline">{copy.download}</span></a>
           </div>
         </header>
         <main className="max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
-          <p className="mb-4 text-center text-sm font-semibold opacity-65">{isZh ? '点击图片可放大查看' : 'Klik jadual untuk paparan lebih besar'}</p>
-          <button type="button" onClick={() => setZoomed(true)} aria-label={isZh ? '放大查看值勤表' : 'Besarkan jadual'} className="block w-full rounded-2xl border overflow-hidden bg-white shadow-sm">
-            <img src={MPT4_ASSETS.dutyRoster} alt={title} className="block w-full h-auto" />
-          </button>
+          <div className="grid sm:grid-cols-[1fr_auto] gap-3 mb-5">
+            <label className="relative block"><i className="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={copy.search} aria-label={copy.search} className={`w-full min-h-12 pl-11 pr-4 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 placeholder-slate-400' : 'bg-white border-slate-200'}`} /></label>
+            <label className="flex items-center gap-2"><span className="sr-only">{copy.day}</span><select value={selectedDay} onChange={event => setSelectedDay(event.target.value)} aria-label={copy.day} className={`min-h-12 w-full sm:w-auto px-4 rounded-2xl border font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}><option value="all">{copy.allDays}</option>{DUTY_ROSTER_DAYS.map(day => <option key={day.id} value={day.id}>{isZh ? day.zh : day.ms}</option>)}</select></label>
+          </div>
+          <div aria-live="polite" className="mb-4 flex items-center justify-between gap-3"><p className="text-sm font-semibold opacity-65">{copy.keyNote}</p><span className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-black text-xs whitespace-nowrap">{totalRows} {copy.results}</span></div>
+          {sections.length === 0 && <div className={`p-8 rounded-2xl border text-center font-bold opacity-70 ${card}`}>{copy.none}</div>}
+          <div className="space-y-6">
+            {sections.map(section => <section key={section.id}>
+              <h2 className={`p-4 sm:px-5 rounded-t-2xl border font-black text-base sm:text-lg ${tone[section.tone]}`}>{isZh ? section.titleZh : section.titleMs}</h2>
+              {section.noteZh && <p className={`px-4 py-3 border-x text-sm leading-6 font-semibold ${isDarkMode ? 'bg-yellow-950/40 border-yellow-900 text-yellow-100' : 'bg-yellow-100 border-yellow-200 text-yellow-950'}`}>{isZh ? section.noteZh : section.noteMs}</p>}
+              <div className="space-y-3 pt-3">{section.rows.map((row,rowIndex) => {
+                const visibleDays = DUTY_ROSTER_DAYS.map((day,index) => ({...day,index})).filter(day => selectedDay === 'all' || selectedDay === day.id);
+                return <article key={`${section.id}-${rowIndex}`} className={`rounded-2xl border overflow-hidden ${card}`}>
+                  <div className={`px-4 py-3 border-b font-extrabold ${isDarkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-100 bg-slate-50'}`}><span>{row.place}</span>{row.route && <p className="mt-1 text-xs font-semibold opacity-60">{row.route}</p>}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-3">{visibleDays.map(day => {
+                    const name = row.staff[day.index];
+                    const match = queryText && name.toLocaleLowerCase().includes(queryText);
+                    return <div key={day.id} className={`min-h-[72px] p-3 rounded-xl border flex flex-col justify-between ${match ? (isDarkMode ? 'bg-amber-950/50 border-amber-700 ring-1 ring-amber-500' : 'bg-amber-50 border-amber-300 ring-1 ring-amber-300') : (isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-100')}`}><span className="text-[0.68rem] font-black uppercase tracking-wide text-blue-500">{isZh ? day.zh : day.ms}</span><span className="mt-2 text-xs sm:text-sm font-extrabold leading-snug break-words">{name}</span></div>;
+                  })}</div>
+                </article>;
+              })}</div>
+            </section>)}
+          </div>
+          <details className={`mt-8 rounded-2xl border overflow-hidden ${card}`}>
+            <summary className="cursor-pointer min-h-14 px-5 py-4 font-extrabold flex items-center gap-2"><i className="ph-fill ph-image text-blue-500 text-xl"></i>{copy.original}</summary>
+            <div className="p-3 sm:p-5 border-t border-slate-200 dark:border-slate-700"><p className="mb-3 text-center text-sm font-semibold opacity-65">{copy.tapZoom}</p><button ref={imageButtonRef} type="button" onClick={() => setZoomed(true)} aria-label={copy.zoom} className="block w-full rounded-xl border overflow-hidden bg-white"><img src={MPT4_ASSETS.dutyRoster} alt={title} className="block w-full h-auto" /></button></div>
+          </details>
         </main>
-        {zoomed && <div role="dialog" aria-modal="true" aria-label={title} onClick={() => setZoomed(false)} className="fixed inset-0 z-[100] bg-black/90 p-2 sm:p-6 flex items-center justify-center overflow-auto"><button type="button" onClick={() => setZoomed(false)} aria-label={isZh ? '关闭' : 'Tutup'} className="fixed top-3 right-3 z-10 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img src={MPT4_ASSETS.dutyRoster} alt={title} onClick={event => event.stopPropagation()} className="max-w-full max-h-full object-contain" /></div>}
+        {zoomed && <div role="dialog" aria-modal="true" aria-label={title} onClick={() => setZoomed(false)} className="fixed inset-0 z-[100] bg-black/90 p-2 sm:p-6 flex items-center justify-center overflow-auto"><button type="button" onClick={() => setZoomed(false)} aria-label={copy.close} className="fixed top-3 right-3 z-10 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img src={MPT4_ASSETS.dutyRoster} alt={title} onClick={event => event.stopPropagation()} className="max-w-full max-h-full object-contain" /></div>}
       </div>;
     };
 
