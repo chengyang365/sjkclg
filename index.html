@@ -477,7 +477,8 @@
     };
 
     const MPT4_ASSETS = {
-      prepInfographic: { ms: './mpt4-pra-infografik.svg', zh: './mpt4-pra-infografik-zh.svg' }
+      prepInfographic: { ms: './mpt4-pra-infografik.svg', zh: './mpt4-pra-infografik-zh.svg' },
+      dutyRoster: './jadual-guru-bertugas-penggal-3-2026.png'
     };
 
     const MPT4_PREP_DATA = {
@@ -636,6 +637,34 @@
       return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
         <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3"><button onClick={onBack} className={`w-11 h-11 rounded-full border ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label="Kembali"><i className="ph-bold ph-arrow-left"></i></button><div className="flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><p className="font-extrabold">MPT4 2026</p></div><button onClick={onLangToggle} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label={zh?'Tukar ke Bahasa Melayu':'切换至中文'}>{zh?'BM':'中'}</button></div></header>
         <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16"><div className="text-center"><p className="text-sm font-black tracking-widest text-blue-600">SJK (C) LADANG GRISEK</p><h1 className="mt-3 text-4xl sm:text-5xl font-black">MPT4 2026</h1><p className="mt-3 opacity-70 font-semibold">{zh?'请选择要查看的页面':'Pilih halaman untuk dilihat'}</p></div><div className="mt-10 grid md:grid-cols-2 gap-5">{cards.map(card=><button key={card.title} onClick={card.action} className={`text-left rounded-3xl border overflow-hidden min-h-[260px] transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><div className={`h-2 bg-gradient-to-r ${card.accent}`}></div><div className="p-7"><i className={`ph-fill ${card.icon} text-4xl text-blue-500`}></i><p className="mt-6 text-sm font-black text-blue-600">{card.date}</p><h2 className="mt-2 text-2xl font-black">{card.title}</h2><p className="mt-3 text-sm leading-7 opacity-70">{card.description}</p><span className="mt-5 inline-flex items-center gap-2 font-extrabold text-blue-600">{zh?'打开页面':'Buka Halaman'} <i className="ph-bold ph-arrow-right"></i></span></div></button>)}</div></main>
+      </div>;
+    };
+
+    const DutyRosterPage = ({ onBack, isDarkMode, lang }) => {
+      const [zoomed, setZoomed] = useState(false);
+      useEffect(() => {
+        if (!zoomed) return;
+        const closeOnEscape = event => { if (event.key === 'Escape') setZoomed(false); };
+        document.addEventListener('keydown', closeOnEscape);
+        return () => document.removeEventListener('keydown', closeOnEscape);
+      }, [zoomed]);
+      const isZh = lang === 'zh';
+      const title = isZh ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)';
+      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
+            <button type="button" onClick={onBack} aria-label={isZh ? '返回应用中心' : 'Kembali ke Pusat Aplikasi'} className={`w-11 h-11 rounded-full border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left"></i></button>
+            <div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><h1 className="font-extrabold truncate">{title}</h1></div>
+            <a href={MPT4_ASSETS.dutyRoster} download className="min-h-11 px-3 sm:px-4 rounded-full bg-blue-600 text-white inline-flex items-center gap-2 font-bold text-sm"><i className="ph-bold ph-download-simple"></i><span className="hidden sm:inline">{isZh ? '下载值勤表' : 'Muat Turun Jadual'}</span></a>
+          </div>
+        </header>
+        <main className="max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+          <p className="mb-4 text-center text-sm font-semibold opacity-65">{isZh ? '点击图片可放大查看' : 'Klik jadual untuk paparan lebih besar'}</p>
+          <button type="button" onClick={() => setZoomed(true)} aria-label={isZh ? '放大查看值勤表' : 'Besarkan jadual'} className="block w-full rounded-2xl border overflow-hidden bg-white shadow-sm">
+            <img src={MPT4_ASSETS.dutyRoster} alt={title} className="block w-full h-auto" />
+          </button>
+        </main>
+        {zoomed && <div role="dialog" aria-modal="true" aria-label={title} onClick={() => setZoomed(false)} className="fixed inset-0 z-[100] bg-black/90 p-2 sm:p-6 flex items-center justify-center overflow-auto"><button type="button" onClick={() => setZoomed(false)} aria-label={isZh ? '关闭' : 'Tutup'} className="fixed top-3 right-3 z-10 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img src={MPT4_ASSETS.dutyRoster} alt={title} onClick={event => event.stopPropagation()} className="max-w-full max-h-full object-contain" /></div>}
       </div>;
     };
 
@@ -1337,6 +1366,13 @@
           onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
         />;
       }
+      if (activePage === 'duty-roster') {
+        return <DutyRosterPage
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+        />;
+      }
 
       return (
         <div className="min-h-screen relative overflow-x-hidden flex flex-col">
@@ -1463,6 +1499,14 @@
                 <div className="flex items-center gap-3 text-sm font-semibold"><i className="ph-fill ph-warning-circle text-xl shrink-0"></i><span>{syncError}</span></div>
                 <button onClick={() => setRefreshNonce(value => value + 1)} className="shrink-0 min-h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm active:scale-95 transition-transform">{lang === 'zh' ? '重新连接' : 'Retry'}</button>
               </section>
+            )}
+
+            {activeTab === 'all' && !searchQuery && (
+              <button type="button" onClick={() => { setActivePage('duty-roster'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full mb-8 p-5 sm:p-6 rounded-3xl border text-left flex items-center gap-4 transition-all hover:-translate-y-0.5 ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-emerald-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-200'}`}>
+                <span className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}><i className="ph-fill ph-calendar-check text-3xl"></i></span>
+                <span className="flex-1 min-w-0"><span className="block text-lg sm:text-xl font-black">{lang === 'zh' ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)'}</span><span className="block mt-1 text-sm font-semibold opacity-65">{lang === 'zh' ? '查看每周值勤地点与教师安排' : 'Semak lokasi dan giliran guru bertugas'}</span></span>
+                <i className="ph-bold ph-arrow-right text-xl text-emerald-500 shrink-0"></i>
+              </button>
             )}
 
             {activeTab === 'all' && !searchQuery && (
