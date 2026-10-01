@@ -476,6 +476,128 @@
       footer: '感谢全体老师的配合与关注，以确保 MPT4 评估顺利、有序进行，并尽量减少对考生的干扰。'
     };
 
+    const MPT4_ASSETS = {
+      prepInfographic: './mpt4-pra-infografik.svg'
+    };
+
+    const MPT4_PREP_DATA = {
+      school: 'SJK (C) LADANG GRISEK',
+      title: 'MATRIKS PEMBELAJARAN TAHUN 4 (MPT4) 2026',
+      subtitle: 'PERSEDIAAN PRA-MPT4',
+      date: '5 Oktober 2026 (Isnin)',
+      infographic: MPT4_ASSETS.prepInfographic,
+      coordinators: [
+        { name: 'Cikgu Loh Boon Ping', role: 'Penolong Kanan HEM' },
+        { name: 'Cikgu Chong Cheng Yang', role: 'Setiausaha Pentaksiran (SuP)' }
+      ],
+      preparationDeadline: 'SELEWAT-LEWATNYA 2 OKTOBER 2026',
+      preparationChecklist: [
+        'Keluarkan barang yang tidak berkaitan.',
+        'Kembalikan bahan bantu mengajar, carta dan bahan paparan ke bilik BBM.',
+        'Kosongkan buku, buku latihan dan buku kerja.',
+        'Kosongkan / tutup papan kenyataan dengan kertas mahjong putih.',
+        'Pastikan tingkap bersih.', 'Periksa kipas dan lampu.',
+        'Pastikan almari besi kelas 5C boleh dikunci.'
+      ],
+      timeline: [
+        { time: '7:30 – 8:00 PAGI', title: 'Perhimpunan / Taklimat Ringkas MPT4', description: 'Selepas perhimpunan, SuP memberi taklimat ringkas kepada murid Tahun 3, 5 dan 6 mengenai perkara yang perlu diberi perhatian sepanjang MPT4.' },
+        { time: '8:00 PAGI – SELESAI', title: 'Penyediaan Bilik Darjah', branches: [
+          { label: 'MURID TAHUN 4', title: 'Kekal di Dewan', items: ['Guru Bimbingan dan Kaunseling boleh menjalankan slot ringkas: pengurusan diri, motivasi atau persediaan menghadapi pentaksiran.'], tone: 'blue' },
+          { label: 'MURID TAHUN 3, 5 DAN 6', title: 'Kembali ke Kelas', items: ['Menyusun meja dan kerusi bersama Guru Kelas / guru yang ditetapkan.', 'Persediaan bagi PBD Akhir Tahun dan Ujian Akhir Sesi Akademik.'], tone: 'green' },
+          { label: 'BILIK PENTAKSIRAN MPT4', title: 'Guru Bertanggungjawab + 8–10 Murid Tahun 5 & 6', items: ['Susun mengikut Pelan Tempat Duduk.', 'Bersihkan bilik.', 'Susun meja dan kerusi.', 'Tampal Label Meja.', 'Semak kemudahan.', 'Sediakan dokumen.'], tone: 'orange' }
+        ]}
+      ],
+      roomAssignments: [
+        ['5C','Bilik A (Bilik Utama)','4D (15)','15 + 1 meja besar','Cikgu Chiam Ai Ying'],
+        ['5D','Bilik B','4D (25)','25','Cikgu Tan Hui Kee'],
+        ['5E','Bilik C','4B (25)','25','Cikgu Leong Siew Fern'],
+        ['6A','Bilik D','4A (11) + 4B (1) + 4C (13)','25','Cikgu Ong Wen Jing'],
+        ['6B','Bilik E','4C (25)','25','Cikgu Tan Hau Vind'],
+        ['6C','Bilik F','4A (20)','20','Cikgu Lim Sie Pei'],
+        ['BILIK B','Bilik Khas','Kes khas','10','Cik Hanan Nazihah Binti Hasmi'],
+        ['BILIK A','Bilik Rizab','–','–','Cikgu Muhammad Faidh Amnan']
+      ],
+      temporaryClassPlacement: [
+        ['5C','4A','Cikgu Yusmairan'], ['5D','4E','Cikgu Tee Ying Chan'],
+        ['5E','Bilik Pend. Islam 1','Cikgu Norhafiza'], ['6A','4D','Cikgu Tan Lee Ching'],
+        ['6B','4C','En Lim Kian Pin'], ['6C','4B','En Willson Lim']
+      ],
+      roomChecklist: [
+        'Susun meja dan kerusi mengikut Pelan Tempat Duduk.',
+        'Kekalkan hanya bilangan meja dan kerusi yang diperlukan.',
+        'Tampal Label Meja pada sudut kanan atas meja.',
+        'Alih / tutup gambar, tulisan, carta atau bahan yang boleh membantu calon.',
+        'Pastikan smartboard berfungsi.',
+        'Tampal pada pintu: jadual pentaksiran, Pelan Tempat Duduk, senarai nama dan angka giliran calon.',
+        'Perabot pengawas — Bilik Utama: 1 meja besar + 1 kerusi KP; bilik lain: 1 kerusi pengawas.',
+        'Sediakan bakul sampah, penyapu dan penyodok sampah.',
+        'Pastikan meja dan kerusi berada dalam keadaan baik.',
+        'Hadapkan pintu almari besi kosong ke arah dinding.',
+        'Pastikan koridor di luar bilik turut dibersihkan.'
+      ],
+      rehearsal: {
+        title: 'Latihan Pergerakan Murid Tahun 4',
+        note: 'Jika bilik pentaksiran siap sebelum waktu rehat, latihan dijalankan sebelum rehat; jika belum siap, latihan dijalankan selepas rehat.',
+        items: ['Pergerakan melalui laluan yang ditetapkan.', 'Mengenal pasti bilik dan tempat duduk sendiri.', 'Menyemak ketepatan susunan tempat duduk calon.']
+      },
+      years356: [
+        'Guru Kelas / guru yang menjaga meneruskan pecutan akhir atau ulang kaji.',
+        'Pertukaran waktu boleh dilaksanakan jika Guru Mata Pelajaran ingin menjalankan ulang kaji.',
+        'Murid boleh dibawa ke dewan seawal 9:00 pagi jika guru perlu berehat atau mempunyai urusan lain.',
+        'Jika PdP / ulang kaji diteruskan, murid boleh kekal di kelas sehingga waktu rehat.'
+      ],
+      hallProgramme: {
+        staff: ['Cikgu Lim Qi Yi', 'Cikgu Chong Wei Ni', 'Cikgu Yap Min Yan'],
+        note: 'Semua guru membantu menjaga disiplin murid di dewan mengikut jadual waktu masing-masing.'
+      },
+      commonAreas: ['Tangga', 'Koridor', 'Susunan meja dan kerusi di koridor', 'Tandas calon', 'Papan kenyataan ditutup dengan kertas mahjong putih', 'Pastikan kawasan bersih dan teratur'],
+      postAssessmentNotice: {
+        title: 'JANGAN SUSUN SEMULA MEJA & KERUSI',
+        body: 'Murid TIDAK DIBENARKAN mengalihkan atau menyusun semula meja dan kerusi sendiri selepas pentaksiran tamat. Murid hendaklah menunggu arahan Guru Kelas.'
+      }
+    };
+
+    const MPT4Hub = ({ onBack, onOpenPrep, onOpenGuide, isDarkMode, lang, onLangToggle }) => {
+      const zh = lang === 'zh';
+      const cards = [
+        { title: 'Persediaan Pra-MPT4', date: '5 Oktober 2026', description: 'Persediaan bilik, pembahagian tugas, latihan pergerakan murid dan program di dewan.', icon: 'ph-clipboard-text', action: onOpenPrep, accent: 'from-amber-500 to-orange-500' },
+        { title: zh ? 'MPT4 管理指南' : 'Panduan Pengurusan MPT4', date: '6–8 Oktober 2026', description: zh ? '评估期间的规定、学生流动、下课时间及老师职责。' : 'Peraturan, pergerakan murid, waktu rehat dan tugas guru sepanjang pentaksiran.', icon: 'ph-book-open-text', action: onOpenGuide, accent: 'from-blue-600 to-indigo-600' }
+      ];
+      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3"><button onClick={onBack} className={`w-11 h-11 rounded-full border ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label="Kembali"><i className="ph-bold ph-arrow-left"></i></button><div className="flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><p className="font-extrabold">MPT4 2026</p></div><button onClick={onLangToggle} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label={zh?'Tukar ke Bahasa Melayu':'切换至中文'}>{zh?'BM':'中'}</button></div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16"><div className="text-center"><p className="text-sm font-black tracking-widest text-blue-600">SJK (C) LADANG GRISEK</p><h1 className="mt-3 text-4xl sm:text-5xl font-black">MPT4 2026</h1><p className="mt-3 opacity-70 font-semibold">{zh?'请选择要查看的页面':'Pilih halaman untuk dilihat'}</p></div><div className="mt-10 grid md:grid-cols-2 gap-5">{cards.map(card=><button key={card.title} onClick={card.action} className={`text-left rounded-3xl border overflow-hidden min-h-[260px] transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><div className={`h-2 bg-gradient-to-r ${card.accent}`}></div><div className="p-7"><i className={`ph-fill ${card.icon} text-4xl text-blue-500`}></i><p className="mt-6 text-sm font-black text-blue-600">{card.date}</p><h2 className="mt-2 text-2xl font-black">{card.title}</h2><p className="mt-3 text-sm leading-7 opacity-70">{card.description}</p><span className="mt-5 inline-flex items-center gap-2 font-extrabold text-blue-600">{zh?'打开页面':'Buka Halaman'} <i className="ph-bold ph-arrow-right"></i></span></div></button>)}</div></main>
+      </div>;
+    };
+
+    const PrepChecklist = ({ title, items, isDarkMode, open = false }) => <details open={open} className={`rounded-2xl border overflow-hidden ${isDarkMode?'bg-slate-800/70 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><summary className="cursor-pointer min-h-14 px-5 py-4 flex items-center gap-3 font-extrabold"><i className="ph-fill ph-check-square text-blue-500 text-xl"></i><span className="flex-1">{title}</span><span className="text-xs opacity-50">{items.length}</span></summary><ol className={`px-5 pb-5 pt-4 border-t space-y-3 ${isDarkMode?'border-slate-700':'border-slate-100'}`}>{items.map((item,i)=><li key={i} className="flex gap-3 text-sm leading-6"><span className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-black shrink-0">{i+1}</span><span>{item}</span></li>)}</ol></details>;
+
+    const MPT4PrepPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
+      const d = MPT4_PREP_DATA;
+      const [showInfographic, setShowInfographic] = useState(false);
+      useEffect(() => { if (!showInfographic) return; const close=e=>{if(e.key==='Escape')setShowInfographic(false)}; document.addEventListener('keydown',close); return()=>document.removeEventListener('keydown',close); }, [showInfographic]);
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const SectionTitle = ({ n, children }) => <div className="mb-5"><p className="text-xs font-black tracking-widest text-blue-600">SECTION {n}</p><h2 className="mt-1 text-2xl font-black">{children}</h2></div>;
+      const SimpleList = ({items}) => <ul className="space-y-3">{items.map((x,i)=><li key={i} className="flex gap-3 text-sm leading-6"><i className="ph-fill ph-check-circle text-emerald-500 mt-0.5 text-lg shrink-0"></i><span>{x}</span></li>)}</ul>;
+      return <div className={`min-h-screen ${isDarkMode?'bg-slate-900 text-slate-100':'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode?'bg-slate-900/90 border-slate-800':'bg-white/90 border-slate-200'}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3"><button onClick={onBack} className={`w-11 h-11 rounded-full border ${card}`} aria-label="Kembali ke MPT4"><i className="ph-bold ph-arrow-left"></i></button><div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500">MPT4 2026</p><p className="font-extrabold truncate">Persediaan Pra-MPT4</p></div><button onClick={onLangToggle} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${card}`} aria-label={lang==='zh'?'Tukar ke Bahasa Melayu':'切换至中文'}>{lang==='zh'?'BM':'中'}</button></div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16"><section className="pt-9 sm:pt-12 text-center"><p className="text-xs sm:text-sm font-black tracking-[.14em] text-blue-600">{d.school}</p><h1 className="mt-4 text-2xl sm:text-4xl font-black leading-tight">{d.title}</h1><p className="mt-3 text-xl sm:text-2xl font-black text-amber-600">{d.subtitle}</p><p className="mt-4 text-lg font-extrabold">{d.date}</p></section>
+          <section className="pt-12"><SectionTitle n="1">ALIRAN PERSEDIAAN PRA-MPT4</SectionTitle><div className={`rounded-3xl border p-4 sm:p-6 ${card}`}><button onClick={()=>setShowInfographic(true)} className="block w-full rounded-2xl overflow-hidden bg-slate-100"><img src={d.infographic} alt="Aliran Persediaan Pra-MPT4" className="w-full max-h-[520px] object-contain" /></button><div className="mt-4 flex flex-col sm:flex-row gap-3"><button onClick={()=>setShowInfographic(true)} className="min-h-11 px-5 rounded-xl bg-blue-600 text-white font-bold"><i className="ph-bold ph-magnifying-glass-plus mr-2"></i>Lihat Infografik</button><a href={d.infographic} download className={`min-h-11 px-5 rounded-xl border inline-flex items-center justify-center font-bold ${isDarkMode?'border-slate-600':'border-slate-300'}`}><i className="ph-bold ph-download-simple mr-2"></i>Muat Turun Infografik</a></div></div></section>
+          <section className="pt-12"><SectionTitle n="2">PENYELARAS</SectionTitle><div className="grid sm:grid-cols-2 gap-3">{d.coordinators.map(x=><article key={x.name} className={`p-5 rounded-2xl border ${card}`}><i className="ph-fill ph-user-circle text-3xl text-blue-500"></i><h3 className="mt-3 font-black text-lg">{x.name}</h3><p className="mt-1 text-sm opacity-65">{x.role}</p></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="3">PERSEDIAAN AWAL</SectionTitle><div className="mb-4 p-5 rounded-2xl bg-rose-600 text-white"><p className="text-xs font-black tracking-widest">DEADLINE</p><p className="mt-1 text-xl sm:text-2xl font-black">{d.preparationDeadline}</p></div><PrepChecklist title="Checklist Persediaan Awal" items={d.preparationChecklist} isDarkMode={isDarkMode} open /></section>
+          <section className="pt-12"><SectionTitle n="4">ALIRAN HARI PERSEDIAAN</SectionTitle><div className="space-y-0">{d.timeline.map((event,i)=><div key={event.time} className="grid grid-cols-[24px_1fr] gap-4"><div className="relative flex justify-center"><span className="mt-2 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-950 z-10"></span>{i<d.timeline.length-1&&<span className="absolute top-6 bottom-0 w-0.5 bg-blue-200 dark:bg-slate-700"></span>}</div><div className="pb-8"><time className="text-xl font-black text-blue-600 dark:text-blue-400">{event.time}</time><h3 className="mt-1 text-lg font-black">{event.title}</h3>{event.description&&<p className="mt-3 text-sm leading-7 opacity-75">{event.description}</p>}{event.branches&&<div className="mt-5 grid lg:grid-cols-3 gap-3">{event.branches.map(b=><article key={b.label} className={`p-5 rounded-2xl border ${card}`}><p className="text-xs font-black tracking-wide text-blue-600">{b.label}</p><h4 className="mt-2 font-black">{b.title}</h4><div className="mt-3"><SimpleList items={b.items}/></div></article>)}</div>}</div></div>)}</div></section>
+          <section className="pt-12"><SectionTitle n="5">PEMBAHAGIAN BILIK PENTAKSIRAN</SectionTitle><div className="grid sm:grid-cols-2 gap-3">{d.roomAssignments.map((r,i)=><article key={i} className={`p-5 rounded-2xl border ${card}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-black text-blue-600">{r[0]}</p><h3 className="mt-1 text-lg font-black">{r[1]}</h3></div><span className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-black">{r[3]} meja</span></div><dl className="mt-4 grid grid-cols-[75px_1fr] gap-y-2 text-sm"><dt className="opacity-55">Calon</dt><dd className="font-bold">{r[2]}</dd><dt className="opacity-55">Guru</dt><dd className="font-bold">{r[4]}</dd></dl></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="6">PENEMPATAN SEMENTARA KELAS</SectionTitle><p className="mb-4 text-sm font-bold opacity-65">Penempatan pada 6–8 Oktober 2026</p><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">{d.temporaryClassPlacement.map((r,i)=><article key={i} className={`p-5 rounded-2xl border ${card}`}><div className="flex items-center gap-3"><span className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black">{r[0]}</span><div><p className="text-xs opacity-55">Bilik Digunakan</p><p className="font-black">{r[1]}</p></div></div><p className="mt-4 text-xs opacity-55">Guru Menjaga Persediaan pada 5/10</p><p className="mt-1 font-bold text-sm">{r[2]}</p></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="7">CHECKLIST BILIK PENTAKSIRAN</SectionTitle><PrepChecklist title="11 perkara untuk disemak" items={d.roomChecklist} isDarkMode={isDarkMode}/></section>
+          <section className="pt-12"><SectionTitle n="8">LATIHAN MURID TAHUN 4</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black text-xl">{d.rehearsal.title}</h3><p className="mt-3 text-sm leading-7 opacity-75">{d.rehearsal.note}</p><div className="mt-5"><SimpleList items={d.rehearsal.items}/></div></div></section>
+          <section className="pt-12"><SectionTitle n="9">TAHUN 3, 5 DAN 6</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black mb-5">Selepas Selesai Penyediaan – Waktu Rehat</h3><SimpleList items={d.years356}/></div></section>
+          <section className="pt-12"><SectionTitle n="10">PROGRAM DI DEWAN</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black text-lg">Selepas Waktu Rehat</h3><p className="mt-2 text-sm opacity-70">Semua murid berkumpul di dewan. Program / ceramah dikendalikan oleh:</p><div className="mt-5 flex flex-wrap gap-2">{d.hallProgramme.staff.map(x=><span key={x} className="px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-bold">{x}</span>)}</div><p className="mt-5 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-sm font-bold leading-6">{d.hallProgramme.note}</p></div></section>
+          <section className="pt-12"><SectionTitle n="11">KAWASAN UMUM ARAS 3</SectionTitle><div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{d.commonAreas.map(x=><div key={x} className={`p-4 rounded-2xl border text-sm font-bold flex gap-2 ${card}`}><i className="ph-fill ph-check-circle text-emerald-500 text-lg shrink-0"></i><span>{x}</span></div>)}</div></section>
+          <section className="pt-12"><SectionTitle n="12">PERINGATAN SELEPAS PENTAKSIRAN</SectionTitle><div className="p-6 sm:p-8 rounded-3xl bg-rose-600 text-white"><i className="ph-fill ph-warning-octagon text-4xl"></i><h3 className="mt-4 text-2xl sm:text-3xl font-black">{d.postAssessmentNotice.title}</h3><p className="mt-4 leading-7 font-semibold">{d.postAssessmentNotice.body}</p></div></section>
+        </main>
+        {showInfographic&&<div role="dialog" aria-modal="true" aria-label="Infografik Pra-MPT4" onClick={()=>setShowInfographic(false)} className="fixed inset-0 z-[100] bg-black/85 p-3 sm:p-8 flex items-center justify-center"><button onClick={()=>setShowInfographic(false)} aria-label="Tutup" className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img onClick={e=>e.stopPropagation()} src={d.infographic} alt="Aliran Persediaan Pra-MPT4" className="max-w-full max-h-full object-contain rounded-xl" /></div>}
+      </div>;
+    };
+
     const MPT4Accordion = ({ section, isOpen, onToggle, isDarkMode, ui }) => (
       <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
         <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={`mpt4-panel-${section.id}`} className="w-full min-h-[64px] px-4 sm:px-6 py-4 flex items-center gap-3 text-left">
@@ -1119,9 +1241,27 @@
         );
       };
 
-      if (activePage === 'mpt4') {
-        return <MPT4Page
+      if (activePage === 'mpt4-hub') {
+        return <MPT4Hub
           onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          onOpenPrep={() => { setActivePage('mpt4-prep'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          onOpenGuide={() => { setActivePage('mpt4-guide'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />;
+      }
+      if (activePage === 'mpt4-prep') {
+        return <MPT4PrepPage
+          onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />;
+      }
+      if (activePage === 'mpt4-guide') {
+        return <MPT4Page
+          onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           isDarkMode={isDarkMode}
           lang={lang}
           onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
@@ -1256,11 +1396,11 @@
             )}
 
             {activeTab === 'all' && !searchQuery && (
-              <button type="button" onClick={() => { setActivePage('mpt4'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full mb-8 sm:mb-10 p-5 sm:p-6 rounded-[1.5rem] border text-left flex items-center gap-4 sm:gap-5 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
+              <button type="button" onClick={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full mb-8 sm:mb-10 p-5 sm:p-6 rounded-[1.5rem] border text-left flex items-center gap-4 sm:gap-5 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-clipboard-text text-3xl"></i></div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap"><h2 className="text-lg sm:text-xl font-black">MPT4 2026</h2><span className={`px-2.5 py-1 rounded-full text-[0.65rem] font-black tracking-wide ${isDarkMode ? 'bg-emerald-950/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>6–8 OKT</span></div>
-                  <p className="mt-1 text-sm sm:text-base font-semibold opacity-65">{lang === 'zh' ? '管理指南' : 'Panduan Pengurusan'}</p>
+                  <div className="flex items-center gap-2 flex-wrap"><h2 className="text-lg sm:text-xl font-black">MPT4 2026</h2><span className={`px-2.5 py-1 rounded-full text-[0.65rem] font-black tracking-wide ${isDarkMode ? 'bg-emerald-950/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>5–8 OKT</span></div>
+                  <p className="mt-1 text-sm sm:text-base font-semibold opacity-65">{lang === 'zh' ? '准备工作与评估期间管理' : 'Persediaan & Panduan Pengurusan'}</p>
                 </div>
                 <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
               </button>
