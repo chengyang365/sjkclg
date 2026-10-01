@@ -1,5 +1,5 @@
-const VERSION = 'lg-app-center-v2';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './mpt4-pra-infografik.svg'];
+const VERSION = 'lg-app-center-v3';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './mpt4-pra-infografik.svg', './mpt4-pra-infografik-zh.svg'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(VERSION).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
