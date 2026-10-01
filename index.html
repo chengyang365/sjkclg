@@ -569,7 +569,10 @@
       'Cikgu Tee Ying Chan': '郑咏珍师',
       'Cikgu Tan Lee Ching': '陈丽清师',
       'En Lim Kian Pin': '林建品师',
-      'En Willson Lim': '林伟胜师'
+      'En Willson Lim': '林伟胜师',
+      'Cikgu Lim Qi Yi': '林启义师',
+      'Cikgu Chong Wei Ni': '张玮倪师',
+      'Cikgu Yap Min Yan': '叶民彦师'
     };
 
     const MPT4_PREP_ZH = {
@@ -614,6 +617,10 @@
     );
     MPT4_PREP_ZH.temporaryClassPlacement = MPT4_PREP_DATA.temporaryClassPlacement.map(row =>
       row.map((value, index) => index === 2 ? (MPT4_TEACHER_NAMES_ZH[value] || value) : value)
+    );
+
+    MPT4_PREP_ZH.hallProgramme.staff = MPT4_PREP_DATA.hallProgramme.staff.map(name =>
+      MPT4_TEACHER_NAMES_ZH[name] || name
     );
 
     MPT4_PREP_DATA.ui = {
