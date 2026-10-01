@@ -370,10 +370,113 @@
         'Murid masuk ke bilik pentaksiran mengikut arahan dan prosedur yang ditetapkan. Guru bertugas tidak perlu mengiringi murid masuk ke dalam bilik pentaksiran.'
       ],
       documents: { guideUrl: '', infographicUrl: '' },
+      ui: {
+        pageName: 'Panduan Pengurusan MPT4', version: 'Versi Terkini / 最新版本',
+        nav: ['Utama', 'Timeline', 'Panduan', 'Guru Bertugas'],
+        sectionTitles: ['Maklumat Penting', 'Pengurusan Murid Tahun 4', 'Panduan Lengkap', 'Waktu Bertugas', 'Tugas Guru Bertugas', 'Dokumen & Infografik'],
+        primaryStaff: 'Petugas Utama', supportingStaff: 'Guru Membantu',
+        guideTitle: 'Panduan Lengkap', guideAction: 'Lihat / Muat Turun PDF', infographicTitle: 'Infografik Ringkas', infographicAction: 'Lihat Infografik', unavailable: 'Belum tersedia'
+      },
       footer: 'Kerjasama dan perhatian semua guru amat dihargai bagi memastikan pentaksiran MPT4 berjalan dengan lancar dan teratur serta gangguan kepada calon dapat diminimumkan.'
     };
 
-    const MPT4Accordion = ({ section, isOpen, onToggle, isDarkMode }) => (
+    const MPT4_ZH = {
+      school: '新廊华小 · SJK (C) LADANG GRISEK',
+      title: '2026年 MPT4',
+      subtitle: '评估期间管理指南',
+      date: '2026年10月6日至8日',
+      breakTime: '上午 9:45 至 10:15',
+      highlights: [
+        { kicker: '三楼', title: '禁区', icon: 'ph-prohibit', tone: 'warning', description: '除 MPT4 评估工作人员外，其他老师及学生不得经过考场区域，也不得使用三楼厕所。' },
+        { kicker: '中央楼梯', title: '专用通道', icon: 'ph-stairs', tone: 'info', description: '仅供评估工作人员及四年级学生使用。' },
+        { kicker: '下课时间', title: '上午 9:45 – 10:15', icon: 'ph-fork-knife', tone: 'neutral', description: 'MPT4 评估期间全体学生统一下课时间。' },
+        { kicker: '保持安静', title: '安静环境', icon: 'ph-speaker-slash', tone: 'neutral', description: '确保学生流动及教学活动不会干扰正在进行的评估。' }
+      ],
+      timeline: [
+        { time: '上午 7:00', title: '在礼堂集合' },
+        { time: '上午 7:25', title: '三、五及六年级学生开始列队返回课室', secondary: true },
+        { time: '上午 7:40', title: '四年级学生开始列队前往考场' },
+        { time: '上午 9:30', title: '返回礼堂', note: '完成评估项目后。' },
+        { time: '上午 9:45 – 10:15', title: '下课时间' },
+        { time: '上午 10:15', title: '在礼堂集合及列队' },
+        { time: '上午 10:25', title: '前往考场' },
+        { time: '中午 12:15', title: '返回礼堂', note: '完成评估项目后。' }
+      ],
+      accordions: [
+        {
+          id: 'A', title: '评估期间规定', intro: '请全体老师向各自班级学生传达以下事项：',
+          groups: [
+            { title: '1. 禁区及学生流动', items: [
+              '评估期间，三楼列为禁区。',
+              '中央楼梯仅供评估工作人员及四年级学生使用。',
+              '除 MPT4 评估工作人员外，其他老师及学生一律不得经过考场区域，也不得使用三楼厕所。',
+              '学生只可使用一楼及二楼的厕所。',
+              '除班长外，其他学生不得前往办公室。',
+              '在 PBD／UASA／教学期间，请老师尽量减少学生离开课室的次数，以及每次同时离开课室的人数。'
+            ]},
+            { title: '2. 暂停进行的活动', lead: '评估期间：', emphasis: '所有课室外活动及特别室的使用一律暂停。' }
+          ]
+        },
+        {
+          id: 'B', title: '全体老师注意事项', groups: [
+            { title: '1. 学生秩序管理', items: [
+              '值勤老师须到指定岗位，协助维持评估期间学生的秩序及流动。',
+              '每日值勤老师须在礼堂看管所有学生，直至三、五及六年级学生列队返回课室。'
+            ]},
+            { title: '2. 课室秩序', paragraphs: [
+              '老师须确保学生遵守秩序，并保持课室安静，以免干扰正在进行的评估。',
+              '应避免进行会产生较大声响的活动，包括大声朗读或集体朗读。'
+            ]},
+            { title: '3. 下课时间安排', lead: 'MPT4 评估期间，所有学生的下课时间统一为：', emphasis: '上午 9:45 至 10:15', items: [
+              '第五节课老师须带领学生前往食堂。',
+              '下课后，学生须在礼堂列队。',
+              '第六节课老师须于上午 10:15 准时到礼堂，带领学生返回课室。'
+            ]}
+          ]
+        },
+        {
+          id: 'C', title: '四年级学生集合及移动安排', intro: '请参阅上方时间表，了解四年级学生完整移动安排。',
+          groups: [{ items: [
+            '上午 7:00 — 在礼堂集合。',
+            '上午 7:40 — 开始列队前往考场。',
+            '上午 9:30 — 完成评估项目后，返回礼堂集合。',
+            '上午 9:45 至 10:15 — 下课时间。',
+            '上午 10:15 — 下课后在礼堂集合及列队。',
+            '上午 10:25 — 开始列队前往考场。',
+            '中午 12:15 — 完成评估项目后，返回礼堂集合。'
+          ], emphasis: '三、五及六年级学生于上午 7:25 开始列队返回课室。' }]
+        },
+        {
+          id: 'D', title: '四年级学生值勤老师', petugas: {
+            primary: ['学生事务副校长（GPK HEM）', '评估秘书（SuP）', '纪律老师', '辅导老师（B&K）'],
+            supporting: ['4A 班级任老师', '4D 班级任老师', '回教教育老师'],
+            note: '以上协助老师仅在没有教学任务或没有在其他班级执行监考任务的时段参与值勤。'
+          }
+        }
+      ],
+      dutyTimes: [
+        { label: '早晨时段', time: '上午 7:00 – 7:45', icon: 'ph-sun-horizon' },
+        { label: '评估结束／下课时段', time: '上午 9:30 – 10:25', icon: 'ph-sun' },
+        { label: '中午时段', time: '中午 12:15 – 下午 1:00', icon: 'ph-clock' }
+      ],
+      duties: [
+        '在礼堂维持学生纪律及管理学生流动。',
+        '评估开始前 30 分钟，带领学生到通往考场的楼梯口。',
+        '每项评估结束后，在考场附近的楼梯口等候，并带领学生返回礼堂。',
+        '学生须按照既定指示及程序自行进入考场；值勤老师无须陪同学生进入考场。'
+      ],
+      documents: MPT4_DATA.documents,
+      ui: {
+        pageName: 'MPT4 管理指南', version: '最新版本 / Versi Terkini',
+        nav: ['重点', '时间表', '完整指南', '值勤老师'],
+        sectionTitles: ['重要资讯', '四年级学生集合及移动安排', '完整指南', '值勤时间', '值勤老师职责', '文件与信息图'],
+        primaryStaff: '主要负责人', supportingStaff: '协助老师',
+        guideTitle: '完整指南', guideAction: '查看／下载 PDF', infographicTitle: '简要信息图', infographicAction: '查看信息图', unavailable: '尚未提供'
+      },
+      footer: '感谢全体老师的配合与关注，以确保 MPT4 评估顺利、有序进行，并尽量减少对考生的干扰。'
+    };
+
+    const MPT4Accordion = ({ section, isOpen, onToggle, isDarkMode, ui }) => (
       <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
         <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={`mpt4-panel-${section.id}`} className="w-full min-h-[64px] px-4 sm:px-6 py-4 flex items-center gap-3 text-left">
           <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}>{section.id}</span>
@@ -394,8 +497,8 @@
             ))}
             {section.petugas && (
               <div className="grid sm:grid-cols-2 gap-4 mt-5">
-                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><h4 className="font-extrabold mb-3">Petugas Utama</h4><ul className="space-y-2 text-sm">{section.petugas.primary.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-blue-500 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
-                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}><h4 className="font-extrabold mb-3">Guru Membantu</h4><ul className="space-y-2 text-sm">{section.petugas.supporting.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-slate-400 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><h4 className="font-extrabold mb-3">{ui.primaryStaff}</h4><ul className="space-y-2 text-sm">{section.petugas.primary.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-blue-500 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}><h4 className="font-extrabold mb-3">{ui.supportingStaff}</h4><ul className="space-y-2 text-sm">{section.petugas.supporting.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-slate-400 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
                 <p className="sm:col-span-2 text-sm leading-6 opacity-75">{section.petugas.note}</p>
               </div>
             )}
@@ -404,8 +507,9 @@
       </div>
     );
 
-    const MPT4Page = ({ onBack, isDarkMode }) => {
+    const MPT4Page = ({ onBack, isDarkMode, lang, onLangToggle }) => {
       const [openSection, setOpenSection] = useState(null);
+      const data = lang === 'zh' ? MPT4_ZH : MPT4_DATA;
       const jumpTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       const toneClasses = {
         warning: isDarkMode ? 'bg-rose-950/35 border-rose-900/60' : 'bg-rose-50 border-rose-200',
@@ -418,29 +522,30 @@
           <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
             <div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
               <button type="button" onClick={onBack} aria-label="Kembali ke Pusat Aplikasi" className={`w-11 h-11 rounded-full flex items-center justify-center border shrink-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left text-xl"></i></button>
-              <div className="min-w-0"><p className="text-xs font-bold text-blue-500 uppercase tracking-wider">LG Apps</p><p className="font-extrabold text-sm sm:text-base truncate">Panduan Pengurusan MPT4</p></div>
+              <div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500 uppercase tracking-wider">LG Apps</p><p className="font-extrabold text-sm sm:text-base truncate">{data.ui.pageName}</p></div>
+              <button type="button" onClick={onLangToggle} aria-label={lang === 'zh' ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full font-bold text-sm border shrink-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>{lang === 'zh' ? 'BM' : '中'}</button>
             </div>
           </header>
 
           <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
             <section className="pt-8 sm:pt-12 text-center" aria-labelledby="mpt4-title">
-              <p className="text-xs sm:text-sm font-extrabold tracking-[0.14em] text-blue-600">{MPT4_DATA.school}</p>
-              <h1 id="mpt4-title" className="mt-3 text-4xl sm:text-5xl font-black tracking-tight">{MPT4_DATA.title}</h1>
-              <p className="mt-2 text-base sm:text-xl font-bold opacity-75">{MPT4_DATA.subtitle}</p>
-              <p className="mt-5 text-xl sm:text-2xl font-black text-blue-600">{MPT4_DATA.date}</p>
-              <span className={`inline-flex mt-4 items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${isDarkMode ? 'bg-emerald-950/30 border-emerald-900/60 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}><span className="w-2 h-2 rounded-full bg-emerald-500"></span>Versi Terkini / 最新版本</span>
+              <p className="text-xs sm:text-sm font-extrabold tracking-[0.14em] text-blue-600">{data.school}</p>
+              <h1 id="mpt4-title" className="mt-3 text-4xl sm:text-5xl font-black tracking-tight">{data.title}</h1>
+              <p className="mt-2 text-base sm:text-xl font-bold opacity-75">{data.subtitle}</p>
+              <p className="mt-5 text-xl sm:text-2xl font-black text-blue-600">{data.date}</p>
+              <span className={`inline-flex mt-4 items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${isDarkMode ? 'bg-emerald-950/30 border-emerald-900/60 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}><span className="w-2 h-2 rounded-full bg-emerald-500"></span>{data.ui.version}</span>
             </section>
 
             <nav aria-label="Navigasi pantas" className={`sticky top-16 z-40 -mx-4 sm:mx-0 mt-7 px-4 sm:px-0 py-3 overflow-x-auto hide-scrollbar ${isDarkMode ? 'bg-slate-900/95' : 'bg-slate-50/95'} backdrop-blur-xl`}>
               <div className="flex gap-2 w-max sm:mx-auto">
-                {[['mpt4-utama','Utama'],['mpt4-timeline','Timeline'],['mpt4-panduan','Panduan'],['mpt4-guru','Guru Bertugas']].map(([id,label]) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{label}</button>)}
+                {['mpt4-utama','mpt4-timeline','mpt4-panduan','mpt4-guru'].map((id,index) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{data.ui.nav[index]}</button>)}
               </div>
             </nav>
 
             <section id="mpt4-utama" className="scroll-mt-32 pt-7" aria-labelledby="mpt4-important">
-              <div className="mb-5"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 1</p><h2 id="mpt4-important" className="mt-1 text-2xl font-black">Maklumat Penting</h2></div>
+              <div className="mb-5"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 1</p><h2 id="mpt4-important" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[0]}</h2></div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                {MPT4_DATA.highlights.map(item => <article key={item.kicker} className={`p-4 sm:p-5 rounded-2xl border min-w-0 ${toneClasses[item.tone]}`}>
+                {data.highlights.map(item => <article key={item.kicker} className={`p-4 sm:p-5 rounded-2xl border min-w-0 ${toneClasses[item.tone]}`}>
                   <i aria-hidden="true" className={`ph-fill ${item.icon} text-2xl ${item.tone === 'warning' ? 'text-rose-500' : 'text-blue-500'}`}></i>
                   <p className="mt-4 text-[0.68rem] sm:text-xs font-black tracking-wider opacity-60">{item.kicker}</p>
                   <h3 className="mt-1 text-base sm:text-lg font-black leading-tight break-words">{item.title}</h3>
@@ -450,32 +555,32 @@
             </section>
 
             <section id="mpt4-timeline" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-movement">
-              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 2</p><h2 id="mpt4-movement" className="mt-1 text-2xl font-black">Pengurusan Murid Tahun 4</h2></div>
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 2</p><h2 id="mpt4-movement" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[1]}</h2></div>
               <div className={`rounded-3xl border p-5 sm:p-8 ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-                {MPT4_DATA.timeline.map((item, index) => <div key={item.time} className="grid grid-cols-[22px_1fr] gap-4">
-                  <div className="relative flex justify-center"><span className={`mt-1.5 w-3 h-3 rounded-full border-[3px] box-content z-10 ${item.secondary ? 'bg-slate-400 border-slate-200 dark:border-slate-700' : 'bg-blue-600 border-blue-100 dark:border-blue-950'}`}></span>{index < MPT4_DATA.timeline.length - 1 && <span className={`absolute top-5 bottom-0 w-0.5 ${isDarkMode ? 'bg-slate-700' : 'bg-slate-200'}`}></span>}</div>
+                {data.timeline.map((item, index) => <div key={item.time} className="grid grid-cols-[22px_1fr] gap-4">
+                  <div className="relative flex justify-center"><span className={`mt-1.5 w-3 h-3 rounded-full border-[3px] box-content z-10 ${item.secondary ? 'bg-slate-400 border-slate-200 dark:border-slate-700' : 'bg-blue-600 border-blue-100 dark:border-blue-950'}`}></span>{index < data.timeline.length - 1 && <span className={`absolute top-5 bottom-0 w-0.5 ${isDarkMode ? 'bg-slate-700' : 'bg-slate-200'}`}></span>}</div>
                   <div className={`pb-7 ${item.secondary ? 'opacity-60' : ''}`}><time className={`block text-lg sm:text-xl font-black ${item.secondary ? '' : 'text-blue-600 dark:text-blue-400'}`}>{item.time}</time><h3 className="mt-1 text-sm sm:text-base font-extrabold leading-6">{item.title}</h3>{item.note && <p className="mt-1 text-sm opacity-70">{item.note}</p>}</div>
                 </div>)}
               </div>
             </section>
 
             <section id="mpt4-panduan" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-guide">
-              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 3</p><h2 id="mpt4-guide" className="mt-1 text-2xl font-black">Panduan Lengkap</h2></div>
-              <div className="space-y-3">{MPT4_DATA.accordions.map(section => <MPT4Accordion key={section.id} section={section} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} />)}</div>
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 3</p><h2 id="mpt4-guide" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[2]}</h2></div>
+              <div className="space-y-3">{data.accordions.map(section => <MPT4Accordion key={section.id} section={section} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} ui={data.ui} />)}</div>
             </section>
 
             <section id="mpt4-guru" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-duty-time">
-              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p><h2 id="mpt4-duty-time" className="mt-1 text-2xl font-black">Waktu Bertugas</h2></div>
-              <div className="grid md:grid-cols-3 gap-3">{MPT4_DATA.dutyTimes.map(slot => <article key={slot.label} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className={`ph-fill ${slot.icon} text-2xl text-blue-500`}></i><p className="mt-4 text-xs font-black tracking-wider opacity-60">{slot.label}</p><p className="mt-1 text-xl font-black">{slot.time}</p></article>)}</div>
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p><h2 id="mpt4-duty-time" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[3]}</h2></div>
+              <div className="grid md:grid-cols-3 gap-3">{data.dutyTimes.map(slot => <article key={slot.label} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className={`ph-fill ${slot.icon} text-2xl text-blue-500`}></i><p className="mt-4 text-xs font-black tracking-wider opacity-60">{slot.label}</p><p className="mt-1 text-xl font-black">{slot.time}</p></article>)}</div>
             </section>
 
-            <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">Tugas Guru Bertugas</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{MPT4_DATA.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
+            <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[4]}</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{data.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
 
-            <section className="pt-12" aria-labelledby="mpt4-documents"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 6</p><h2 id="mpt4-documents" className="mt-1 text-2xl font-black">Dokumen & Infografik</h2></div><div className="grid sm:grid-cols-2 gap-3">
-              {[{title:'Panduan Lengkap',label:'Lihat / Muat Turun PDF',url:MPT4_DATA.documents.guideUrl,icon:'ph-file-pdf'},{title:'Infografik Ringkas',label:'Lihat Infografik',url:MPT4_DATA.documents.infographicUrl,icon:'ph-image'}].map(doc => <div key={doc.title} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'}`}><i className={`ph-fill ${doc.icon} text-2xl text-blue-500`}></i><h3 className="mt-3 font-extrabold">{doc.title}</h3>{doc.url ? <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 min-h-11 inline-flex items-center px-4 rounded-xl bg-blue-600 text-white font-bold text-sm">{doc.label}</a> : <button type="button" disabled className="mt-4 min-h-11 px-4 rounded-xl bg-slate-200 dark:bg-slate-700 opacity-60 font-bold text-sm cursor-not-allowed">{doc.label} · Belum tersedia</button>}</div>)}
+            <section className="pt-12" aria-labelledby="mpt4-documents"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 6</p><h2 id="mpt4-documents" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[5]}</h2></div><div className="grid sm:grid-cols-2 gap-3">
+              {[{title:data.ui.guideTitle,label:data.ui.guideAction,url:data.documents.guideUrl,icon:'ph-file-pdf'},{title:data.ui.infographicTitle,label:data.ui.infographicAction,url:data.documents.infographicUrl,icon:'ph-image'}].map(doc => <div key={doc.title} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'}`}><i className={`ph-fill ${doc.icon} text-2xl text-blue-500`}></i><h3 className="mt-3 font-extrabold">{doc.title}</h3>{doc.url ? <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 min-h-11 inline-flex items-center px-4 rounded-xl bg-blue-600 text-white font-bold text-sm">{doc.label}</a> : <button type="button" disabled className="mt-4 min-h-11 px-4 rounded-xl bg-slate-200 dark:bg-slate-700 opacity-60 font-bold text-sm cursor-not-allowed">{doc.label} · {data.ui.unavailable}</button>}</div>)}
             </div></section>
 
-            <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{MPT4_DATA.footer}</p></footer>
+            <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{data.footer}</p></footer>
           </main>
         </div>
       );
@@ -1015,7 +1120,12 @@
       };
 
       if (activePage === 'mpt4') {
-        return <MPT4Page onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }} isDarkMode={isDarkMode} />;
+        return <MPT4Page
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />;
       }
 
       return (
@@ -1150,7 +1260,7 @@
                 <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-clipboard-text text-3xl"></i></div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap"><h2 className="text-lg sm:text-xl font-black">MPT4 2026</h2><span className={`px-2.5 py-1 rounded-full text-[0.65rem] font-black tracking-wide ${isDarkMode ? 'bg-emerald-950/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>6–8 OKT</span></div>
-                  <p className="mt-1 text-sm sm:text-base font-semibold opacity-65">Panduan Pengurusan</p>
+                  <p className="mt-1 text-sm sm:text-base font-semibold opacity-65">{lang === 'zh' ? '管理指南' : 'Panduan Pengurusan'}</p>
                 </div>
                 <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
               </button>
