@@ -131,7 +131,8 @@
       deleteApp: (id) => apiRequest('deleteApp', { id }),
       recordClick: (id) => apiRequest('recordClick', { id }),
       updateAppOrders: (orders) => apiRequest('updateAppOrders', { orders }),
-      saveSettings: (key, val) => apiRequest('saveSettings', { key, val })
+      saveSettings: (key, val) => apiRequest('saveSettings', { key, val }),
+      submitMpt4Acknowledgement: (data) => apiRequest('submitMpt4Acknowledgement', data)
     };
 
     const AnimatedNumber = ({ value }) => {
@@ -762,6 +763,68 @@
       </div>;
     };
 
+    const MPT4_ACK_TEACHERS = [
+      'AMNAN','CHIAM AI YING','CHIN LEE MEI','CHONG CHENG YANG','CHONG WEI NI','LEONG SIEW FEN',
+      'LIM KIAN PIN','LIM QI YI','LIM SIE PEI','LOH BOON PING','NABILA','NADIA','NORHAFIZA',
+      'OI SWEE CHIEN','ONG WEN JING','RINNY SEAH','ROSE MALATINA','TAN HAU VIND','TAN HUI KEE',
+      'TAN LEE CHING','TEE YING CHAN','WINSON','WILLSON LIM','WONG SIEW JING','YAP MIN YAN',
+      'YIP KIM YUN','YUSMAIRAN','CIK HANAN NAZIHAH BINTI HASMI','MUHAMMAD FAIDH AMNAN'
+    ];
+    const normalizeMpt4Teacher = name => String(name || '').replace(/^(CIKGU|EN)\s+/i, '').replace(/\s*\(K\)$/i, '').trim().toUpperCase();
+    const MPT4_TEACHER_NAMES_ZH_NORMALIZED = Object.fromEntries(
+      Object.entries(MPT4_TEACHER_NAMES_ZH).map(([name, chineseName]) => [normalizeMpt4Teacher(name), chineseName])
+    );
+
+    const MPT4Acknowledgement = ({ pageId, isDarkMode, lang }) => {
+      const isZh = lang === 'zh';
+      const [teacher, setTeacher] = useState('');
+      const [checked, setChecked] = useState(false);
+      const [submitting, setSubmitting] = useState(false);
+      const [savedAt, setSavedAt] = useState('');
+      const [error, setError] = useState('');
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const copy = isZh ? {
+        title: '教师阅读确认', prompt: '请确认您已阅读并了解本页面内容。', select: '请选择您的姓名',
+        confirm: '我已阅读并了解本页面内容', submit: '提交阅读确认', saving: '提交中…',
+        success: '确认已记录', time: '记录时间', required: '请选择姓名并勾选确认后再提交。',
+        failure: '提交失败。请检查网络连接后重试；您的选择仍会保留。',
+        note: '请以本人名义提交。系统记录教师姓名、页面版本和提交时间。'
+      } : {
+        title: 'Pengesahan Bacaan Guru', prompt: 'Sila sahkan bahawa anda telah membaca dan memahami kandungan halaman ini.',
+        select: 'Pilih nama anda', confirm: 'Saya telah membaca dan memahami kandungan halaman ini',
+        submit: 'Hantar Pengesahan', saving: 'Menghantar…', success: 'Pengesahan direkodkan', time: 'Masa rekod',
+        required: 'Sila pilih nama dan tandakan pengesahan sebelum menghantar.',
+        failure: 'Penghantaran gagal. Semak sambungan Internet dan cuba lagi; pilihan anda dikekalkan.',
+        note: 'Sila hantar atas nama sendiri. Nama guru, versi halaman dan masa penghantaran akan direkodkan.'
+      };
+      const handleSubmit = async event => {
+        event.preventDefault();
+        setError('');
+        if (!teacher || !checked) { setError(copy.required); return; }
+        setSubmitting(true);
+        try {
+          const result = await server.submitMpt4Acknowledgement({ pageId, pageVersion: 'v1', teacherName: teacher, language: lang });
+          setSavedAt(result.confirmedAt || new Date().toISOString());
+        } catch (e) {
+          setError(copy.failure);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+      return <section className="pt-12" aria-labelledby={`${pageId}-ack-title`}>
+        <div className={`rounded-3xl border p-5 sm:p-7 ${card}`}>
+          <div className="flex items-start gap-3"><span className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0"><i className="ph-fill ph-read-cv-logo text-2xl"></i></span><div><h2 id={`${pageId}-ack-title`} className="text-xl font-black">{copy.title}</h2><p className="mt-1 text-sm leading-6 opacity-70">{copy.prompt}</p></div></div>
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+            <label className="block"><span className="sr-only">{copy.select}</span><select value={teacher} onChange={e => { setTeacher(e.target.value); setSavedAt(''); }} required className={`min-h-12 w-full px-4 rounded-xl border font-semibold outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}><option value="">{copy.select}</option>{MPT4_ACK_TEACHERS.map(name => <option key={name} value={name}>{isZh && MPT4_TEACHER_NAMES_ZH_NORMALIZED[name] ? `${MPT4_TEACHER_NAMES_ZH_NORMALIZED[name]}（${name}）` : name}</option>)}</select></label>
+            <label className="flex items-start gap-3 p-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 cursor-pointer"><input type="checkbox" checked={checked} onChange={e => { setChecked(e.target.checked); setSavedAt(''); }} className="mt-1 w-5 h-5 accent-blue-600 shrink-0"/><span className="text-sm font-bold leading-6">{copy.confirm}</span></label>
+            {error && <p role="alert" className="text-sm font-bold text-rose-600 dark:text-rose-300">{error}</p>}
+            {savedAt && <p role="status" className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 text-sm font-bold"><i className="ph-bold ph-check-circle mr-2"></i>{copy.success} · {copy.time}: {new Date(savedAt).toLocaleString(isZh ? 'zh-CN' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur' })}</p>}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3"><button type="submit" disabled={submitting} className="min-h-12 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-extrabold">{submitting ? copy.saving : copy.submit}</button><p className="text-xs leading-5 opacity-60">{copy.note}</p></div>
+          </form>
+        </div>
+      </section>;
+    };
+
     const PrepChecklist = ({ title, items, isDarkMode, open = false }) => <details open={open} className={`rounded-2xl border overflow-hidden ${isDarkMode?'bg-slate-800/70 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><summary className="cursor-pointer min-h-14 px-5 py-4 flex items-center gap-3 font-extrabold"><i className="ph-fill ph-check-square text-blue-500 text-xl"></i><span className="flex-1">{title}</span><span className="text-xs opacity-50">{items.length}</span></summary><ol className={`px-5 pb-5 pt-4 border-t space-y-3 ${isDarkMode?'border-slate-700':'border-slate-100'}`}>{items.map((item,i)=><li key={i} className="flex gap-3 text-sm leading-6"><span className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-black shrink-0">{i+1}</span><span>{item}</span></li>)}</ol></details>;
 
     const MPT4PrepPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
@@ -786,6 +849,7 @@
           <section className="pt-12"><SectionTitle n="10">{d.ui.hallProgramme}</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black text-lg">{d.ui.afterBreak}</h3><p className="mt-2 text-sm opacity-70">{d.ui.hallIntro}</p><div className="mt-5 flex flex-wrap gap-2">{d.hallProgramme.staff.map(x=><span key={x} className="px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-bold">{x}</span>)}</div><p className="mt-5 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-sm font-bold leading-6">{d.hallProgramme.note}</p></div></section>
           <section className="pt-12"><SectionTitle n="11">{d.ui.commonAreas}</SectionTitle><div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{d.commonAreas.map(x=><div key={x} className={`p-4 rounded-2xl border text-sm font-bold flex gap-2 ${card}`}><i className="ph-fill ph-check-circle text-emerald-500 text-lg shrink-0"></i><span>{x}</span></div>)}</div></section>
           <section className="pt-12"><SectionTitle n="12">{d.ui.reminder}</SectionTitle><div className="p-6 sm:p-8 rounded-3xl bg-rose-600 text-white"><i className="ph-fill ph-warning-octagon text-4xl"></i><h3 className="mt-4 text-2xl sm:text-3xl font-black">{d.postAssessmentNotice.title}</h3><p className="mt-4 leading-7 font-semibold">{d.postAssessmentNotice.body}</p></div></section>
+          <MPT4Acknowledgement pageId="mpt4-prep-2026" isDarkMode={isDarkMode} lang={lang} />
         </main>
         {showInfographic&&<div role="dialog" aria-modal="true" aria-label={d.ui.infographic} onClick={()=>setShowInfographic(false)} className="fixed inset-0 z-[100] bg-black/85 p-3 sm:p-8 flex items-center justify-center"><button onClick={()=>setShowInfographic(false)} aria-label={d.ui.close} className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img onClick={e=>e.stopPropagation()} src={d.infographic} alt={d.ui.infographic} className="max-w-full max-h-full object-contain rounded-xl" /></div>}
       </div>;
@@ -896,6 +960,7 @@
             </div></section>
 
             <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{data.footer}</p></footer>
+            <MPT4Acknowledgement pageId="mpt4-guide-2026" isDarkMode={isDarkMode} lang={lang} />
           </main>
         </div>
       );
@@ -1942,4 +2007,3 @@
   </script>
 </body>
 </html>
-
