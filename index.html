@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.03.6';
+    const APP_BUILD_ID = '2026.10.03.7';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -382,7 +382,7 @@
       ],
       ui: {
         pageName: 'Panduan Pengurusan MPT4', version: 'Versi Terkini / 最新版本',
-        nav: ['Utama', 'Timeline', 'Panduan', 'Guru Bertugas'],
+        nav: ['Utama', 'Timeline', 'Panduan', 'Guru Bertugas Tahun 4', 'Waktu Bertugas'],
         sectionTitles: ['Maklumat Penting', 'Pengurusan Murid Tahun 4', 'Panduan Lengkap', 'Waktu Bertugas', 'Tugas Guru Bertugas'],
         primaryStaff: 'Petugas Utama', supportingStaff: 'Guru Membantu'
       },
@@ -476,7 +476,7 @@
       ],
       ui: {
         pageName: 'MPT4 管理指南', version: '最新版本 / Versi Terkini',
-        nav: ['重点', '时间表', '完整指南', '值勤老师'],
+        nav: ['重点', '时间表', '完整指南', '四年级值勤老师', '值勤时间'],
         sectionTitles: ['重要资讯', '四年级学生集合及移动安排', '完整指南', '值勤时间', '值勤老师职责'],
         primaryStaff: '主要负责人', supportingStaff: '协助老师'
       },
@@ -1209,6 +1209,7 @@
     const MPT4Page = ({ onBack, isDarkMode, lang, onLangToggle }) => {
       const [openSection, setOpenSection] = useState(null);
       const data = lang === 'zh' ? MPT4_ZH : MPT4_DATA;
+      const dutySection = data.accordions.find(section => section.id === 'D');
       const jumpTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       const toneClasses = {
         warning: isDarkMode ? 'bg-rose-950/35 border-rose-900/60' : 'bg-rose-50 border-rose-200',
@@ -1237,7 +1238,7 @@
 
             <nav aria-label="Navigasi pantas" className={`sticky top-16 z-40 -mx-4 sm:mx-0 mt-7 px-4 sm:px-0 py-3 overflow-x-auto hide-scrollbar ${isDarkMode ? 'bg-slate-900/95' : 'bg-slate-50/95'} backdrop-blur-xl`}>
               <div className="flex gap-2 w-max sm:mx-auto">
-                {['mpt4-utama','mpt4-timeline','mpt4-panduan','mpt4-guru'].map((id,index) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{data.ui.nav[index]}</button>)}
+                {['mpt4-utama','mpt4-timeline','mpt4-panduan','mpt4-petugas','mpt4-guru'].map((id,index) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{data.ui.nav[index]}</button>)}
               </div>
             </nav>
 
@@ -1265,15 +1266,20 @@
 
             <section id="mpt4-panduan" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-guide">
               <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 3</p><h2 id="mpt4-guide" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[2]}</h2></div>
-              <div className="space-y-3">{data.accordions.map(section => <MPT4Accordion key={section.id} section={section} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} ui={data.ui} />)}</div>
+              <div className="space-y-3">{data.accordions.filter(section => section.id !== 'D').map(section => <MPT4Accordion key={section.id} section={section} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} ui={data.ui} />)}</div>
+            </section>
+
+            <section id="mpt4-petugas" className="scroll-mt-32 pt-12" aria-label={dutySection.title}>
+              <div className="mb-4"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p></div>
+              <MPT4Accordion section={dutySection} isOpen={openSection === dutySection.id} onToggle={() => setOpenSection(openSection === dutySection.id ? null : dutySection.id)} isDarkMode={isDarkMode} ui={data.ui} />
             </section>
 
             <section id="mpt4-guru" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-duty-time">
-              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p><h2 id="mpt4-duty-time" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[3]}</h2></div>
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duty-time" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[3]}</h2></div>
               <div className="grid md:grid-cols-3 gap-3">{data.dutyTimes.map(slot => <article key={slot.label} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className={`ph-fill ${slot.icon} text-2xl text-blue-500`}></i><p className="mt-4 text-xs font-black tracking-wider opacity-60">{slot.label}</p><p className="mt-1 text-xl font-black">{slot.time}</p></article>)}</div>
             </section>
 
-            <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[4]}</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{data.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
+            <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 6</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[4]}</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{data.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
 
 
             <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{data.footer}</p></footer>
