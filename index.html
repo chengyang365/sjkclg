@@ -163,6 +163,7 @@
       );
     };
 
+    const APP_BUILD_ID = '2026.10.03';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -174,6 +175,10 @@
         countdown: '校务倒计时', daysLeft: '天', todayIs: '就是今天！', passed: '已结束',
         toastSaved: '已同步', toastDeleted: '应用已删除', toastPinned: '已加入置顶', toastUnpinned: '已取消置顶',
         offlineMsg: '未连接到云端，正使用本地缓存。', searchResults: '搜索结果', recentAccess: '最近访问',
+        appVersionOffline: `离线缓存版 · v${APP_BUILD_ID}`, appVersionChecking: `正在检查更新 · 当前 v${APP_BUILD_ID}`,
+        appVersionAvailable: `发现新版 · 当前 v${APP_BUILD_ID}`, appVersionCurrent: `在线已核验 · v${APP_BUILD_ID}`,
+        appVersionError: `无法核验 · 当前 v${APP_BUILD_ID}`, checkUpdate: '检查更新', applyUpdate: '安装新版并刷新', updateChecking: '检查中…',
+        appUpdateAria: '检查或安装应用更新',
         pinTitle: '输入系统密码', pinPlaceholder: '••••', pinError: '密码错误，请重试', unlock: '解锁', copied: '已复制链接', copyFailed: '复制失败'
       },
       ms: {
@@ -186,6 +191,10 @@
         countdown: 'Kiraan Detik', daysLeft: 'Hari Lagi', todayIs: 'Hari ini!', passed: 'Telah Berlalu',
         toastSaved: 'Berjaya disegerakkan', toastDeleted: 'Telah dipadam', toastPinned: 'Telah dipin', toastUnpinned: 'Pin dibuang',
         offlineMsg: 'Tiada sambungan internet. Mod luar talian aktif.', searchResults: 'Hasil Carian', recentAccess: 'Baru Digunakan',
+        appVersionOffline: `Versi cache luar talian · v${APP_BUILD_ID}`, appVersionChecking: `Menyemak kemas kini · Versi semasa v${APP_BUILD_ID}`,
+        appVersionAvailable: `Versi baharu tersedia · Semasa v${APP_BUILD_ID}`, appVersionCurrent: `Disahkan dalam talian · v${APP_BUILD_ID}`,
+        appVersionError: `Tidak dapat disahkan · Versi semasa v${APP_BUILD_ID}`, checkUpdate: 'Semak kemas kini', applyUpdate: 'Pasang & muat semula', updateChecking: 'Menyemak…',
+        appUpdateAria: 'Semak atau pasang kemas kini aplikasi',
         pinTitle: 'Masukkan PIN', pinPlaceholder: '••••', pinError: 'PIN salah, cuba lagi', unlock: 'Buka', copied: 'Pautan disalin', copyFailed: 'Gagal disalin'
       }
     };
@@ -1047,6 +1056,10 @@
       const [syncError, setSyncError] = useState('');
       const [lastSyncedAt, setLastSyncedAt] = useState(() => localStorage.getItem('sjkc_last_synced_at') || '');
       const [refreshNonce, setRefreshNonce] = useState(0);
+      const [appUpdateStatus, setAppUpdateStatus] = useState(navigator.onLine ? 'checking' : 'offline');
+      const [appUpdateCheckedAt, setAppUpdateCheckedAt] = useState('');
+      const updateRegistrationRef = useRef(null);
+      const reloadAfterUpdateRef = useRef(false);
       
       const [lang, setLang] = useState(() => {
         try { return localStorage.getItem('sjkc_language') || 'zh'; } catch { return 'zh'; }
@@ -1067,8 +1080,8 @@
 
       const [isOffline, setIsOffline] = useState(!navigator.onLine);
       useEffect(() => {
-        const handleOnline = () => setIsOffline(false);
-        const handleOffline = () => setIsOffline(true);
+        const handleOnline = () => { setIsOffline(false); checkForAppUpdate(); };
+        const handleOffline = () => { setIsOffline(true); setAppUpdateStatus('offline'); };
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
         return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
@@ -1117,6 +1130,11 @@
       }, []);
 
       const currentT = t[lang];
+      const appVersionLabel = !navigator.onLine || appUpdateStatus === 'offline' ? currentT.appVersionOffline
+        : appUpdateStatus === 'available' ? currentT.appVersionAvailable
+        : appUpdateStatus === 'checking' ? currentT.appVersionChecking
+        : appUpdateStatus === 'error' ? currentT.appVersionError
+        : currentT.appVersionCurrent;
 
       useEffect(() => {
         document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'ms';
@@ -1215,8 +1233,65 @@
         return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       }, [isOffline, refreshNonce]);
 
+      const checkForAppUpdate = async () => {
+        if (!navigator.onLine) { setAppUpdateStatus('offline'); return; }
+        if (!('serviceWorker' in navigator)) { setAppUpdateStatus('error'); return; }
+        setAppUpdateStatus('checking');
+        try {
+          let registration = updateRegistrationRef.current || await navigator.serviceWorker.getRegistration();
+          if (!registration) registration = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+          updateRegistrationRef.current = registration;
+          if (registration.waiting) {
+            reloadAfterUpdateRef.current = true;
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            return;
+          }
+          await registration.update();
+          if (registration.waiting) {
+            reloadAfterUpdateRef.current = true;
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            return;
+          }
+          setAppUpdateCheckedAt(new Date().toISOString());
+          setAppUpdateStatus('current');
+          setRefreshNonce(value => value + 1);
+        } catch (error) {
+          console.warn('App update check failed:', error);
+          setAppUpdateStatus('error');
+        }
+      };
+
       useEffect(() => {
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(error => console.warn('Service worker registration failed:', error));
+        if (!('serviceWorker' in navigator)) { setAppUpdateStatus('error'); return; }
+        let active = true;
+        const onControllerChange = () => {
+          if (reloadAfterUpdateRef.current) window.location.reload();
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(registration => {
+          if (!active) return;
+          updateRegistrationRef.current = registration;
+          const inspectWorker = () => {
+            if (registration.waiting && navigator.serviceWorker.controller) setAppUpdateStatus('available');
+          };
+          registration.addEventListener('updatefound', () => {
+            const installing = registration.installing;
+            installing?.addEventListener('statechange', inspectWorker);
+          });
+          inspectWorker();
+          if (navigator.onLine) registration.update().then(() => {
+            inspectWorker();
+            if (!registration.waiting && active) {
+              setAppUpdateCheckedAt(new Date().toISOString());
+              setAppUpdateStatus('current');
+            }
+          }).catch(() => { if (active) setAppUpdateStatus('error'); });
+          else setAppUpdateStatus('offline');
+        }).catch(error => {
+          console.warn('Service worker registration failed:', error);
+          if (active) setAppUpdateStatus('error');
+        });
+        return () => { active = false; navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange); };
       }, []);
 
       const handleInstallClick = async () => {
@@ -1430,6 +1505,17 @@
       }, [apps]);
 
       const ambientClasses = getAmbientClasses(isDarkMode);
+      const compactAppUpdateControl = (
+        <div className="fixed bottom-3 left-3 z-[90] pointer-events-none">
+          <div className={`pointer-events-auto max-w-[calc(100vw-1.5rem)] flex items-center gap-2 px-3 py-2 rounded-2xl shadow-lg border backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/95 border-slate-700 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-600'}`}>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${appUpdateStatus === 'current' && navigator.onLine ? 'bg-emerald-500' : appUpdateStatus === 'available' ? 'bg-blue-500' : 'bg-amber-500'}`}></span>
+            <span className="text-[0.65rem] font-semibold truncate max-w-[58vw]" aria-live="polite">{appVersionLabel}</span>
+            <button type="button" onClick={checkForAppUpdate} disabled={appUpdateStatus === 'checking'} aria-label={currentT.appUpdateAria} className="min-w-10 min-h-10 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-300 disabled:opacity-60">
+              <i className={`ph-bold text-lg ${appUpdateStatus === 'checking' ? 'ph-spinner-gap animate-spin' : appUpdateStatus === 'available' ? 'ph-download-simple' : 'ph-arrows-clockwise'}`}></i>
+            </button>
+          </div>
+        </div>
+      );
 
       const renderAppCard = (app, index, isPinnedSection = false, isSearchList = false) => {
         const isPinned = pinnedIds.includes(app.id);
@@ -1502,37 +1588,37 @@
       };
 
       if (activePage === 'mpt4-hub') {
-        return <MPT4Hub
+        return <><MPT4Hub
           onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           onOpenPrep={() => { setActivePage('mpt4-prep'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           onOpenGuide={() => { setActivePage('mpt4-guide'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           isDarkMode={isDarkMode}
           lang={lang}
           onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
-        />;
+        />{compactAppUpdateControl}</>;
       }
       if (activePage === 'mpt4-prep') {
-        return <MPT4PrepPage
+        return <><MPT4PrepPage
           onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           isDarkMode={isDarkMode}
           lang={lang}
           onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
-        />;
+        />{compactAppUpdateControl}</>;
       }
       if (activePage === 'mpt4-guide') {
-        return <MPT4Page
+        return <><MPT4Page
           onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           isDarkMode={isDarkMode}
           lang={lang}
           onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
-        />;
+        />{compactAppUpdateControl}</>;
       }
       if (activePage === 'duty-roster') {
-        return <DutyRosterPage
+        return <><DutyRosterPage
           onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
           isDarkMode={isDarkMode}
           lang={lang}
-        />;
+        />{compactAppUpdateControl}</>;
       }
 
       return (
@@ -1651,6 +1737,16 @@
                   </div>
                 </div>
               )}
+              <div className={`max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex items-center justify-between gap-3 text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className="flex items-center gap-2 min-w-0" aria-live="polite">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${appUpdateStatus === 'current' && navigator.onLine ? 'bg-emerald-500' : appUpdateStatus === 'available' ? 'bg-blue-500' : 'bg-amber-500'}`}></span>
+                  <span className="truncate">{appVersionLabel}{appUpdateStatus === 'current' && appUpdateCheckedAt ? ` · ${new Date(appUpdateCheckedAt).toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'ms-MY', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                </span>
+                <button type="button" onClick={checkForAppUpdate} disabled={appUpdateStatus === 'checking'} className={`shrink-0 min-h-11 px-3 rounded-xl border font-bold inline-flex items-center gap-2 transition-colors disabled:opacity-60 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white border-slate-200 text-blue-700 hover:bg-blue-50'}`}>
+                  <i className={`ph-bold ${appUpdateStatus === 'checking' ? 'ph-spinner-gap animate-spin' : appUpdateStatus === 'available' ? 'ph-download-simple' : 'ph-arrows-clockwise'}`}></i>
+                  <span>{appUpdateStatus === 'checking' ? currentT.updateChecking : appUpdateStatus === 'available' ? currentT.applyUpdate : currentT.checkUpdate}</span>
+                </button>
+              </div>
             </div>
           </header>
 
@@ -2009,3 +2105,4 @@
   </script>
 </body>
 </html>
+
