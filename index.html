@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.03.1';
+    const APP_BUILD_ID = '2026.10.03.2';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -633,6 +633,289 @@
 
     MPT4_PREP_DATA.ui = {
       infographic:'ALIRAN PERSEDIAAN PRA-MPT4', viewInfographic:'Lihat Infografik', downloadInfographic:'Muat Turun Infografik', coordinators:'PENYELARAS', preparation:'PERSEDIAAN AWAL', deadline:'DEADLINE', preparationChecklist:'Checklist Persediaan Awal', preparationFlow:'ALIRAN HARI PERSEDIAAN', roomAssignments:'PEMBAHAGIAN BILIK PENTAKSIRAN', sourceRoom:'Bilik Darjah', candidates:'Calon', teacher:'Guru', desks:'meja', temporaryPlacement:'PENEMPATAN SEMENTARA KELAS', placementNote:'Penempatan pada 6–8 Oktober 2026', usedRoom:'Bilik Digunakan', prepTeacher:'Guru Menjaga Persediaan pada 5/10', roomChecklist:'CHECKLIST BILIK PENTAKSIRAN', checklistCount:'11 perkara untuk disemak', rehearsal:'LATIHAN MURID TAHUN 4', years356:'TAHUN 3, 5 DAN 6', years356Title:'Selepas Selesai Penyediaan – Waktu Rehat', hallProgramme:'PROGRAM DI DEWAN', afterBreak:'Selepas Waktu Rehat', hallIntro:'Semua murid berkumpul di dewan. Program / ceramah dikendalikan oleh:', commonAreas:'KAWASAN UMUM ARAS 3', reminder:'PERINGATAN SELEPAS PENTAKSIRAN', close:'Tutup'
+    };
+
+
+    // School year-end assessment; Year 4 core subjects follow the official MPT4 timetable.
+    const YEAR_END_2026 = [
+  {
+    "years": [
+      1,
+      2
+    ],
+    "label": "Tahun 1–2",
+    "rows": [
+      [
+        6,
+        "BM",
+        "13:30",
+        "14:45"
+      ],
+      [
+        6,
+        "PSV",
+        "16:00",
+        "17:00"
+      ],
+      [
+        7,
+        "BI",
+        "13:30",
+        "14:45"
+      ],
+      [
+        7,
+        "PM/PI",
+        "16:00",
+        "17:00"
+      ],
+      [
+        8,
+        "BC",
+        "13:30",
+        "14:45"
+      ],
+      [
+        8,
+        "PJPK",
+        "16:00",
+        "17:00"
+      ],
+      [
+        12,
+        "SN",
+        "13:30",
+        "14:45"
+      ],
+      [
+        12,
+        "MT",
+        "16:00",
+        "17:00"
+      ]
+    ]
+  },
+  {
+    "years": [
+      3
+    ],
+    "label": "Tahun 3",
+    "rows": [
+      [
+        6,
+        "BM",
+        "08:15",
+        "09:30"
+      ],
+      [
+        6,
+        "PSV",
+        "11:00",
+        "12:00"
+      ],
+      [
+        7,
+        "BI",
+        "08:15",
+        "09:30"
+      ],
+      [
+        7,
+        "PM/PI",
+        "11:00",
+        "12:00"
+      ],
+      [
+        8,
+        "BC",
+        "08:15",
+        "09:30"
+      ],
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "SN",
+        "08:15",
+        "09:30"
+      ],
+      [
+        12,
+        "MT",
+        "10:10",
+        "11:25"
+      ]
+    ]
+  },
+  {
+    "years": [
+      4
+    ],
+    "label": "Tahun 4",
+    "mpt4": true,
+    "rows": [
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "MZ",
+        "08:15",
+        "09:15"
+      ],
+      [
+        12,
+        "RBT",
+        "10:10",
+        "11:10"
+      ],
+      [
+        12,
+        "PM/PI",
+        "11:20",
+        "12:35"
+      ],
+      [
+        13,
+        "SEJ",
+        "08:15",
+        "09:30"
+      ],
+      [
+        13,
+        "PSV",
+        "10:10",
+        "12:10"
+      ]
+    ]
+  },
+  {
+    "years": [
+      5,
+      6
+    ],
+    "label": "Tahun 5–6",
+    "rows": [
+      [
+        6,
+        "BM",
+        "08:15",
+        "09:30"
+      ],
+      [
+        6,
+        "MZ",
+        "11:00",
+        "12:00"
+      ],
+      [
+        7,
+        "BI",
+        "08:15",
+        "09:30"
+      ],
+      [
+        7,
+        "RBT",
+        "11:00",
+        "12:00"
+      ],
+      [
+        8,
+        "BC",
+        "08:15",
+        "09:30"
+      ],
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "SN",
+        "08:15",
+        "09:30"
+      ],
+      [
+        12,
+        "MT",
+        "10:10",
+        "11:25"
+      ],
+      [
+        12,
+        "PM/PI",
+        "11:30",
+        "12:45"
+      ],
+      [
+        13,
+        "SEJ",
+        "08:15",
+        "09:30"
+      ],
+      [
+        13,
+        "PSV",
+        "10:10",
+        "12:10"
+      ]
+    ]
+  }
+];
+    const ASSESSMENT_SUBJECTS = {
+      BM: ['国文', 'Bahasa Melayu'], BI: ['英文', 'Bahasa Inggeris'], BC: ['华文', 'Bahasa Cina'],
+      SN: ['科学', 'Sains'], MT: ['数学', 'Matematik'], PSV: ['美术', 'Pendidikan Seni Visual'],
+      'PM/PI': ['道德／伊斯兰教育', 'Pendidikan Moral / Pendidikan Islam'],
+      PJPK: ['体育与健康教育', 'Pendidikan Jasmani dan Pendidikan Kesihatan'],
+      MZ: ['音乐', 'Muzik'], RBT: ['设计与工艺', 'Reka Bentuk dan Teknologi'], SEJ: ['历史', 'Sejarah']
+    };
+    const assessmentMinutes = (start, end) => {
+      const minutes = value => { const [h, m] = value.split(':').map(Number); return h * 60 + m; };
+      return minutes(end) - minutes(start);
+    };
+    const YearEndAssessmentPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
+      const zh = lang === 'zh';
+      const surface = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+      const title = zh ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026';
+      const weekdays = { 6: ['星期二', 'SELASA'], 7: ['星期三', 'RABU'], 8: ['星期四', 'KHAMIS'], 12: ['星期一', 'ISNIN'], 13: ['星期二', 'SELASA'] };
+      const time = value => {
+        const [h, m] = value.split(':').map(Number);
+        return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a.m.' : 'p.m.'}`;
+      };
+      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b ${surface}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 min-h-16 py-2 flex items-center gap-3">
+          <button type="button" onClick={onBack} aria-label={zh ? '返回首页' : 'Kembali ke halaman utama'} className={`w-11 h-11 shrink-0 rounded-full border ${surface}`}><i className="ph-bold ph-arrow-left"></i></button>
+          <div className="flex-1 min-w-0"><p className="text-sm font-bold text-blue-500">LG APPS</p><h1 className="font-extrabold">{title}</h1></div>
+          <button type="button" onClick={onLangToggle} aria-label={zh ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${surface}`}>{zh ? 'BM' : '中'}</button>
+        </div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+          <p className="text-base font-semibold">{zh ? '2026年10月6、7、8、12及13日 · 一至六年级' : '6, 7, 8, 12 dan 13 Oktober 2026 · Tahun 1–6'}</p>
+          <nav aria-label={zh ? '年级' : 'Tahun'} className="flex flex-wrap gap-2">{YEAR_END_2026.map(group => <a key={group.label} href={`#assessment-year-${group.years[0]}`} className={`min-h-11 inline-flex items-center px-4 rounded-full border font-bold text-sm ${surface}`}>{zh ? `${group.years.join('–')}年级` : group.label}</a>)}</nav>
+          {YEAR_END_2026.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
+            <h2 className="text-2xl font-black mb-4">{zh ? `${group.years.join('–')}年级` : group.label}</h2>
+            {group.mpt4 && <p className={`mb-5 p-4 rounded-2xl border text-base leading-7 ${isDarkMode ? 'bg-amber-950/30 border-amber-800 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>{zh ? '10月6日至8日：BM、BI、BC、SN、MT 以 MPT4 2026 正式时间表为准。以下列出校内年终评估安排。' : '6–8 Oktober: BM, BI, BC, SN dan MT mengikut jadual rasmi MPT4 2026. Jadual di bawah adalah untuk pentaksiran akhir tahun sekolah.'}</p>}
+            <div className="space-y-5">{[...new Set(group.rows.map(row => row[0]))].map(day => <div key={day}>
+              <h3 className="text-base font-extrabold mb-2">{String(day).padStart(2, '0')}-10-2026 · {weekdays[day][zh ? 0 : 1]}</h3>
+              <ul className="space-y-2">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
+                <span className="font-bold text-base sm:flex-1">{subject} · {ASSESSMENT_SUBJECTS[subject][zh ? 0 : 1]}</span>
+                <time className="text-base whitespace-nowrap">{time(start)} – {time(end)}</time>
+                <span className="text-sm font-semibold sm:w-20 sm:text-right">{assessmentMinutes(start, end)} {zh ? '分钟' : 'minit'}</span>
+              </li>)}</ul>
+            </div>)}</div>
+          </section>)}
+          <aside className={`rounded-3xl border p-5 text-base leading-7 ${surface}`}><h2 className="font-extrabold mb-2">{zh ? '四至六年级共同科目时长' : 'Tempoh mata pelajaran bersama Tahun 4–6'}</h2><p>MZ / RBT / PJPK: 60 {zh ? '分钟' : 'minit'} · PM/PI / SEJ: 75 {zh ? '分钟' : 'minit'} · PSV: 120 {zh ? '分钟' : 'minit'}</p></aside>
+        </main>
+      </div>;
     };
 
     const MPT4Hub = ({ onBack, onOpenPrep, onOpenGuide, isDarkMode, lang, onLangToggle }) => {
@@ -1602,6 +1885,13 @@
         );
       };
 
+      if (activePage === 'assessment-2026') {
+        return <><YearEndAssessmentPage
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode} lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />{compactAppUpdateControl}</>;
+      }
       if (activePage === 'mpt4-hub') {
         return <><MPT4Hub
           onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
@@ -1778,6 +2068,14 @@
                 <span className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}><i className="ph-fill ph-calendar-check text-3xl"></i></span>
                 <span className="flex-1 min-w-0"><span className="block text-lg sm:text-xl font-black">{lang === 'zh' ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)'}</span><span className="block mt-1 text-sm font-semibold opacity-65">{lang === 'zh' ? '查看每周值勤地点与教师安排' : 'Semak lokasi dan giliran guru bertugas'}</span></span>
                 <i className="ph-bold ph-arrow-right text-xl text-emerald-500 shrink-0"></i>
+              </button>
+            )}
+
+            {activeTab === 'all' && !searchQuery && (
+              <button type="button" onClick={() => { setActivePage('assessment-2026'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full mb-6 p-5 sm:p-6 rounded-3xl border text-left flex items-center gap-4 transition hover:shadow-md ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white/80 border-slate-200 shadow-sm'}`}>
+                <i className="ph-fill ph-calendar text-3xl text-blue-500 shrink-0"></i>
+                <span className="flex-1 min-w-0"><span className="block text-lg sm:text-xl font-black">{lang === 'zh' ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026'}</span><span className="block mt-1 text-base opacity-70">{lang === 'zh' ? '一至六年级 · 10月6日至13日' : 'Tahun 1–6 · 6–13 Oktober 2026'}</span></span>
+                <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
               </button>
             )}
 
