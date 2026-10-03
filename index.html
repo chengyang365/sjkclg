@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.03.3';
+    const APP_BUILD_ID = '2026.10.03.4';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -883,6 +883,14 @@
       const minutes = value => { const [h, m] = value.split(':').map(Number); return h * 60 + m; };
       return minutes(end) - minutes(start);
     };
+    const assessmentDuration = (minutes, zh) => {
+      const hours = Math.floor(minutes / 60);
+      const remainder = minutes % 60;
+      const parts = [];
+      if (hours) parts.push(zh ? `${hours}小时` : `${hours} jam`);
+      if (remainder || !hours) parts.push(zh ? `${remainder}分钟` : `${remainder} minit`);
+      return parts.join(zh ? '' : ' ');
+    };
     const YearEndAssessmentPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
       const zh = lang === 'zh';
       const surface = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
@@ -909,11 +917,11 @@
               <ul className="space-y-2">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
                 <span className="font-bold text-base sm:flex-1">{subject} · {ASSESSMENT_SUBJECTS[subject][zh ? 0 : 1]}</span>
                 <time className="text-base whitespace-nowrap">{time(start)} – {time(end)}</time>
-                <span className="text-sm font-semibold sm:w-20 sm:text-right">{assessmentMinutes(start, end)} {zh ? '分钟' : 'minit'}</span>
+                <span className="text-sm font-semibold shrink-0 whitespace-nowrap sm:text-right">{assessmentDuration(assessmentMinutes(start, end), zh)}</span>
               </li>)}</ul>
             </div>)}</div>
           </section>)}
-          <aside className={`rounded-3xl border p-5 text-base leading-7 ${surface}`}><h2 className="font-extrabold mb-2">{zh ? '四至六年级共同科目时长' : 'Tempoh mata pelajaran bersama Tahun 4–6'}</h2><p>MZ / RBT / PJPK: 60 {zh ? '分钟' : 'minit'} · PM/PI / SEJ: 75 {zh ? '分钟' : 'minit'} · PSV: 120 {zh ? '分钟' : 'minit'}</p></aside>
+          <aside className={`rounded-3xl border p-5 text-base leading-7 ${surface}`}><h2 className="font-extrabold mb-2">{zh ? '四至六年级共同科目时长' : 'Tempoh mata pelajaran bersama Tahun 4–6'}</h2><p>MZ / RBT / PJPK: {assessmentDuration(60, zh)} · PM/PI / SEJ: {assessmentDuration(75, zh)} · PSV: {assessmentDuration(120, zh)}</p></aside>
         </main>
       </div>;
     };
