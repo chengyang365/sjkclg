@@ -1,4 +1,4 @@
-const VERSION = 'lg-app-center-v9';
+const VERSION = 'lg-app-center-v10';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './mpt4-pra-infografik.svg', './mpt4-pra-infografik-zh.svg', './jadual-guru-bertugas-penggal-3-2026.png?v=20261001b'];
 
 self.addEventListener('install', event => {
@@ -43,4 +43,3 @@ self.addEventListener('fetch', event => {
 self.addEventListener('message', event => {
   if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
-
