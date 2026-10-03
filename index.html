@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 50286)
-Total output lines: 2433
-
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -9,7 +6,2416 @@ Total output lines: 2433
   <title>LG App Center</title>
   
   <!-- 网站 Favicon (浏览器标签页图标) - 使用校徽 -->
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/lo…50086 tokens truncated…ter gap-2 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">{isSaving ? <i className="ph-bold ph-spinner ph-spin text-xl"></i> : currentT.save}</button>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png">
+  
+  <!-- Apple Touch Icon (iOS 桌面图标) - 使用校徽 -->
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="新廊 LG">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          spacing: { 'safe': 'env(safe-area-inset-bottom)', 'safe-top': 'env(safe-area-inset-top)' },
+          transitionTimingFunction: { 'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Static manifest: required for dependable installed-PWA behaviour. -->
+  <link rel="manifest" href="./manifest.webmanifest">
+
+  <!-- Import Map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "react/jsx-runtime": "https://esm.sh/react@18.2.0/jsx-runtime",
+        "qrcode.react": "https://esm.sh/qrcode.react@3.1.0"
+      }
+    }
+  </script>
+
+  <!-- Babel -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    @keyframes float-slow { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+    @keyframes float-delayed { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(20px) scale(0.95); } }
+    .animate-float-slow { animation: float-slow 12s ease-in-out infinite; }
+    .animate-float-delayed { animation: float-delayed 15s ease-in-out infinite 2s; }
+    
+    @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-waterfall { animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+    
+    @keyframes growWidth { from { width: 0; } to { width: var(--target-width); } }
+    .animate-grow { animation: growWidth 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* 智能光影特效 */
+    .spotlight-card { position: relative; }
+    .spotlight-card::before {
+      content: ""; position: absolute; inset: 0; border-radius: inherit; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+    }
+    html.dark .spotlight-card::before { background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1), transparent 40%); }
+    .spotlight-card:hover::before { opacity: 1; }
+
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+    button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.65);
+      outline-offset: 3px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 transition-colors duration-500 flex flex-col min-h-screen">
+  <div id="root" class="flex flex-col flex-1"></div>
+
+  <script type="text/babel" data-presets="react" data-type="module">
+    import React, { useState, useMemo, useEffect, useRef } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { QRCodeSVG } from 'qrcode.react';
+
+    // 触觉反馈
+    const vibrate = (ms = 40) => {
+      if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) window.navigator.vibrate(ms);
+    };
+
+    // ==========================================
+    // Fetch API 真实后端联调器 (针对 Netlify 部署)
+    // ==========================================
+    
+    // 🔴 步骤1: 请在这里填入您在 Google Apps Script 部署后得到的 Web App URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbypof7i8UG4x4GxEaT5Mw5u_WPtvJHTT9FYnX0lGtgklahugJtfaRtPipKGc9jxrLrP/exec";
+
+    // The server owns credential checks and must validate this short-lived token for
+    // every write action. Never place an administrator PIN in this client.
+    const getAdminToken = () => sessionStorage.getItem('sjkc_admin_token') || '';
+
+    const apiRequest = async (action, data = {}) => {
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+          body: JSON.stringify({ action, data, token: getAdminToken() })
+        });
+        const result = await response.json();
+        if (result.status === 'success') return result.data;
+        else throw new Error(result.message);
+      } catch (error) {
+        console.error("API Request Failed:", error);
+        throw error;
+      }
+    };
+
+    const server = {
+      getInitialData: () => apiRequest('getInitialData', {}),
+      authenticateAdmin: (pin) => apiRequest('authenticateAdmin', { pin }),
+      saveApp: (data) => apiRequest('saveApp', data),
+      deleteApp: (id) => apiRequest('deleteApp', { id }),
+      recordClick: (id) => apiRequest('recordClick', { id }),
+      updateAppOrders: (orders) => apiRequest('updateAppOrders', { orders }),
+      saveSettings: (key, val) => apiRequest('saveSettings', { key, val }),
+      getMpt4Teachers: (pageId, pageVersion) => apiRequest('getMpt4Teachers', { pageId, pageVersion }),
+      submitMpt4Acknowledgement: (data) => apiRequest('submitMpt4Acknowledgement', data)
+    };
+
+    const AnimatedNumber = ({ value }) => {
+      const [displayValue, setDisplayValue] = useState(0);
+      useEffect(() => {
+        let start = 0; const duration = 1000; const increment = value / (duration / 16);
+        const timer = setInterval(() => {
+          start += increment;
+          if (start >= value) { clearInterval(timer); setDisplayValue(value); } 
+          else { setDisplayValue(Math.floor(start)); }
+        }, 16);
+        return () => clearInterval(timer);
+      }, [value]);
+      return <span>{displayValue.toLocaleString()}</span>;
+    };
+
+    const Toast = ({ message, type, isVisible }) => {
+      if (!isVisible) return null;
+      const bgClass = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-blue-600';
+      const icon = type === 'success' ? 'ph-check-circle' : type === 'error' ? 'ph-warning-circle' : 'ph-info';
+      return (
+        <div className="fixed sm:top-24 bottom-24 sm:bottom-auto left-1/2 -translate-x-1/2 z-[250] animate-in slide-in-from-bottom-10 sm:slide-in-from-top-10 fade-in duration-300 pointer-events-none">
+          <div className={`${bgClass} text-white px-5 py-3 rounded-full shadow-2xl font-bold text-sm flex items-center gap-2 backdrop-blur-xl bg-opacity-95 border border-white/20`}>
+            <i className={`ph-fill ${icon} text-lg`}></i> {message}
+          </div>
+        </div>
+      );
+    };
+
+    const APP_BUILD_ID = '2026.10.03.10';
+    const t = {
+      zh: {
+        schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
+        tabs: { all: '全部应用', pinned: '我的置顶', admin: '行政', kurikulum: '课程', hem: '学生事务', koko: '兼修课程', other: '其他' },
+        categories: { pinned: '我的置顶', admin: '行政管理 (Pentadbiran)', kurikulum: '课程与教学 (Kurikulum)', hem: '学生事务 (HEM)', koko: '兼修课程 (Kokurikulum)', other: '其他系统 (Lain-lain)' },
+        addApp: '添加内部系统', editApp: '编辑系统', save: '保存同步', cancel: '取消', emptyState: '此分类下暂无系统', noResult: '未找到匹配的系统',
+        announcementSetup: '内部通告设置', annActive: '开启通告横幅', annZh: '中文内容', annMs: '马来文内容',
+        eventSetup: '倒计时设置', eventTitleZh: '事件名称 (中)', eventTitleMs: '事件名称 (马)', eventDate: '目标日期',
+        countdown: '校务倒计时', daysLeft: '天', todayIs: '就是今天！', passed: '已结束',
+        toastSaved: '已同步', toastDeleted: '应用已删除', toastPinned: '已加入置顶', toastUnpinned: '已取消置顶',
+        offlineMsg: '未连接到云端，正使用本地缓存。', searchResults: '搜索结果', recentAccess: '最近访问',
+        appVersionOffline: `离线缓存版 · v${APP_BUILD_ID}`, appVersionChecking: `正在检查更新 · 当前 v${APP_BUILD_ID}`,
+        appVersionAvailable: `发现新版 · 当前 v${APP_BUILD_ID}`, appVersionCurrent: `在线已核验 · v${APP_BUILD_ID}`,
+        appVersionError: `无法核验 · 当前 v${APP_BUILD_ID}`, checkUpdate: '检查更新', applyUpdate: '安装新版并刷新', updateChecking: '检查中…',
+        appUpdateAria: '检查或安装应用更新',
+        pinTitle: '输入系统密码', pinPlaceholder: '••••', pinError: '密码错误，请重试', unlock: '解锁', copied: '已复制链接', copyFailed: '复制失败'
+      },
+      ms: {
+        schoolName: 'SJK (C) Ladang Grisek', appTitle: 'Pusat Aplikasi', searchPlaceholder: 'Cari sistem...', adminActive: 'Tadbir Sistem',
+        tabs: { all: 'Semua App', pinned: 'Dipin', admin: 'Pentadbiran', kurikulum: 'Kurikulum', hem: 'HEM', koko: 'Koko', other: 'Lain-lain' },
+        categories: { pinned: 'Dipinkan', admin: 'Pentadbiran', kurikulum: 'Kurikulum', hem: 'Hal Ehwal Murid', koko: 'Kokurikulum', other: 'Lain-lain' },
+        addApp: 'Tambah Sistem', editApp: 'Edit Sistem', save: 'Simpan', cancel: 'Batal', emptyState: 'Tiada sistem buat masa ini', noResult: 'Sistem tidak dijumpai',
+        announcementSetup: 'Tetapan Notis', annActive: 'Aktifkan Banner', annZh: 'Notis (Cina)', annMs: 'Notis (Melayu)',
+        eventSetup: 'Tetapan Countdown', eventTitleZh: 'Acara (Cina)', eventTitleMs: 'Acara (Melayu)', eventDate: 'Tarikh',
+        countdown: 'Kiraan Detik', daysLeft: 'Hari Lagi', todayIs: 'Hari ini!', passed: 'Telah Berlalu',
+        toastSaved: 'Berjaya disegerakkan', toastDeleted: 'Telah dipadam', toastPinned: 'Telah dipin', toastUnpinned: 'Pin dibuang',
+        offlineMsg: 'Tiada sambungan internet. Mod luar talian aktif.', searchResults: 'Hasil Carian', recentAccess: 'Baru Digunakan',
+        appVersionOffline: `Versi cache luar talian · v${APP_BUILD_ID}`, appVersionChecking: `Menyemak kemas kini · Versi semasa v${APP_BUILD_ID}`,
+        appVersionAvailable: `Versi baharu tersedia · Semasa v${APP_BUILD_ID}`, appVersionCurrent: `Disahkan dalam talian · v${APP_BUILD_ID}`,
+        appVersionError: `Tidak dapat disahkan · Versi semasa v${APP_BUILD_ID}`, checkUpdate: 'Semak kemas kini', applyUpdate: 'Pasang & muat semula', updateChecking: 'Menyemak…',
+        appUpdateAria: 'Semak atau pasang kemas kini aplikasi',
+        pinTitle: 'Masukkan PIN', pinPlaceholder: '••••', pinError: 'PIN salah, cuba lagi', unlock: 'Buka', copied: 'Pautan disalin', copyFailed: 'Gagal disalin'
+      }
+    };
+
+    const iconMap = {
+      Settings: 'ph-gear', Users: 'ph-users', MonitorPlay: 'ph-monitor-play', BookOpen: 'ph-book-open', GraduationCap: 'ph-graduation-cap', 
+      Library: 'ph-books', LayoutDashboard: 'ph-squares-four', Globe: 'ph-globe', Chart: 'ph-chart-bar', Folder: 'ph-folder', 
+      Calendar: 'ph-calendar', Megaphone: 'ph-megaphone', Clock: 'ph-clock', Printer: 'ph-printer', ShieldCheck: 'ph-shield-check', 
+      Chalkboard: 'ph-chalkboard', Video: 'ph-video', FileText: 'ph-file-text', Exam: 'ph-exam', Math: 'ph-calculator',
+      Science: 'ph-flask', Sport: 'ph-basketball', Art: 'ph-palette', Music: 'ph-music-notes', Code: 'ph-code', Translate: 'ph-translate', 
+      Trophy: 'ph-trophy', Link: 'ph-link', Envelope: 'ph-envelope', Cloud: 'ph-cloud'
+    };
+
+    const CustomIconSelect = ({ value, onChange, isDarkMode }) => {
+      const [isOpen, setIsOpen] = useState(false);
+      const dropdownRef = useRef(null);
+
+      useEffect(() => {
+        const handleClickOutside = (event) => { if (dropdownRef.current && !dropdownRef.current.contains(event.target)) setIsOpen(false); };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
+
+      return (
+        <div ref={dropdownRef} className="relative w-full z-50">
+          <button type="button" onClick={() => setIsOpen(!isOpen)} className={`w-full flex items-center justify-between border rounded-2xl px-5 py-4 font-bold outline-none transition-all ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700 border-slate-700' : 'bg-slate-50 hover:bg-slate-100 border-slate-200'} ${isOpen ? 'ring-2 ring-blue-500 border-blue-500' : ''}`}>
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-slate-700 text-blue-400' : 'bg-white text-blue-600'}`}>
+                <i className={`ph-fill ${iconMap[value] || 'ph-squares-four'} text-xl`}></i>
+              </div>
+              <span>{value || 'Default'}</span>
+            </div>
+            <i className={`ph-bold ph-caret-down transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
+          </button>
+          {isOpen && (
+            <div className={`absolute top-full left-0 w-full mt-2 rounded-2xl shadow-2xl border overflow-hidden animate-in slide-in-from-top-2 fade-in duration-200 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+              <ul className="max-h-60 overflow-y-auto hide-scrollbar p-2 grid grid-cols-1 sm:grid-cols-2 gap-1">
+                {Object.keys(iconMap).map(iconName => (
+                  <li key={iconName} onClick={() => { onChange(iconName); setIsOpen(false); vibrate(15); }} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer font-bold transition-colors ${value === iconName ? (isDarkMode ? 'bg-blue-600/20 text-blue-400' : 'bg-blue-50 text-blue-700') : (isDarkMode ? 'hover:bg-slate-700 text-slate-300' : 'hover:bg-slate-50 text-slate-700')}`}>
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm ${value === iconName ? (isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-white text-blue-600') : (isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500')}`}><i className={`ph-fill ${iconMap[iconName]} text-xl`}></i></div>
+                    <span className="text-sm truncate">{iconName}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    const renderIcon = (iconVal, isList) => {
+      const sizeClass = isList ? 'text-[1.5rem]' : 'text-[1.8rem] sm:text-[2.2rem]';
+      if (!iconVal) return <i className={`ph-fill ph-squares-four ${sizeClass}`}></i>;
+      if (iconVal.startsWith('http') || iconVal.startsWith('data:image')) return <img src={iconVal} alt="icon" className="w-full h-full object-cover rounded-[inherit] scale-[0.85]" />;
+      if (iconMap[iconVal]) return <i className={`ph-fill ${iconMap[iconVal]} ${sizeClass}`}></i>;
+      return <span className={isList ? 'text-[1.5rem]' : 'text-[1.8rem] sm:text-[2.2rem]'}>{iconVal}</span>;
+    };
+
+    // 智能实时时钟钩子，时间中加入不换行空格（\u00A0）
+    const useSmartClock = (lang) => {
+      const [time, setTime] = useState(new Date());
+
+      useEffect(() => {
+        const timer = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(timer);
+      }, []);
+
+      return useMemo(() => {
+        const h = time.getHours();
+        const m = time.getMinutes().toString().padStart(2, '0');
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        const displayH = h % 12 || 12;
+        const timeStr = `${displayH}:${m}\u00A0${ampm}`;
+
+        const year = time.getFullYear();
+        const month = time.getMonth() + 1;
+        const date = time.getDate();
+        const dayIdx = time.getDay();
+
+        if (lang === 'zh') {
+          const daysZh = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+          return `${year}年${month}月${date}日 ${daysZh[dayIdx]} ${timeStr}`;
+        } else {
+          const daysMs = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+          const monthsMs = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogos', 'Sep', 'Okt', 'Nov', 'Dis'];
+          return `${daysMs[dayIdx]}, ${date} ${monthsMs[month - 1]} ${year} ${timeStr}`;
+        }
+      }, [time, lang]);
+    };
+
+    const getAmbientClasses = (isDarkMode) => {
+      const h = new Date().getHours();
+      if (h >= 5 && h < 12) return isDarkMode ? ['bg-orange-900/10', 'bg-amber-900/10'] : ['bg-orange-400/20', 'bg-amber-400/20'];
+      if (h >= 12 && h < 17) return isDarkMode ? ['bg-blue-900/10', 'bg-cyan-900/10'] : ['bg-blue-400/20', 'bg-cyan-400/20'];
+      if (h >= 17 && h < 19) return isDarkMode ? ['bg-purple-900/10', 'bg-rose-900/10'] : ['bg-purple-400/20', 'bg-rose-400/20'];
+      return isDarkMode ? ['bg-indigo-900/10', 'bg-blue-900/10'] : ['bg-indigo-400/20', 'bg-blue-400/20'];
+    };
+
+    const MPT4_DATA = {
+      school: 'SJK (C) LADANG GRISEK',
+      title: 'MPT4 2026',
+      subtitle: 'Panduan Pengurusan Sepanjang Pentaksiran',
+      date: '6 – 8 Oktober 2026',
+      breakTime: '9:45 – 10:15 pagi',
+      highlights: [
+        { kicker: 'ARAS 3', title: 'KAWASAN LARANGAN', icon: 'ph-prohibit', tone: 'warning', description: 'Selain petugas pentaksiran MPT4, guru dan murid tidak dibenarkan melalui kawasan bilik pentaksiran atau menggunakan tandas di Aras 3.' },
+        { kicker: 'TANGGA TENGAH', title: 'LALUAN KHAS', icon: 'ph-stairs', tone: 'info', description: 'Untuk petugas pentaksiran dan murid Tahun 4 sahaja.' },
+        { kicker: 'WAKTU REHAT', title: '9:45 – 10:15 PAGI', icon: 'ph-fork-knife', tone: 'neutral', description: 'Waktu rehat bagi semua murid sepanjang pentaksiran MPT4.' },
+        { kicker: 'JAGA KETENTERAMAN', title: 'SUASANA SENYAP', icon: 'ph-speaker-slash', tone: 'neutral', description: 'Pastikan pergerakan dan aktiviti PdP tidak mengganggu pentaksiran.' }
+      ],
+      timeline: [
+        { time: '7:00 PAGI', title: 'Berkumpul di Dewan' },
+        { time: '7:25 PAGI', title: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas', secondary: true },
+        { time: '7:40 PAGI', title: 'Murid Tahun 4 mula beratur menuju ke Bilik Pentaksiran' },
+        { time: '9:30 PAGI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' },
+        { time: '9:45 – 10:15 PAGI', title: 'Waktu Rehat' },
+        { time: '10:15 PAGI', title: 'Berkumpul dan beratur di Dewan' },
+        { time: '10:25 PAGI', title: 'Bergerak ke Bilik Pentaksiran' },
+        { time: '12:15 TENGAH HARI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' }
+      ],
+      accordions: [
+        {
+          id: 'A', title: 'PERATURAN SEPANJANG TEMPOH PENTAKSIRAN',
+          intro: 'Diminta semua guru memaklumkan perkara-perkara berikut kepada murid kelas masing-masing.',
+          groups: [
+            { title: '1. Kawasan Larangan dan Pergerakan Murid', items: [
+              'Sepanjang tempoh pentaksiran, Aras 3 merupakan Kawasan Larangan.',
+              'Tangga tengah dikhaskan untuk kegunaan petugas pentaksiran dan murid Tahun 4 sahaja.',
+              'Selain petugas pentaksiran MPT4, semua guru dan murid tidak dibenarkan melalui kawasan bilik pentaksiran atau menggunakan tandas di Aras 3.',
+              'Murid hanya dibenarkan menggunakan tandas di Aras 1 dan Aras 2.',
+              'Selain Ketua Kelas, murid lain tidak dibenarkan pergi ke pejabat.',
+              'Guru diminta mengurangkan kekerapan serta bilangan murid yang keluar dari kelas pada satu-satu masa semasa PBD/UASA/PdP.'
+            ]},
+            { title: '2. Aktiviti yang Ditangguhkan', lead: 'Sepanjang tempoh pentaksiran:', emphasis: 'Semua aktiviti di luar bilik darjah serta penggunaan bilik-bilik khas ditangguhkan.' }
+          ]
+        },
+        {
+          id: 'B', title: 'PERINGATAN KEPADA SEMUA GURU', groups: [
+            { title: '1. Kawalan Murid', items: [
+              'Guru yang bertugas hendaklah berada di lokasi yang ditetapkan serta membantu mengawal pergerakan dan disiplin murid sepanjang tempoh pentaksiran.',
+              'Guru hendaklah bertugas di kelas atau di dewan mengikut Jadual Guru Ganti yang ditetapkan pada hari berkenaan.',
+              'Mulai pukul 12:30 tengah hari, semua murid boleh berkumpul di dewan dan akan berada di bawah pengawasan guru bertugas.'
+            ]},
+            { title: '2. Suasana Kelas', paragraphs: [
+              'Guru hendaklah memastikan murid sentiasa tertib dan kelas berada dalam keadaan senyap agar tidak mengganggu pentaksiran yang sedang dijalankan.',
+              'Aktiviti yang menghasilkan bunyi bising, termasuk bacaan kuat atau bacaan beramai-ramai, hendaklah dielakkan.'
+            ]},
+            { title: '3. Pengurusan Waktu Rehat', lead: 'Sepanjang pentaksiran MPT4, waktu rehat bagi semua murid ialah:', emphasis: '9:45 pagi – 10:15 pagi', items: [
+              'Guru waktu ke-5 hendaklah mengiringi murid ke kantin.',
+              'Selepas rehat, murid hendaklah berbaris di dewan.',
+              'Guru waktu ke-6 hendaklah berada di dewan tepat pada 10:15 pagi untuk membawa murid kembali ke bilik darjah.'
+            ]}
+          ]
+        },
+        {
+          id: 'C', title: 'PENGURUSAN DAN PERGERAKAN MURID TAHUN 4',
+          intro: 'Rujuk garis masa di atas untuk jadual pergerakan penuh murid Tahun 4.',
+          groups: [{ items: [
+            '7:00 pagi — Berkumpul di dewan.',
+            '7:40 pagi — Mula beratur menuju ke bilik pentaksiran.',
+            '9:30 pagi — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.',
+            '9:45 pagi – 10:15 pagi — Waktu rehat.',
+            '10:15 pagi — Berkumpul dan beratur di dewan selepas waktu rehat.',
+            '10:25 pagi — Mula beratur menuju ke bilik pentaksiran.',
+            '12:15 tengah hari — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.'
+          ], emphasis: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas pada 7:25 pagi. Guru waktu ke-2 hendaklah masuk ke kelas tepat pada masa.' }]
+        },
+      ],
+      dutySection: {
+        title: 'Guru Bertugas dan Pengurusan Murid Tahun 4',
+        accordions: [
+          { id: 'A', title: 'GURU BERTUGAS MENJAGA MURID TAHUN 4', petugas: {
+            primary: ['GPK HEM', 'SuP', 'Guru Disiplin', 'Guru Bimbingan dan Kaunseling (B&K)'],
+            supporting: ['Guru Kelas 4A', 'Guru Kelas 4D', 'Guru Pendidikan Islam'],
+            note: 'Guru membantu bertugas apabila tidak mempunyai tugas mengajar atau mengawas pentaksiran di kelas lain.'
+          }},
+          { id: 'B', title: 'WAKTU BERTUGAS', dutyTimes: [
+            { label: 'SESI PAGI', time: '7:00 – 7:45 pagi', icon: 'ph-sun-horizon' },
+            { label: 'SELEPAS INSTRUMEN / REHAT', time: '9:30 – 10:25 pagi', icon: 'ph-sun' },
+            { label: 'SESI TENGAH HARI', time: '12:15 tengah hari – 1:00 tengah hari', icon: 'ph-clock' }
+          ]},
+          { id: 'C', title: 'TUGAS GURU BERTUGAS', duties: [
+            'Berada di dewan untuk mengawal disiplin dan pergerakan murid.',
+            '30 minit sebelum pentaksiran bermula, membawa murid ke tangga menuju ke bilik pentaksiran.',
+            'Bersedia di tangga berhampiran bilik pentaksiran selepas setiap instrumen pentaksiran selesai untuk membawa murid kembali ke dewan.',
+            'Murid masuk ke bilik pentaksiran mengikut arahan dan prosedur yang ditetapkan. Guru bertugas tidak perlu mengiringi murid masuk ke dalam bilik pentaksiran.'
+          ]}
+        ]
+      },
+      ui: {
+        pageName: 'Panduan Pengurusan MPT4', version: 'Versi Terkini / 最新版本',
+        nav: ['Utama', 'Timeline', 'Panduan', 'Guru Bertugas Tahun 4'],
+        sectionTitles: ['Maklumat Penting', 'Pengurusan Murid Tahun 4', 'Panduan Lengkap'],
+        primaryStaff: 'Petugas Utama', supportingStaff: 'Guru Membantu'
+      },
+      footer: 'Kerjasama dan perhatian semua guru amat dihargai bagi memastikan pentaksiran MPT4 berjalan dengan lancar dan teratur serta gangguan kepada calon dapat diminimumkan.'
+    };
+
+    const MPT4_ZH = {
+      school: '新廊华小 · SJK (C) LADANG GRISEK',
+      title: '2026年 MPT4',
+      subtitle: '评估期间管理指南',
+      date: '2026年10月6日至8日',
+      breakTime: '上午 9:45 至 10:15',
+      highlights: [
+        { kicker: '三楼', title: '禁区', icon: 'ph-prohibit', tone: 'warning', description: '除 MPT4 评估工作人员外，其他老师及学生不得经过考场区域，也不得使用三楼厕所。' },
+        { kicker: '中央楼梯', title: '专用通道', icon: 'ph-stairs', tone: 'info', description: '仅供评估工作人员及四年级学生使用。' },
+        { kicker: '下课时间', title: '上午 9:45 – 10:15', icon: 'ph-fork-knife', tone: 'neutral', description: 'MPT4 评估期间全体学生统一下课时间。' },
+        { kicker: '保持安静', title: '安静环境', icon: 'ph-speaker-slash', tone: 'neutral', description: '确保学生流动及教学活动不会干扰正在进行的评估。' }
+      ],
+      timeline: [
+        { time: '上午 7:00', title: '在礼堂集合' },
+        { time: '上午 7:25', title: '三、五及六年级学生开始列队返回课室', secondary: true },
+        { time: '上午 7:40', title: '四年级学生开始列队前往考场' },
+        { time: '上午 9:30', title: '返回礼堂', note: '完成评估项目后。' },
+        { time: '上午 9:45 – 10:15', title: '下课时间' },
+        { time: '上午 10:15', title: '在礼堂集合及列队' },
+        { time: '上午 10:25', title: '前往考场' },
+        { time: '中午 12:15', title: '返回礼堂', note: '完成评估项目后。' }
+      ],
+      accordions: [
+        {
+          id: 'A', title: '评估期间规定', intro: '请全体老师向各自班级学生传达以下事项：',
+          groups: [
+            { title: '1. 禁区及学生流动', items: [
+              '评估期间，三楼列为禁区。',
+              '中央楼梯仅供评估工作人员及四年级学生使用。',
+              '除 MPT4 评估工作人员外，其他老师及学生一律不得经过考场区域，也不得使用三楼厕所。',
+              '学生只可使用一楼及二楼的厕所。',
+              '除班长外，其他学生不得前往办公室。',
+              '在 PBD／UASA／教学期间，请老师尽量减少学生离开课室的次数，以及每次同时离开课室的人数。'
+            ]},
+            { title: '2. 暂停进行的活动', lead: '评估期间：', emphasis: '所有课室外活动及特别室的使用一律暂停。' }
+          ]
+        },
+        {
+          id: 'B', title: '全体老师注意事项', groups: [
+            { title: '1. 学生秩序管理', items: [
+              '值勤老师须到指定岗位，协助维持评估期间学生的秩序及流动。',
+              '老师须按照当天所制定的代课时间表，进班或到礼堂值勤。',
+              '中午 12:30 起，所有学生可到礼堂集合，并由值勤老师负责看管。'
+            ]},
+            { title: '2. 课室秩序', paragraphs: [
+              '老师须确保学生遵守秩序，并保持课室安静，以免干扰正在进行的评估。',
+              '应避免进行会产生较大声响的活动，包括大声朗读或集体朗读。'
+            ]},
+            { title: '3. 下课时间安排', lead: 'MPT4 评估期间，所有学生的下课时间统一为：', emphasis: '上午 9:45 至 10:15', items: [
+              '第五节课老师须带领学生前往食堂。',
+              '下课后，学生须在礼堂列队。',
+              '第六节课老师须于上午 10:15 准时到礼堂，带领学生返回课室。'
+            ]}
+          ]
+        },
+        {
+          id: 'C', title: '四年级学生集合及移动安排', intro: '请参阅上方时间表，了解四年级学生完整移动安排。',
+          groups: [{ items: [
+            '上午 7:00 — 在礼堂集合。',
+            '上午 7:40 — 开始列队前往考场。',
+            '上午 9:30 — 完成评估项目后，返回礼堂集合。',
+            '上午 9:45 至 10:15 — 下课时间。',
+            '上午 10:15 — 下课后在礼堂集合及列队。',
+            '上午 10:25 — 开始列队前往考场。',
+            '中午 12:15 — 完成评估项目后，返回礼堂集合。'
+          ], emphasis: '三、五及六年级学生于上午 7:25 开始列队返回课室。第二节课的老师须准时进入课室。' }]
+        },
+      ],
+      dutySection: {
+        title: '四年级学生值勤老师与安排',
+        accordions: [
+          { id: 'A', title: '四年级学生值勤老师', petugas: {
+            primary: ['学生事务副校长（GPK HEM）', '评估秘书（SuP）', '纪律老师', '辅导老师（B&K）'],
+            supporting: ['4A 班级任老师', '4D 班级任老师', '回教教育老师'],
+            note: '以上协助老师仅在没有教学任务或没有在其他班级执行监考任务的时段参与值勤。'
+          }},
+          { id: 'B', title: '值勤时间', dutyTimes: [
+            { label: '早晨时段', time: '上午 7:00 – 7:45', icon: 'ph-sun-horizon' },
+            { label: '评估结束／下课时段', time: '上午 9:30 – 10:25', icon: 'ph-sun' },
+            { label: '中午时段', time: '中午 12:15 – 下午 1:00', icon: 'ph-clock' }
+          ]},
+          { id: 'C', title: '值勤老师职责', duties: [
+            '在礼堂维持学生纪律及管理学生流动。',
+            '评估开始前 30 分钟，带领学生到通往考场的楼梯口。',
+            '每项评估结束后，在考场附近的楼梯口等候，并带领学生返回礼堂。',
+            '学生须按照既定指示及程序自行进入考场；值勤老师无须陪同学生进入考场。'
+          ]}
+        ]
+      },
+      ui: {
+        pageName: 'MPT4 管理指南', version: '最新版本 / Versi Terkini',
+        nav: ['重点', '时间表', '完整指南', '四年级学生值勤老师与安排'],
+        sectionTitles: ['重要资讯', '四年级学生集合及移动安排', '完整指南'],
+        primaryStaff: '主要负责人', supportingStaff: '协助老师'
+      },
+      footer: '感谢全体老师的配合与关注，以确保 MPT4 评估顺利、有序进行，并尽量减少对考生的干扰。'
+    };
+
+    const MPT4_ASSETS = {
+      prepInfographic: { ms: './mpt4-pra-infografik.svg', zh: './mpt4-pra-infografik-zh.svg' },
+      dutyRoster: './jadual-guru-bertugas-penggal-3-2026.png?v=20261001b'
+    };
+
+    const MPT4_PREP_DATA = {
+      school: 'SJK (C) LADANG GRISEK',
+      title: 'MATRIKS PEMBELAJARAN TAHUN 4 (MPT4) 2026',
+      subtitle: 'PERSEDIAAN PRA-MPT4',
+      date: '5 Oktober 2026 (Isnin)',
+      infographic: MPT4_ASSETS.prepInfographic.ms,
+      coordinators: [
+        { name: 'Cikgu Loh Boon Ping', role: 'Penolong Kanan HEM' },
+        { name: 'Cikgu Chong Cheng Yang', role: 'Setiausaha Pentaksiran (SuP)' }
+      ],
+      preparationDeadline: 'SELEWAT-LEWATNYA 2 OKTOBER 2026',
+      preparationChecklist: [
+        'Keluarkan barang yang tidak berkaitan.',
+        'Kembalikan bahan bantu mengajar, carta dan bahan paparan ke bilik BBM.',
+        'Kosongkan buku, buku latihan dan buku kerja.',
+        'Kosongkan / tutup papan kenyataan dengan kertas mahjong putih.',
+        'Pastikan tingkap bersih.', 'Periksa kipas dan lampu.',
+        'Pastikan almari besi kelas 5C boleh dikunci.'
+      ],
+      timeline: [
+        { time: '7:30 – 8:00 PAGI', title: 'Perhimpunan / Taklimat Ringkas MPT4', description: 'Selepas perhimpunan, SuP memberi taklimat ringkas kepada murid Tahun 3, 5 dan 6 mengenai perkara yang perlu diberi perhatian sepanjang MPT4.' },
+        { time: '8:00 PAGI – SELESAI', title: 'Penyediaan Bilik Darjah', branches: [
+          { label: 'MURID TAHUN 4', title: 'Kekal di Dewan', items: ['Guru Bimbingan dan Kaunseling boleh menjalankan slot ringkas: pengurusan diri, motivasi atau persediaan menghadapi pentaksiran.'], tone: 'blue' },
+          { label: 'MURID TAHUN 3, 5 DAN 6', title: 'Kembali ke Kelas', items: ['Menyusun meja dan kerusi bersama Guru Kelas / guru yang ditetapkan.', 'Persediaan bagi PBD Akhir Tahun dan Ujian Akhir Sesi Akademik.'], tone: 'green' },
+          { label: 'BILIK PENTAKSIRAN MPT4', title: 'Guru Bertanggungjawab + 8–10 Murid Tahun 5 & 6', items: ['Susun mengikut Pelan Tempat Duduk.', 'Bersihkan bilik.', 'Susun meja dan kerusi.', 'Tampal Label Meja.', 'Semak kemudahan.', 'Sediakan dokumen.'], tone: 'orange' }
+        ]}
+      ],
+      roomAssignments: [
+        ['5C','Bilik A (Bilik Utama)','4D (15)','15 + 1 meja besar','Cikgu Chiam Ai Ying'],
+        ['5D','Bilik B','4D (25)','25','Cikgu Tan Hui Kee'],
+        ['5E','Bilik C','4B (25)','25','Cikgu Leong Siew Fern'],
+        ['6A','Bilik D','4A (11) + 4B (1) + 4C (13)','25','Cikgu Ong Wen Jing'],
+        ['6B','Bilik E','4C (25)','25','Cikgu Tan Hau Vind'],
+        ['6C','Bilik F','4A (20)','20','Cikgu Lim Sie Pei'],
+        ['BILIK B','Bilik Khas','Kes khas','10','Cik Hanan Nazihah Binti Hasmi'],
+        ['BILIK A','Bilik Rizab','–','–','Cikgu Muhammad Faidh Amnan']
+      ],
+      temporaryClassPlacement: [
+        ['5C','4A','Cikgu Yusmairan'], ['5D','4E','Cikgu Tee Ying Chan'],
+        ['5E','Bilik Pend. Islam 1','Cikgu Norhafiza'], ['6A','4D','Cikgu Tan Lee Ching'],
+        ['6B','4C','En Lim Kian Pin'], ['6C','4B','En Willson Lim']
+      ],
+      roomChecklist: [
+        'Susun meja dan kerusi mengikut Pelan Tempat Duduk.',
+        'Kekalkan hanya bilangan meja dan kerusi yang diperlukan.',
+        'Tampal Label Meja pada sudut kanan atas meja.',
+        'Alih / tutup gambar, tulisan, carta atau bahan yang boleh membantu calon.',
+        'Pastikan smartboard berfungsi.',
+        'Tampal pada pintu: jadual pentaksiran, Pelan Tempat Duduk, senarai nama dan angka giliran calon.',
+        'Perabot pengawas — Bilik Utama: 1 meja besar + 1 kerusi KP; bilik lain: 1 kerusi pengawas.',
+        'Sediakan bakul sampah, penyapu dan penyodok sampah.',
+        'Pastikan meja dan kerusi berada dalam keadaan baik.',
+        'Hadapkan pintu almari besi kosong ke arah dinding.',
+        'Pastikan koridor di luar bilik turut dibersihkan.'
+      ],
+      rehearsal: {
+        title: 'Latihan Pergerakan Murid Tahun 4',
+        note: 'Jika bilik pentaksiran siap sebelum waktu rehat, latihan dijalankan sebelum rehat; jika belum siap, latihan dijalankan selepas rehat.',
+        items: ['Pergerakan melalui laluan yang ditetapkan.', 'Mengenal pasti bilik dan tempat duduk sendiri.', 'Menyemak ketepatan susunan tempat duduk calon.']
+      },
+      years356: [
+        'Guru Kelas / guru yang menjaga meneruskan pecutan akhir atau ulang kaji.',
+        'Pertukaran waktu boleh dilaksanakan jika Guru Mata Pelajaran ingin menjalankan ulang kaji.',
+        'Murid boleh dibawa ke dewan seawal 9:00 pagi jika guru perlu berehat atau mempunyai urusan lain.',
+        'Jika PdP / ulang kaji diteruskan, murid boleh kekal di kelas sehingga waktu rehat.'
+      ],
+      hallProgramme: {
+        staff: ['Cikgu Lim Qi Yi', 'Cikgu Chong Wei Ni', 'Cikgu Yap Min Yan'],
+        note: 'Semua guru membantu menjaga disiplin murid di dewan mengikut jadual waktu masing-masing.'
+      },
+      commonAreas: ['Tangga', 'Koridor', 'Susunan meja dan kerusi di koridor', 'Tandas calon', 'Papan kenyataan ditutup dengan kertas mahjong putih', 'Pastikan kawasan bersih dan teratur'],
+      postAssessmentNotice: {
+        title: 'JANGAN SUSUN SEMULA MEJA & KERUSI',
+        body: 'Murid TIDAK DIBENARKAN mengalihkan atau menyusun semula meja dan kerusi sendiri selepas pentaksiran tamat. Murid hendaklah menunggu arahan Guru Kelas.'
+      }
+    };
+
+    const MPT4_TEACHER_NAMES_ZH = {
+      'Cikgu Loh Boon Ping': '罗文彬师',
+      'Cikgu Chong Cheng Yang': '张政扬师',
+      'Cikgu Chiam Ai Ying': '詹爱莹师',
+      'Cikgu Tan Hui Kee': '陈惠琪师',
+      'Cikgu Leong Siew Fern': '梁筱芬师',
+      'Cikgu Ong Wen Jing': '王文静师',
+      'Cikgu Tan Hau Vind': '陈皓运师',
+      'Cikgu Lim Sie Pei': '林诗佩师',
+      'Cikgu Tee Ying Chan': '郑咏珍师',
+      'Cikgu Tan Lee Ching': '陈丽清师',
+      'En Lim Kian Pin': '林建品师',
+      'En Willson Lim': '林伟胜师',
+      'Cikgu Lim Qi Yi': '林启义师',
+      'Cikgu Chong Wei Ni': '张玮倪师',
+      'Cikgu Yap Min Yan': '叶民彦师'
+    };
+
+    const MPT4_PREP_ZH = {
+      school: '新廊华小 · SJK (C) LADANG GRISEK',
+      title: '四年级学习矩阵 MPT4 2026', subtitle: '评估前准备', date: '2026年10月5日（星期一）',
+      infographic: MPT4_ASSETS.prepInfographic.zh,
+      coordinators: [
+        { name: 'Cikgu Loh Boon Ping', role: '学生事务副校长 / Penolong Kanan HEM' },
+        { name: 'Cikgu Chong Cheng Yang', role: '评估秘书 / Setiausaha Pentaksiran (SuP)' }
+      ],
+      preparationDeadline: '最迟于 2026年10月2日完成',
+      preparationChecklist: ['清除课室内无关物品。','将教具、图表及展示材料放回 BBM 室。','清空书本、练习簿及作业簿。','清空或以白色麻将纸遮盖布告板。','确保窗户清洁。','检查风扇及电灯。','确保 5C 班铁橱可以上锁。'],
+      timeline: [
+        { time:'7:30 – 8:00 早上', title:'周会 / MPT4 简短说明', description:'周会结束后，由 SuP 向三、五及六年级学生简要说明 MPT4 评估期间需要注意的事项。' },
+        { time:'8:00 早上 – 完成', title:'课室及考场准备', branches:[
+          { label:'四年级学生', title:'留在礼堂', items:['辅导老师可进行简短活动，例如：自我管理、激励或评估前准备。'] },
+          { label:'三、五及六年级学生', title:'返回课室', items:['由级任老师或已安排的老师带领整理桌椅。','准备 PBD 年终评估及 UASA。'] },
+          { label:'MPT4 考场', title:'考场负责人 + 8–10 名五、六年级学生', items:['根据座位平面图排列桌椅。','清理课室。','排好桌椅。','贴上桌面标签。','检查设施。','准备考场文件。'] }
+        ]}
+      ],
+      roomAssignments: [
+        ['5C','Bilik A（主考场）','4D（15）','15 + 1 张大桌','Cikgu Chiam Ai Ying'],['5D','Bilik B','4D（25）','25','Cikgu Tan Hui Kee'],['5E','Bilik C','4B（25）','25','Cikgu Leong Siew Fern'],['6A','Bilik D','4A（11）+ 4B（1）+ 4C（13）','25','Cikgu Ong Wen Jing'],['6B','Bilik E','4C（25）','25','Cikgu Tan Hau Vind'],['6C','Bilik F','4A（20）','20','Cikgu Lim Sie Pei'],['BILIK B','特别考场','特殊情况使用','10','Cik Hanan Nazihah Binti Hasmi'],['BILIK A','备用考场','–','–','Cikgu Muhammad Faidh Amnan']
+      ],
+      temporaryClassPlacement: MPT4_PREP_DATA.temporaryClassPlacement,
+      roomChecklist: ['根据座位平面图排列桌椅。','只保留所需数量的桌椅。','将桌面标签贴在桌子右上角。','移走或遮盖可能协助考生作答的图片、文字、图表等。','确保 smartboard 正常操作。','在前门张贴：评估时间表、座位平面图、考生姓名及考生编号名单。','监考家具——主考场：1 张大桌 + 1 张 KP 椅子；其他考场：1 张监考员椅子。','准备垃圾桶、扫把及畚斗。','确保桌椅完好。','将空铁橱的柜门朝向墙壁。','考场完成后，清理课室外走廊。'],
+      rehearsal: { title:'四年级学生移动演练', note:'如果考场在下课前准备完毕，则在下课前进行演练；如果尚未完成，则安排在下课后进行。', items:['按指定路线前往考场。','确认自己的考场及座位。','检查考生座位安排是否正确。'] },
+      years356: ['级任老师 / 负责老师继续进行最后冲刺或复习。','如科任老师有需要，可照常换节并进行复习。','如果老师需要休息或有其他事务，最早可于 9:00 早上带学生到礼堂。','如继续 PdP / 复习，学生可留在课室直到下课。'],
+      hallProgramme: { staff:MPT4_PREP_DATA.hallProgramme.staff, note:'所有老师须按照各自时间表，到礼堂协助维持学生纪律。' },
+      commonAreas: ['楼梯','走廊','走廊桌椅排列','考生厕所','布告板以白色麻将纸遮盖','确保公共区域整洁有序'],
+      postAssessmentNotice: { title:'禁止自行搬动或恢复桌椅', body:'评估结束后，学生不得自行搬动或重新排列桌椅。学生须等待级任老师指示后方可进行。' },
+      ui: {
+        infographic:'MPT4 评估前准备流程图', viewInfographic:'查看流程图', downloadInfographic:'下载流程图', coordinators:'考场协调员', preparation:'课室前期准备', deadline:'截止日期', preparationChecklist:'课室前期准备 Checklist', preparationFlow:'10月5日准备日流程', roomAssignments:'MPT4 考场分配', sourceRoom:'原课室', candidates:'考生', teacher:'负责人', desks:'桌子', temporaryPlacement:'临时班级安排', placementNote:'2026年10月6日至8日临时课室安排', usedRoom:'使用课室', prepTeacher:'5/10 负责准备老师', roomChecklist:'考场准备 Checklist', checklistCount:'11 项检查', rehearsal:'四年级学生演练', years356:'三、五及六年级安排', years356Title:'完成课室准备后至下课时间', hallProgramme:'下课后礼堂活动', afterBreak:'下课后', hallIntro:'所有学生在礼堂集合。活动 / 讲座由以下老师负责：', commonAreas:'三楼公共区域', reminder:'评估结束后的重要提醒', close:'关闭'
+      }
+    };
+
+    // Resolve supplied Chinese names centrally while retaining the BM source names.
+    MPT4_PREP_ZH.coordinators = MPT4_PREP_ZH.coordinators.map(person => ({
+      ...person, name: MPT4_TEACHER_NAMES_ZH[person.name] || person.name
+    }));
+    MPT4_PREP_ZH.roomAssignments = MPT4_PREP_ZH.roomAssignments.map(row =>
+      row.map((value, index) => index === 4 ? (MPT4_TEACHER_NAMES_ZH[value] || value) : value)
+    );
+    MPT4_PREP_ZH.temporaryClassPlacement = MPT4_PREP_DATA.temporaryClassPlacement.map(row =>
+      row.map((value, index) => index === 2 ? (MPT4_TEACHER_NAMES_ZH[value] || value) : value)
+    );
+
+    MPT4_PREP_ZH.hallProgramme.staff = MPT4_PREP_DATA.hallProgramme.staff.map(name =>
+      MPT4_TEACHER_NAMES_ZH[name] || name
+    );
+
+    MPT4_PREP_DATA.ui = {
+      infographic:'ALIRAN PERSEDIAAN PRA-MPT4', viewInfographic:'Lihat Infografik', downloadInfographic:'Muat Turun Infografik', coordinators:'PENYELARAS', preparation:'PERSEDIAAN AWAL', deadline:'DEADLINE', preparationChecklist:'Checklist Persediaan Awal', preparationFlow:'ALIRAN HARI PERSEDIAAN', roomAssignments:'PEMBAHAGIAN BILIK PENTAKSIRAN', sourceRoom:'Bilik Darjah', candidates:'Calon', teacher:'Guru', desks:'meja', temporaryPlacement:'PENEMPATAN SEMENTARA KELAS', placementNote:'Penempatan pada 6–8 Oktober 2026', usedRoom:'Bilik Digunakan', prepTeacher:'Guru Menjaga Persediaan pada 5/10', roomChecklist:'CHECKLIST BILIK PENTAKSIRAN', checklistCount:'11 perkara untuk disemak', rehearsal:'LATIHAN MURID TAHUN 4', years356:'TAHUN 3, 5 DAN 6', years356Title:'Selepas Selesai Penyediaan – Waktu Rehat', hallProgramme:'PROGRAM DI DEWAN', afterBreak:'Selepas Waktu Rehat', hallIntro:'Semua murid berkumpul di dewan. Program / ceramah dikendalikan oleh:', commonAreas:'KAWASAN UMUM ARAS 3', reminder:'PERINGATAN SELEPAS PENTAKSIRAN', close:'Tutup'
+    };
+
+
+    // School year-end assessment; Year 4 core subjects follow the official MPT4 timetable.
+    const YEAR_END_2026 = [
+  {
+    "years": [
+      1,
+      2
+    ],
+    "label": "Tahun 1–2",
+    "rows": [
+      [
+        6,
+        "BM",
+        "13:30",
+        "14:45"
+      ],
+      [
+        6,
+        "PSV",
+        "16:00",
+        "17:00"
+      ],
+      [
+        7,
+        "BI",
+        "13:30",
+        "14:45"
+      ],
+      [
+        7,
+        "PM/PI",
+        "16:00",
+        "17:00"
+      ],
+      [
+        8,
+        "BC",
+        "13:30",
+        "14:45"
+      ],
+      [
+        8,
+        "PJPK",
+        "16:00",
+        "17:00"
+      ],
+      [
+        12,
+        "SN",
+        "13:30",
+        "14:45"
+      ],
+      [
+        12,
+        "MT",
+        "16:00",
+        "17:15"
+      ]
+    ]
+  },
+  {
+    "years": [
+      3
+    ],
+    "label": "Tahun 3",
+    "rows": [
+      [
+        6,
+        "BM",
+        "08:15",
+        "09:30"
+      ],
+      [
+        6,
+        "PSV",
+        "11:00",
+        "12:00"
+      ],
+      [
+        7,
+        "BI",
+        "08:15",
+        "09:30"
+      ],
+      [
+        7,
+        "PM/PI",
+        "11:00",
+        "12:00"
+      ],
+      [
+        8,
+        "BC",
+        "08:15",
+        "09:30"
+      ],
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "SN",
+        "08:15",
+        "09:30"
+      ],
+      [
+        12,
+        "MT",
+        "10:10",
+        "11:25"
+      ]
+    ]
+  },
+  {
+    "years": [
+      4
+    ],
+    "label": "Tahun 4",
+    "mpt4": true,
+    "rows": [
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "MZ",
+        "08:15",
+        "09:15"
+      ],
+      [
+        12,
+        "RBT",
+        "10:10",
+        "11:10"
+      ],
+      [
+        12,
+        "PM/PI",
+        "11:20",
+        "12:35"
+      ],
+      [
+        13,
+        "SEJ",
+        "08:15",
+        "09:30"
+      ],
+      [
+        13,
+        "PSV",
+        "10:10",
+        "12:10"
+      ]
+    ]
+  },
+  {
+    "years": [
+      5,
+      6
+    ],
+    "label": "Tahun 5–6",
+    "rows": [
+      [
+        6,
+        "BM",
+        "08:15",
+        "09:30"
+      ],
+      [
+        6,
+        "MZ",
+        "11:00",
+        "12:00"
+      ],
+      [
+        7,
+        "BI",
+        "08:15",
+        "09:30"
+      ],
+      [
+        7,
+        "RBT",
+        "11:00",
+        "12:00"
+      ],
+      [
+        8,
+        "BC",
+        "08:15",
+        "09:30"
+      ],
+      [
+        8,
+        "PJPK",
+        "11:00",
+        "12:00"
+      ],
+      [
+        12,
+        "SN",
+        "08:15",
+        "09:30"
+      ],
+      [
+        12,
+        "MT",
+        "10:10",
+        "11:25"
+      ],
+      [
+        12,
+        "PM/PI",
+        "11:30",
+        "12:45"
+      ],
+      [
+        13,
+        "SEJ",
+        "08:15",
+        "09:30"
+      ],
+      [
+        13,
+        "PSV",
+        "10:10",
+        "12:10"
+      ]
+    ]
+  }
+];
+    const ASSESSMENT_SUBJECTS = {
+      BM: ['国文', 'Bahasa Melayu'], BI: ['英文', 'Bahasa Inggeris'], BC: ['华文', 'Bahasa Cina'],
+      SN: ['科学', 'Sains'], MT: ['数学', 'Matematik'], PSV: ['美术', 'Pendidikan Seni Visual'],
+      'PM/PI': ['道德／伊斯兰教育', 'Pendidikan Moral / Pendidikan Islam'],
+      PJPK: ['体育与健康教育', 'Pendidikan Jasmani dan Pendidikan Kesihatan'],
+      MZ: ['音乐', 'Muzik'], RBT: ['设计与工艺', 'Reka Bentuk dan Teknologi'], SEJ: ['历史', 'Sejarah']
+    };
+    const assessmentMinutes = (start, end) => {
+      const minutes = value => { const [h, m] = value.split(':').map(Number); return h * 60 + m; };
+      return minutes(end) - minutes(start);
+    };
+    const assessmentDuration = (minutes, zh) => {
+      const hours = Math.floor(minutes / 60);
+      const remainder = minutes % 60;
+      const parts = [];
+      if (hours) parts.push(zh ? `${hours}小时` : `${hours} jam`);
+      if (remainder || !hours) parts.push(zh ? `${remainder}分钟` : `${remainder} minit`);
+      return parts.join(zh ? '' : ' ');
+    };
+    const YearEndAssessmentPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
+      const zh = lang === 'zh';
+      const surface = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+      const title = zh ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026';
+      const weekdays = { 6: ['星期二', 'SELASA'], 7: ['星期三', 'RABU'], 8: ['星期四', 'KHAMIS'], 12: ['星期一', 'ISNIN'], 13: ['星期二', 'SELASA'] };
+      const time = value => {
+        const [h, m] = value.split(':').map(Number);
+        return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a.m.' : 'p.m.'}`;
+      };
+      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b ${surface}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 min-h-16 py-2 flex items-center gap-3">
+          <button type="button" onClick={onBack} aria-label={zh ? '返回首页' : 'Kembali ke halaman utama'} className={`w-11 h-11 shrink-0 rounded-full border ${surface}`}><i className="ph-bold ph-arrow-left"></i></button>
+          <div className="flex-1 min-w-0"><p className="text-sm font-bold text-blue-500">LG APPS</p><h1 className="font-extrabold">{title}</h1></div>
+          <button type="button" onClick={onLangToggle} aria-label={zh ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${surface}`}>{zh ? 'BM' : '中'}</button>
+        </div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+          <p className="text-base font-semibold">{zh ? '2026年10月6、7、8、12及13日 · 一至六年级' : '6, 7, 8, 12 dan 13 Oktober 2026 · Tahun 1–6'}</p>
+          <nav aria-label={zh ? '年级' : 'Tahun'} className="flex flex-wrap gap-2">{YEAR_END_2026.map(group => <a key={group.label} href={`#assessment-year-${group.years[0]}`} className={`min-h-11 inline-flex items-center px-4 rounded-full border font-bold text-sm ${surface}`}>{zh ? `${group.years.join('–')}年级` : group.label}</a>)}</nav>
+          {YEAR_END_2026.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
+            <h2 className="text-2xl font-black mb-4">{zh ? `${group.years.join('–')}年级` : group.label}</h2>
+            {group.mpt4 && <p className={`mb-5 p-4 rounded-2xl border text-base leading-7 ${isDarkMode ? 'bg-amber-950/30 border-amber-800 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>{zh ? '10月6日至8日：BM、BI、BC、SN、MT 以 MPT4 2026 正式时间表为准。以下列出校内年终评估安排。' : '6–8 Oktober: BM, BI, BC, SN dan MT mengikut jadual rasmi MPT4 2026. Jadual di bawah adalah untuk pentaksiran akhir tahun sekolah.'}</p>}
+            <div className="space-y-5">{[...new Set(group.rows.map(row => row[0]))].map(day => <div key={day}>
+              <h3 className="text-base font-extrabold mb-2">{String(day).padStart(2, '0')}-10-2026 · {weekdays[day][zh ? 0 : 1]}</h3>
+              <ul className="space-y-2">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
+                <span className="font-bold text-base sm:flex-1">{subject} · {ASSESSMENT_SUBJECTS[subject][zh ? 0 : 1]}</span>
+                <time className="text-base whitespace-nowrap">{time(start)} – {time(end)}</time>
+                <span className="text-sm font-semibold shrink-0 whitespace-nowrap sm:text-right">{assessmentDuration(assessmentMinutes(start, end), zh)}</span>
+              </li>)}</ul>
+            </div>)}</div>
+          </section>)}
+          <aside className={`rounded-3xl border p-5 text-base leading-7 ${surface}`}><h2 className="font-extrabold mb-2">{zh ? '四至六年级共同科目时长' : 'Tempoh mata pelajaran bersama Tahun 4–6'}</h2><p>MZ / RBT / PJPK: {assessmentDuration(60, zh)} · PM/PI / SEJ: {assessmentDuration(75, zh)} · PSV: {assessmentDuration(120, zh)}</p></aside>
+        </main>
+      </div>;
+    };
+
+    const MPT4Hub = ({ onBack, onOpenPrep, onOpenGuide, isDarkMode, lang, onLangToggle }) => {
+      const zh = lang === 'zh';
+      const cards = [
+        { title: zh ? '评估前准备' : 'Persediaan Pra-MPT4', date: zh ? '2026年10月5日' : '5 Oktober 2026', description: zh ? '考场准备、任务分配、学生移动演练及礼堂活动安排。' : 'Persediaan bilik, pembahagian tugas, latihan pergerakan murid dan program di dewan.', icon: 'ph-clipboard-text', action: onOpenPrep, accent: 'from-amber-500 to-orange-500' },
+        { title: zh ? 'MPT4 评估期间管理指南' : 'Panduan Pengurusan MPT4', date: zh ? '2026年10月6日至8日' : '6–8 Oktober 2026', description: zh ? '评估期间规定、学生移动、下课安排及值勤老师职责。' : 'Peraturan, pergerakan murid, waktu rehat dan tugas guru sepanjang pentaksiran.', icon: 'ph-book-open-text', action: onOpenGuide, accent: 'from-blue-600 to-indigo-600' }
+      ];
+      return <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3"><button onClick={onBack} className={`w-11 h-11 rounded-full border ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label="Kembali"><i className="ph-bold ph-arrow-left"></i></button><div className="flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><p className="font-extrabold">MPT4 2026</p></div><button onClick={onLangToggle} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200'}`} aria-label={zh?'Tukar ke Bahasa Melayu':'切换至中文'}>{zh?'BM':'中'}</button></div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16"><div className="text-center"><p className="text-sm font-black tracking-widest text-blue-600">SJK (C) LADANG GRISEK</p><h1 className="mt-3 text-4xl sm:text-5xl font-black">MPT4 2026</h1><p className="mt-3 opacity-70 font-semibold">{zh?'请选择要查看的页面':'Pilih halaman untuk dilihat'}</p></div><div className="mt-10 grid md:grid-cols-2 gap-5">{cards.map(card=><button key={card.title} onClick={card.action} className={`text-left rounded-3xl border overflow-hidden min-h-[260px] transition hover:-translate-y-1 hover:shadow-xl ${isDarkMode?'bg-slate-800 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><div className={`h-2 bg-gradient-to-r ${card.accent}`}></div><div className="p-7"><i className={`ph-fill ${card.icon} text-4xl text-blue-500`}></i><p className="mt-6 text-sm font-black text-blue-600">{card.date}</p><h2 className="mt-2 text-2xl font-black">{card.title}</h2><p className="mt-3 text-sm leading-7 opacity-70">{card.description}</p><span className="mt-5 inline-flex items-center gap-2 font-extrabold text-blue-600">{zh?'打开页面':'Buka Halaman'} <i className="ph-bold ph-arrow-right"></i></span></div></button>)}</div></main>
+      </div>;
+    };
+
+    const DUTY_ROSTER_DAYS = [
+      { id: 'mon', zh: '星期一', ms: 'Isnin' }, { id: 'tue', zh: '星期二', ms: 'Selasa' },
+      { id: 'wed', zh: '星期三', ms: 'Rabu' }, { id: 'thu', zh: '星期四', ms: 'Khamis' },
+      { id: 'fri', zh: '星期五', ms: 'Jumaat' }
+    ];
+
+    const DUTY_ROSTER_SECTIONS = [
+      {
+        id: 'morning-arrival', tone: 'lime', titleZh: '早上时段 · 6:25 a.m. – 7:00 a.m.', titleMs: 'Waktu Pagi · 6:25 a.m. – 7:00 a.m.',
+        noteZh: '6:25–6:45 a.m. 在食堂／礼堂值勤。6:45 后，老师转到礼堂并带学生前往二、三楼。',
+        noteMs: '6:25–6:45 a.m. di kantin/dewan. Selepas 6:45 a.m. guru beralih ke dewan dan bawa murid ke tingkat 2/3.',
+        rows: [
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['LIM SIE PEI','AMNAN','LIM QI YI','ROSE MALATINA','CHONG CHENG YANG'] },
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['WONG SIEW JING','TAN HUI KEE','WINSON','YIP KIM YUN','YAP MIN YAN'] },
+          { place: 'B门 (Pintu B)', group: 'B门', staff: ['WILLSON LIM','CHIAM AI YING','TAN LEE CHING','TEE YING CHAN','NABILA'] },
+          { place: '第二层 (Tingkat Dua)', route: '礼堂 → 第二层 · Dewan → Tingkat 2', staff: ['YUSMAIRAN','CHONG WEI NI','OI SWEE CHIEN','LIM KIAN PIN','NADIA'] },
+          { place: '第三层 (Tingkat Tiga)', route: '食堂 → 礼堂 → 第三层 · Kantin → Dewan → Tingkat 3', staff: ['NORHAFIZA','CHIN LEE MEI','ONG WEN JING','LEONG SIEW FEN','TAN HAU VIND'] }
+        ]
+      },
+      {
+        id: 'late-arrival', tone: 'cyan', titleZh: '迟到学生 · 7:00 a.m. – 7:15 a.m.', titleMs: 'Murid yang Lewat · 7:00 a.m. – 7:15 a.m.',
+        rows: [{ place: '校门 (Pintu Sekolah)', group: '校门', staff: ['LIM QI YI','CHIAM AI YING','CHONG WEI NI','RINNY SEAH','LOH BOON PING'] }]
+      },
+      {
+        id: 'recess', tone: 'sky', titleZh: '下课时间 · 9:30 a.m. – 10:00 a.m.', titleMs: 'Waktu Rehat · 9:30 a.m. – 10:00 a.m.',
+        rows: [
+          { place: '第二层 (Tingkat Dua)', staff: ['NORHAFIZA','TAN HUI KEE','LIM QI YI','TEE YING CHAN','NADIA'] },
+          { place: '第三层 (Tingkat Tiga)', staff: ['YUSMAIRAN','CHONG WEI NI','WINSON','ROSE MALATINA','CHONG CHENG YANG'] },
+          { place: '食堂 (Kantin)', group: '食堂', staff: ['WONG SIEW JING','AMNAN','ONG WEN JING','YIP KIM YUN','TAN HAU VIND'] },
+          { place: '食堂 (Kantin)', group: '食堂', staff: ['LIM SIE PEI','CHIAM AI YING','TAN LEE CHING','LIM KIAN PIN','YAP MIN YAN'] },
+          { place: '礼堂 (Dewan)', staff: ['WONG SIEW JING','CHIN LEE MEI','OI SWEE CHIEN','LEONG SIEW FEN','NABILA'] }
+        ]
+      },
+      {
+        id: 'dismissal', tone: 'orange', titleZh: '放学岗位 · 12:50 p.m. 起（星期五 11:25 a.m. 起）', titleMs: 'Tempat Bertugas Balik · 12:50 p.m. (Jumaat mulai 11:25 a.m.)',
+        rows: [
+          { place: '后门 (Pintu Belakang)', group: '后门', staff: ['YUSMAIRAN (K)','CHIN LEE MEI','ONG WEN JING','ROSE MALATINA','NADIA (K)'] },
+          { place: '后门 (Pintu Belakang)', group: '后门', staff: ['WONG SIEW JING','TAN HUI KEE','LIM QI YI (K)','LIM KIAN PIN','YAP MIN YAN'] },
+          { place: '食堂／礼堂后方 (Kantin / Belakang Dewan)', group: '食堂', staff: ['LIM SIE PEI','CHIAM AI YING','TAN LEE CHING','YIP KIM YUN (K)','TAN HAU VIND'] },
+          { place: '电单车／Van／礼堂 (Motor / Van / Dewan)', group: '交通', staff: ['WILLSON LIM','CHONG WEI NI','WINSON','LEONG SIEW FEN','CHONG CHENG YANG'] },
+          { place: '电单车／Van／礼堂 (Motor / Van / Dewan)', group: '交通', staff: ['NORHAFIZA','AMNAN (K)','OI SWEE CHIEN','TEE YING CHAN','NABILA'] }
+        ]
+      }
+    ];
+
+    const DutyRosterPage = ({ onBack, isDarkMode, lang }) => {
+      const [zoomed, setZoomed] = useState(false);
+      const [query, setQuery] = useState('');
+      const [selectedDay, setSelectedDay] = useState('all');
+      const imageButtonRef = useRef(null);
+      useEffect(() => {
+        if (!zoomed) return;
+        const previousFocus = document.activeElement;
+        const closeOnEscape = event => { if (event.key === 'Escape') setZoomed(false); };
+        document.addEventListener('keydown', closeOnEscape);
+        return () => { document.removeEventListener('keydown', closeOnEscape); previousFocus?.focus?.(); };
+      }, [zoomed]);
+      const isZh = lang === 'zh';
+      const title = isZh ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)';
+      const copy = isZh ? {
+        search: '搜索老师或地点', allDays: '所有星期', results: '项安排', day: '星期',
+        original: '查看原始值勤表图片', tapZoom: '查看完整原图（点击放大）',
+        back: '返回应用中心', zoom: '放大查看值勤表', close: '关闭', download: '下载值勤表',
+        none: '没有符合条件的值勤安排', noRows: '此筛选条件下没有安排',
+        keyNote: '原表中的 (K) 标记已保留。地点名称同时显示中文和马来文，方便对照原表。'
+      } : {
+        search: 'Cari nama guru atau lokasi', allDays: 'Semua hari', results: 'tugasan', day: 'Hari',
+        original: 'Lihat imej jadual asal', tapZoom: 'Lihat jadual asal penuh (klik untuk besarkan)',
+        back: 'Kembali ke Pusat Aplikasi', zoom: 'Besarkan jadual', close: 'Tutup', download: 'Muat Turun Jadual',
+        none: 'Tiada tugasan yang sepadan', noRows: 'Tiada tugasan untuk penapis ini',
+        keyNote: 'Tanda (K) daripada jadual asal dikekalkan. Nama lokasi dipaparkan dalam bahasa Cina dan Melayu untuk rujukan.'
+      };
+      const queryText = query.trim().toLocaleLowerCase();
+      const sections = DUTY_ROSTER_SECTIONS.map(section => ({
+        ...section,
+        rows: section.rows.filter(row => !queryText || `${row.place} ${row.route || ''} ${row.staff.join(' ')}`.toLocaleLowerCase().includes(queryText))
+      })).filter(section => section.rows.length);
+      const totalRows = sections.reduce((count, section) => count + section.rows.length, 0);
+      const shell = isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900';
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const tone = { lime: isDarkMode ? 'border-lime-800 bg-lime-950/30' : 'border-lime-200 bg-lime-50', cyan: isDarkMode ? 'border-cyan-800 bg-cyan-950/30' : 'border-cyan-200 bg-cyan-50', sky: isDarkMode ? 'border-sky-800 bg-sky-950/30' : 'border-sky-200 bg-sky-50', orange: isDarkMode ? 'border-orange-800 bg-orange-950/30' : 'border-orange-200 bg-orange-50' };
+      return <div className={`min-h-screen ${shell}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+          <div className="max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
+            <button type="button" onClick={onBack} aria-label={copy.back} className={`w-11 h-11 rounded-full border flex items-center justify-center ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left"></i></button>
+            <div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500 tracking-wider">LG APPS</p><h1 className="font-extrabold truncate">{title}</h1></div>
+            <a href={MPT4_ASSETS.dutyRoster} download className="min-h-11 px-3 sm:px-4 rounded-full bg-blue-600 text-white inline-flex items-center gap-2 font-bold text-sm"><i className="ph-bold ph-download-simple"></i><span className="hidden sm:inline">{copy.download}</span></a>
+          </div>
+        </header>
+        <main className="max-w-6xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
+          <div className="grid sm:grid-cols-[1fr_auto] gap-3 mb-5">
+            <label className="relative block"><i className="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={copy.search} aria-label={copy.search} className={`w-full min-h-12 pl-11 pr-4 rounded-2xl border outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-800 border-slate-700 placeholder-slate-400' : 'bg-white border-slate-200'}`} /></label>
+            <label className="flex items-center gap-2"><span className="sr-only">{copy.day}</span><select value={selectedDay} onChange={event => setSelectedDay(event.target.value)} aria-label={copy.day} className={`min-h-12 w-full sm:w-auto px-4 rounded-2xl border font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}><option value="all">{copy.allDays}</option>{DUTY_ROSTER_DAYS.map(day => <option key={day.id} value={day.id}>{isZh ? day.zh : day.ms}</option>)}</select></label>
+          </div>
+          <div aria-live="polite" className="mb-4 flex items-center justify-between gap-3"><p className="text-sm font-semibold opacity-65">{copy.keyNote}</p><span className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-black text-xs whitespace-nowrap">{totalRows} {copy.results}</span></div>
+          {sections.length === 0 && <div className={`p-8 rounded-2xl border text-center font-bold opacity-70 ${card}`}>{copy.none}</div>}
+          <div className="space-y-6">
+            {sections.map(section => <section key={section.id}>
+              <h2 className={`p-4 sm:px-5 rounded-t-2xl border font-black text-base sm:text-lg ${tone[section.tone]}`}>{isZh ? section.titleZh : section.titleMs}</h2>
+              {section.noteZh && <p className={`px-4 py-3 border-x text-sm leading-6 font-semibold ${isDarkMode ? 'bg-yellow-950/40 border-yellow-900 text-yellow-100' : 'bg-yellow-100 border-yellow-200 text-yellow-950'}`}>{isZh ? section.noteZh : section.noteMs}</p>}
+              <div className="space-y-3 pt-3">{section.rows.map((row,rowIndex) => {
+                const visibleDays = DUTY_ROSTER_DAYS.map((day,index) => ({...day,index})).filter(day => selectedDay === 'all' || selectedDay === day.id);
+                return <article key={`${section.id}-${rowIndex}`} className={`rounded-2xl border overflow-hidden ${card}`}>
+                  <div className={`px-4 py-3 border-b font-extrabold ${isDarkMode ? 'border-slate-700 bg-slate-800' : 'border-slate-100 bg-slate-50'}`}><span>{row.place}</span>{row.route && <p className="mt-1 text-xs font-semibold opacity-60">{row.route}</p>}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-3">{visibleDays.map(day => {
+                    const name = row.staff[day.index];
+                    const match = queryText && name.toLocaleLowerCase().includes(queryText);
+                    return <div key={day.id} className={`min-h-[72px] p-3 rounded-xl border flex flex-col justify-between ${match ? (isDarkMode ? 'bg-amber-950/50 border-amber-700 ring-1 ring-amber-500' : 'bg-amber-50 border-amber-300 ring-1 ring-amber-300') : (isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-100')}`}><span className="text-[0.68rem] font-black uppercase tracking-wide text-blue-500">{isZh ? day.zh : day.ms}</span><span className="mt-2 text-xs sm:text-sm font-extrabold leading-snug break-words">{name}</span></div>;
+                  })}</div>
+                </article>;
+              })}</div>
+            </section>)}
+          </div>
+          <details className={`mt-8 rounded-2xl border overflow-hidden ${card}`}>
+            <summary className="cursor-pointer min-h-14 px-5 py-4 font-extrabold flex items-center gap-2"><i className="ph-fill ph-image text-blue-500 text-xl"></i>{copy.original}</summary>
+            <div className="p-3 sm:p-5 border-t border-slate-200 dark:border-slate-700"><p className="mb-3 text-center text-sm font-semibold opacity-65">{copy.tapZoom}</p><button ref={imageButtonRef} type="button" onClick={() => setZoomed(true)} aria-label={copy.zoom} className="block w-full rounded-xl border overflow-hidden bg-white"><img src={MPT4_ASSETS.dutyRoster} alt={title} className="block w-full h-auto" /></button></div>
+          </details>
+        </main>
+        {zoomed && <div role="dialog" aria-modal="true" aria-label={title} onClick={() => setZoomed(false)} className="fixed inset-0 z-[100] bg-black/90 p-2 sm:p-6 flex items-center justify-center overflow-auto"><button type="button" onClick={() => setZoomed(false)} aria-label={copy.close} className="fixed top-3 right-3 z-10 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img src={MPT4_ASSETS.dutyRoster} alt={title} onClick={event => event.stopPropagation()} className="max-w-full max-h-full object-contain" /></div>}
+      </div>;
+    };
+
+    const MPT4Acknowledgement = ({ pageId, isDarkMode, lang }) => {
+      const isZh = lang === 'zh';
+      const [teachers, setTeachers] = useState([]);
+      const [teachersLoading, setTeachersLoading] = useState(true);
+      const [submittedCount, setSubmittedCount] = useState(0);
+      const [totalCount, setTotalCount] = useState(0);
+      const [teacherId, setTeacherId] = useState('');
+      const [checked, setChecked] = useState(false);
+      const [submitting, setSubmitting] = useState(false);
+      const [savedAt, setSavedAt] = useState('');
+      const [error, setError] = useState('');
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const applyTeacherStatus = result => {
+        // Allow the current name-only API response to keep the form usable until GAS is redeployed.
+        const status = Array.isArray(result)
+          ? { teachers: result, submittedCount: 0, totalCount: result.length }
+          : (result || {});
+        setTeachers(Array.isArray(status.teachers) ? status.teachers : []);
+        setSubmittedCount(Number(status.submittedCount) || 0);
+        setTotalCount(Number(status.totalCount) || 0);
+      };
+      useEffect(() => {
+        let active = true;
+        server.getMpt4Teachers(pageId, 'v1')
+          .then(result => { if (active) applyTeacherStatus(result); })
+          .catch(() => { if (active) setError(isZh ? '无法读取 Users 教师名单，请检查网络后重试。' : 'Tidak dapat memuatkan senarai guru daripada Users. Sila semak Internet dan cuba lagi.'); })
+          .finally(() => { if (active) setTeachersLoading(false); });
+        return () => { active = false; };
+      }, []);
+      const copy = isZh ? {
+        title: '教师阅读确认', prompt: '请确认您已阅读并了解本页面内容。', select: '请选择您的姓名',
+        confirm: '我已阅读并了解本页面内容', submit: '提交阅读确认', saving: '提交中…',
+        success: '确认已记录', time: '记录时间', required: '请选择姓名并勾选确认后再提交。',
+        submitted: '已提交', alreadySubmitted: '此页面的阅读确认已提交，无需重复提交。', countLabel: '本页已提交', countSuffix: '位老师',
+        failure: '提交失败。请检查网络连接后重试；您的选择仍会保留。',
+        noTeachers: 'Users 表中没有可用的教师姓名。',
+        note: '请以本人名义提交。系统记录教师姓名、页面版本和提交时间。'
+      } : {
+        title: 'Pengesahan Bacaan Guru', prompt: 'Sila sahkan bahawa anda telah membaca dan memahami kandungan halaman ini.',
+        select: 'Pilih nama anda', confirm: 'Saya telah membaca dan memahami kandungan halaman ini',
+        submit: 'Hantar Pengesahan', saving: 'Menghantar…', success: 'Pengesahan direkodkan', time: 'Masa rekod',
+        required: 'Sila pilih nama dan tandakan pengesahan sebelum menghantar.',
+        submitted: 'Telah dihantar', alreadySubmitted: 'Pengesahan untuk halaman ini telah dihantar. Tidak perlu hantar sekali lagi.', countLabel: 'Telah dihantar', countSuffix: 'orang guru',
+        failure: 'Penghantaran gagal. Semak sambungan Internet dan cuba lagi; pilihan anda dikekalkan.',
+        noTeachers: 'Tiada nama guru yang boleh dipilih dalam helaian Users.',
+        note: 'Sila hantar atas nama sendiri. Nama guru, versi halaman dan masa penghantaran akan direkodkan.'
+      };
+      const handleSubmit = async event => {
+        event.preventDefault();
+        setError('');
+        if (!teacherId || !checked) { setError(copy.required); return; }
+        setSubmitting(true);
+        try {
+          const result = await server.submitMpt4Acknowledgement({ pageId, pageVersion: 'v1', teacherId: Number(teacherId), language: lang });
+          setSavedAt(result.confirmedAt || new Date().toISOString());
+          setTeachers(current => current.map(person => String(person.id) === String(teacherId) ? { ...person, submitted: true } : person));
+          setSubmittedCount(Number(result.submittedCount) || submittedCount + 1);
+          setTotalCount(Number(result.totalCount) || totalCount);
+        } catch (e) {
+          if (e.message === 'ALREADY_SUBMITTED') {
+            setError(copy.alreadySubmitted);
+            try {
+              const latest = await server.getMpt4Teachers(pageId, 'v1');
+              applyTeacherStatus(latest);
+            } catch (_) {}
+          } else setError(copy.failure);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+      return <section className="pt-12" aria-labelledby={`${pageId}-ack-title`}>
+        <div className={`rounded-3xl border p-5 sm:p-7 ${card}`}>
+          <div className="flex items-start gap-3"><span className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0"><i className="ph-fill ph-read-cv-logo text-2xl"></i></span><div><h2 id={`${pageId}-ack-title`} className="text-xl font-black">{copy.title}</h2><p className="mt-1 text-sm leading-6 opacity-70">{copy.prompt}</p></div></div>
+          <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+            <label className="block"><span className="sr-only">{copy.select}</span><select value={teacherId} onChange={e => { setTeacherId(e.target.value); setSavedAt(''); }} required disabled={teachersLoading || teachers.length === 0} className={`min-h-12 w-full px-4 rounded-xl border font-semibold outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}><option value="">{teachersLoading ? (isZh ? '正在读取教师名单…' : 'Memuatkan senarai guru…') : copy.select}</option>{teachers.map(person => { const name = isZh && person.nameZh ? `${person.nameZh}（${person.nameMs}）` : person.nameMs; return <option key={person.id} value={person.id} disabled={person.submitted}>{person.submitted ? `${name} · ${copy.submitted}` : name}</option>; })}</select></label>
+            {!teachersLoading && teachers.length === 0 && !error && <p role="status" className="text-sm font-semibold opacity-70">{copy.noTeachers}</p>}
+            <label className="flex items-start gap-3 p-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 cursor-pointer"><input type="checkbox" checked={checked} onChange={e => { setChecked(e.target.checked); setSavedAt(''); }} className="mt-1 w-5 h-5 accent-blue-600 shrink-0"/><span className="text-sm font-bold leading-6">{copy.confirm}</span></label>
+            {error && <p role="alert" className="text-sm font-bold text-rose-600 dark:text-rose-300">{error}</p>}
+            {savedAt && <p role="status" className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 text-sm font-bold"><i className="ph-bold ph-check-circle mr-2"></i>{copy.success} · {copy.time}: {new Date(savedAt).toLocaleString(isZh ? 'zh-CN' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur' })}</p>}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3"><div className="shrink-0"><button type="submit" disabled={submitting || teachersLoading || teachers.length === 0 || teachers.find(person => String(person.id) === String(teacherId))?.submitted} className="min-h-12 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-extrabold">{submitting ? copy.saving : copy.submit}</button><p className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-300" role="status">{copy.countLabel} {submittedCount}{totalCount ? ` / ${totalCount}` : ''} {copy.countSuffix}</p></div><p className="text-xs leading-5 opacity-60">{copy.note}</p></div>
+          </form>
+        </div>
+      </section>;
+    };
+
+    const PrepChecklist = ({ title, items, isDarkMode, open = false }) => <details open={open} className={`rounded-2xl border overflow-hidden ${isDarkMode?'bg-slate-800/70 border-slate-700':'bg-white border-slate-200 shadow-sm'}`}><summary className="cursor-pointer min-h-14 px-5 py-4 flex items-center gap-3 font-extrabold"><i className="ph-fill ph-check-square text-blue-500 text-xl"></i><span className="flex-1">{title}</span><span className="text-xs opacity-50">{items.length}</span></summary><ol className={`px-5 pb-5 pt-4 border-t space-y-3 ${isDarkMode?'border-slate-700':'border-slate-100'}`}>{items.map((item,i)=><li key={i} className="flex gap-3 text-sm leading-6"><span className="w-7 h-7 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 flex items-center justify-center font-black shrink-0">{i+1}</span><span>{item}</span></li>)}</ol></details>;
+
+    const MPT4PrepPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
+      const d = lang === 'zh' ? MPT4_PREP_ZH : MPT4_PREP_DATA;
+      const [showInfographic, setShowInfographic] = useState(false);
+      useEffect(() => { if (!showInfographic) return; const close=e=>{if(e.key==='Escape')setShowInfographic(false)}; document.addEventListener('keydown',close); return()=>document.removeEventListener('keydown',close); }, [showInfographic]);
+      const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const SectionTitle = ({ n, children }) => <div className="mb-5"><p className="text-xs font-black tracking-widest text-blue-600">SECTION {n}</p><h2 className="mt-1 text-2xl font-black">{children}</h2></div>;
+      const SimpleList = ({items}) => <ul className="space-y-3">{items.map((x,i)=><li key={i} className="flex gap-3 text-sm leading-6"><i className="ph-fill ph-check-circle text-emerald-500 mt-0.5 text-lg shrink-0"></i><span>{x}</span></li>)}</ul>;
+      return <div className={`min-h-screen ${isDarkMode?'bg-slate-900 text-slate-100':'bg-slate-50 text-slate-900'}`}>
+        <header className={`sticky top-0 z-40 border-b backdrop-blur-xl ${isDarkMode?'bg-slate-900/90 border-slate-800':'bg-white/90 border-slate-200'}`}><div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3"><button onClick={onBack} className={`w-11 h-11 rounded-full border ${card}`} aria-label="Kembali ke MPT4"><i className="ph-bold ph-arrow-left"></i></button><div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500">MPT4 2026</p><p className="font-extrabold truncate">{d.subtitle}</p></div><button onClick={onLangToggle} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${card}`} aria-label={lang==='zh'?'Tukar ke Bahasa Melayu':'切换至中文'}>{lang==='zh'?'BM':'中'}</button></div></header>
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16"><section className="pt-9 sm:pt-12 text-center"><p className="text-xs sm:text-sm font-black tracking-[.14em] text-blue-600">{d.school}</p><h1 className="mt-4 text-2xl sm:text-4xl font-black leading-tight">{d.title}</h1><p className="mt-3 text-xl sm:text-2xl font-black text-amber-600">{d.subtitle}</p><p className="mt-4 text-lg font-extrabold">{d.date}</p></section>
+          <section className="pt-12"><SectionTitle n="1">{d.ui.infographic}</SectionTitle><div className={`rounded-3xl border p-4 sm:p-6 ${card}`}><button onClick={()=>setShowInfographic(true)} className="block w-full rounded-2xl overflow-hidden bg-slate-100"><img src={d.infographic} alt={d.ui.infographic} className="w-full max-h-[520px] object-contain" /></button><div className="mt-4 flex flex-col sm:flex-row gap-3"><button onClick={()=>setShowInfographic(true)} className="min-h-11 px-5 rounded-xl bg-blue-600 text-white font-bold"><i className="ph-bold ph-magnifying-glass-plus mr-2"></i>{d.ui.viewInfographic}</button><a href={d.infographic} download className={`min-h-11 px-5 rounded-xl border inline-flex items-center justify-center font-bold ${isDarkMode?'border-slate-600':'border-slate-300'}`}><i className="ph-bold ph-download-simple mr-2"></i>{d.ui.downloadInfographic}</a></div></div></section>
+          <section className="pt-12"><SectionTitle n="2">{d.ui.coordinators}</SectionTitle><div className="grid sm:grid-cols-2 gap-3">{d.coordinators.map(x=><article key={x.name} className={`p-5 rounded-2xl border ${card}`}><i className="ph-fill ph-user-circle text-3xl text-blue-500"></i><h3 className="mt-3 font-black text-lg">{x.name}</h3><p className="mt-1 text-sm opacity-65">{x.role}</p></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="3">{d.ui.preparation}</SectionTitle><div className="mb-4 p-5 rounded-2xl bg-rose-600 text-white"><p className="text-xs font-black tracking-widest">{d.ui.deadline}</p><p className="mt-1 text-xl sm:text-2xl font-black">{d.preparationDeadline}</p></div><PrepChecklist title={d.ui.preparationChecklist} items={d.preparationChecklist} isDarkMode={isDarkMode} open /></section>
+          <section className="pt-12"><SectionTitle n="4">{d.ui.preparationFlow}</SectionTitle><div className="space-y-0">{d.timeline.map((event,i)=><div key={event.time} className="grid grid-cols-[24px_1fr] gap-4"><div className="relative flex justify-center"><span className="mt-2 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-100 dark:ring-blue-950 z-10"></span>{i<d.timeline.length-1&&<span className="absolute top-6 bottom-0 w-0.5 bg-blue-200 dark:bg-slate-700"></span>}</div><div className="pb-8"><time className="text-xl font-black text-blue-600 dark:text-blue-400">{event.time}</time><h3 className="mt-1 text-lg font-black">{event.title}</h3>{event.description&&<p className="mt-3 text-sm leading-7 opacity-75">{event.description}</p>}{event.branches&&<div className="mt-5 grid lg:grid-cols-3 gap-3">{event.branches.map(b=><article key={b.label} className={`p-5 rounded-2xl border ${card}`}><p className="text-xs font-black tracking-wide text-blue-600">{b.label}</p><h4 className="mt-2 font-black">{b.title}</h4><div className="mt-3"><SimpleList items={b.items}/></div></article>)}</div>}</div></div>)}</div></section>
+          <section className="pt-12"><SectionTitle n="5">{d.ui.roomAssignments}</SectionTitle><div className="grid sm:grid-cols-2 gap-3">{d.roomAssignments.map((r,i)=><article key={i} className={`p-5 rounded-2xl border ${card}`}><div className="flex items-start justify-between gap-3"><div><p className="text-xs font-black text-blue-600">{r[0]}</p><h3 className="mt-1 text-lg font-black">{r[1]}</h3></div><span className="px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 text-xs font-black">{r[3]} {d.ui.desks}</span></div><dl className="mt-4 grid grid-cols-[75px_1fr] gap-y-2 text-sm"><dt className="opacity-55">{d.ui.candidates}</dt><dd className="font-bold">{r[2]}</dd><dt className="opacity-55">{d.ui.teacher}</dt><dd className="font-bold">{r[4]}</dd></dl></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="6">{d.ui.temporaryPlacement}</SectionTitle><p className="mb-4 text-sm font-bold opacity-65">{d.ui.placementNote}</p><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">{d.temporaryClassPlacement.map((r,i)=><article key={i} className={`p-5 rounded-2xl border ${card}`}><div className="flex items-center gap-3"><span className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black">{r[0]}</span><div><p className="text-xs opacity-55">{d.ui.usedRoom}</p><p className="font-black">{r[1]}</p></div></div><p className="mt-4 text-xs opacity-55">{d.ui.prepTeacher}</p><p className="mt-1 font-bold text-sm">{r[2]}</p></article>)}</div></section>
+          <section className="pt-12"><SectionTitle n="7">{d.ui.roomChecklist}</SectionTitle><PrepChecklist title={d.ui.checklistCount} items={d.roomChecklist} isDarkMode={isDarkMode}/></section>
+          <section className="pt-12"><SectionTitle n="8">{d.ui.rehearsal}</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black text-xl">{d.rehearsal.title}</h3><p className="mt-3 text-sm leading-7 opacity-75">{d.rehearsal.note}</p><div className="mt-5"><SimpleList items={d.rehearsal.items}/></div></div></section>
+          <section className="pt-12"><SectionTitle n="9">{d.ui.years356}</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black mb-5">{d.ui.years356Title}</h3><SimpleList items={d.years356}/></div></section>
+          <section className="pt-12"><SectionTitle n="10">{d.ui.hallProgramme}</SectionTitle><div className={`p-6 rounded-3xl border ${card}`}><h3 className="font-black text-lg">{d.ui.afterBreak}</h3><p className="mt-2 text-sm opacity-70">{d.ui.hallIntro}</p><div className="mt-5 flex flex-wrap gap-2">{d.hallProgramme.staff.map(x=><span key={x} className="px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-950 text-sm font-bold">{x}</span>)}</div><p className="mt-5 p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-sm font-bold leading-6">{d.hallProgramme.note}</p></div></section>
+          <section className="pt-12"><SectionTitle n="11">{d.ui.commonAreas}</SectionTitle><div className="grid grid-cols-2 sm:grid-cols-3 gap-3">{d.commonAreas.map(x=><div key={x} className={`p-4 rounded-2xl border text-sm font-bold flex gap-2 ${card}`}><i className="ph-fill ph-check-circle text-emerald-500 text-lg shrink-0"></i><span>{x}</span></div>)}</div></section>
+          <section className="pt-12"><SectionTitle n="12">{d.ui.reminder}</SectionTitle><div className="p-6 sm:p-8 rounded-3xl bg-rose-600 text-white"><i className="ph-fill ph-warning-octagon text-4xl"></i><h3 className="mt-4 text-2xl sm:text-3xl font-black">{d.postAssessmentNotice.title}</h3><p className="mt-4 leading-7 font-semibold">{d.postAssessmentNotice.body}</p></div></section>
+          <MPT4Acknowledgement pageId="mpt4-prep-2026" isDarkMode={isDarkMode} lang={lang} />
+        </main>
+        {showInfographic&&<div role="dialog" aria-modal="true" aria-label={d.ui.infographic} onClick={()=>setShowInfographic(false)} className="fixed inset-0 z-[100] bg-black/85 p-3 sm:p-8 flex items-center justify-center"><button onClick={()=>setShowInfographic(false)} aria-label={d.ui.close} className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white text-slate-900 text-xl"><i className="ph-bold ph-x"></i></button><img onClick={e=>e.stopPropagation()} src={d.infographic} alt={d.ui.infographic} className="max-w-full max-h-full object-contain rounded-xl" /></div>}
+      </div>;
+    };
+
+    const MPT4Accordion = ({ section, panelId = section.id, isOpen, onToggle, isDarkMode, ui }) => (
+      <div className={`rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+        <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={`mpt4-panel-${panelId}`} className="w-full min-h-[64px] px-4 sm:px-6 py-4 flex items-center gap-3 text-left">
+          <span className={`w-9 h-9 rounded-xl flex items-center justify-center font-black shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}>{section.id}</span>
+          <span className="flex-1 text-sm sm:text-base font-extrabold leading-snug">{section.title}</span>
+          <i aria-hidden="true" className={`ph-bold ph-caret-down text-lg transition-transform ${isOpen ? 'rotate-180' : ''}`}></i>
+        </button>
+        {isOpen && (
+          <div id={`mpt4-panel-${panelId}`} className={`px-5 sm:px-7 pb-6 border-t ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+            {section.intro && <p className="mt-5 text-sm sm:text-[0.95rem] leading-7 font-semibold opacity-80">{section.intro}</p>}
+            {section.groups?.map((group, groupIndex) => (
+              <div key={groupIndex} className="mt-5">
+                {group.title && <h4 className="font-extrabold text-[0.95rem] mb-3">{group.title}</h4>}
+                {group.lead && <p className="text-sm leading-6 opacity-80 mb-3">{group.lead}</p>}
+                {group.paragraphs?.map((paragraph, index) => <p key={index} className="text-sm leading-7 opacity-80 mb-3">{paragraph}</p>)}
+                {group.emphasis && <div className={`p-4 rounded-xl font-extrabold text-sm leading-6 ${isDarkMode ? 'bg-blue-500/10 text-blue-200' : 'bg-blue-50 text-blue-900'}`}>{group.emphasis}</div>}
+                {group.items && <ul className="space-y-3">{group.items.map((item, index) => <li key={index} className="flex gap-3 text-sm leading-6 opacity-85"><span className="mt-2 w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0"></span><span>{item}</span></li>)}</ul>}
+              </div>
+            ))}
+            {section.dutyTimes && (
+              <div className="mt-5 grid md:grid-cols-3 gap-3">{section.dutyTimes.map(slot => <article key={slot.label} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className={`ph-fill ${slot.icon} text-2xl text-blue-500`}></i><p className="mt-4 text-xs font-black tracking-wider opacity-60">{slot.label}</p><p className="mt-1 text-xl font-black">{slot.time}</p></article>)}</div>
+            )}
+            {section.duties && <ul className="mt-5 space-y-5">{section.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul>}
+            {section.petugas && (
+              <div className="grid sm:grid-cols-2 gap-4 mt-5">
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-blue-500/10' : 'bg-blue-50'}`}><h4 className="font-extrabold mb-3">{ui.primaryStaff}</h4><ul className="space-y-2 text-sm">{section.petugas.primary.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-blue-500 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <div className={`p-5 rounded-2xl ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}><h4 className="font-extrabold mb-3">{ui.supportingStaff}</h4><ul className="space-y-2 text-sm">{section.petugas.supporting.map(name => <li key={name} className="flex gap-2"><i className="ph-fill ph-check-circle text-slate-400 mt-0.5"></i><span>{name}</span></li>)}</ul></div>
+                <p className="sm:col-span-2 text-sm leading-6 opacity-75">{section.petugas.note}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+
+    const MPT4Page = ({ onBack, isDarkMode, lang, onLangToggle }) => {
+      const [openSection, setOpenSection] = useState(null);
+      const data = lang === 'zh' ? MPT4_ZH : MPT4_DATA;
+      const dutySection = data.dutySection;
+      const jumpTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const toneClasses = {
+        warning: isDarkMode ? 'bg-rose-950/35 border-rose-900/60' : 'bg-rose-50 border-rose-200',
+        info: isDarkMode ? 'bg-blue-950/30 border-blue-900/50' : 'bg-blue-50 border-blue-100',
+        neutral: isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'
+      };
+
+      return (
+        <div className={`min-h-screen ${isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
+          <header className={`sticky top-0 z-50 border-b backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
+            <div className="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center gap-3">
+              <button type="button" onClick={onBack} aria-label="Kembali ke Pusat Aplikasi" className={`w-11 h-11 rounded-full flex items-center justify-center border shrink-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><i className="ph-bold ph-arrow-left text-xl"></i></button>
+              <div className="min-w-0 flex-1"><p className="text-xs font-bold text-blue-500 uppercase tracking-wider">LG Apps</p><p className="font-extrabold text-sm sm:text-base truncate">{data.ui.pageName}</p></div>
+              <button type="button" onClick={onLangToggle} aria-label={lang === 'zh' ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full font-bold text-sm border shrink-0 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>{lang === 'zh' ? 'BM' : '中'}</button>
+            </div>
+          </header>
+
+          <main className="max-w-5xl mx-auto px-4 sm:px-6 pb-16">
+            <section className="pt-8 sm:pt-12 text-center" aria-labelledby="mpt4-title">
+              <p className="text-xs sm:text-sm font-extrabold tracking-[0.14em] text-blue-600">{data.school}</p>
+              <h1 id="mpt4-title" className="mt-3 text-4xl sm:text-5xl font-black tracking-tight">{data.title}</h1>
+              <p className="mt-2 text-base sm:text-xl font-bold opacity-75">{data.subtitle}</p>
+              <p className="mt-5 text-xl sm:text-2xl font-black text-blue-600">{data.date}</p>
+              <span className={`inline-flex mt-4 items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold border ${isDarkMode ? 'bg-emerald-950/30 border-emerald-900/60 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}><span className="w-2 h-2 rounded-full bg-emerald-500"></span>{data.ui.version}</span>
+            </section>
+
+            <nav aria-label="Navigasi pantas" className={`sticky top-16 z-40 -mx-4 sm:mx-0 mt-7 px-4 sm:px-0 py-3 overflow-x-auto hide-scrollbar ${isDarkMode ? 'bg-slate-900/95' : 'bg-slate-50/95'} backdrop-blur-xl`}>
+              <div className="flex gap-2 w-max sm:mx-auto">
+                {['mpt4-utama','mpt4-timeline','mpt4-panduan','mpt4-petugas'].map((id,index) => <button key={id} type="button" onClick={() => jumpTo(id)} className={`min-h-11 px-4 rounded-full border text-sm font-bold ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700' : 'bg-white border-slate-200 hover:border-blue-300'}`}>{data.ui.nav[index]}</button>)}
+              </div>
+            </nav>
+
+            <section id="mpt4-utama" className="scroll-mt-32 pt-7" aria-labelledby="mpt4-important">
+              <div className="mb-5"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 1</p><h2 id="mpt4-important" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[0]}</h2></div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {data.highlights.map(item => <article key={item.kicker} className={`p-4 sm:p-5 rounded-2xl border min-w-0 ${toneClasses[item.tone]}`}>
+                  <i aria-hidden="true" className={`ph-fill ${item.icon} text-2xl ${item.tone === 'warning' ? 'text-rose-500' : 'text-blue-500'}`}></i>
+                  <p className="mt-4 text-[0.68rem] sm:text-xs font-black tracking-wider opacity-60">{item.kicker}</p>
+                  <h3 className="mt-1 text-base sm:text-lg font-black leading-tight break-words">{item.title}</h3>
+                  <p className="mt-3 text-xs sm:text-sm leading-5 sm:leading-6 opacity-75">{item.description}</p>
+                </article>)}
+              </div>
+            </section>
+
+            <section id="mpt4-timeline" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-movement">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 2</p><h2 id="mpt4-movement" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[1]}</h2></div>
+              <div className={`rounded-3xl border p-5 sm:p-8 ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
+                {data.timeline.map((item, index) => <div key={item.time} className="grid grid-cols-[22px_1fr] gap-4">
+                  <div className="relative flex justify-center"><span className={`mt-1.5 w-3 h-3 rounded-full border-[3px] box-content z-10 ${item.secondary ? 'bg-slate-400 border-slate-200 dark:border-slate-700' : 'bg-blue-600 border-blue-100 dark:border-blue-950'}`}></span>{index < data.timeline.length - 1 && <span className={`absolute top-5 bottom-0 w-0.5 ${isDarkMode ? 'bg-slate-700' : 'bg-slate-200'}`}></span>}</div>
+                  <div className={`pb-7 ${item.secondary ? 'opacity-60' : ''}`}><time className={`block text-lg sm:text-xl font-black ${item.secondary ? '' : 'text-blue-600 dark:text-blue-400'}`}>{item.time}</time><h3 className="mt-1 text-sm sm:text-base font-extrabold leading-6">{item.title}</h3>{item.note && <p className="mt-1 text-sm opacity-70">{item.note}</p>}</div>
+                </div>)}
+              </div>
+            </section>
+
+            <section id="mpt4-panduan" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-guide">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 3</p><h2 id="mpt4-guide" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[2]}</h2></div>
+              <div className="space-y-3">{data.accordions.map(section => <MPT4Accordion key={section.id} section={section} panelId={`guide-${section.id}`} isOpen={openSection === section.id} onToggle={() => setOpenSection(openSection === section.id ? null : section.id)} isDarkMode={isDarkMode} ui={data.ui} />)}</div>
+            </section>
+
+            <section id="mpt4-petugas" className="scroll-mt-32 pt-12" aria-labelledby="mpt4-petugas-title">
+              <div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 4</p><h2 id="mpt4-petugas-title" className="mt-1 text-2xl font-black">{dutySection.title}</h2></div>
+              <div className="space-y-3">{dutySection.accordions.map(section => { const accordionKey = `duty-${section.id}`; return <MPT4Accordion key={accordionKey} section={section} panelId={accordionKey} isOpen={openSection === accordionKey} onToggle={() => setOpenSection(openSection === accordionKey ? null : accordionKey)} isDarkMode={isDarkMode} ui={data.ui} />; })}</div>
+            </section>
+
+
+            <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{data.footer}</p></footer>
+            <MPT4Acknowledgement pageId="mpt4-guide-2026" isDarkMode={isDarkMode} lang={lang} />
+          </main>
+        </div>
+      );
+    };
+
+    const useModalKeyboard = (isOpen, onClose) => {
+      useEffect(() => {
+        if (!isOpen) return;
+        const previousFocus = document.activeElement;
+        const timer = setTimeout(() => {
+          const dialog = document.querySelector('[role="dialog"]');
+          dialog?.querySelector('input, button, select, textarea, [tabindex]:not([tabindex="-1"])')?.focus();
+        }, 0);
+        const handleKeyDown = (event) => {
+          if (event.key === 'Escape') { event.preventDefault(); onClose(); return; }
+          if (event.key !== 'Tab') return;
+          const dialog = document.querySelector('[role="dialog"]');
+          const focusable = [...(dialog?.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])') || [])];
+          if (!focusable.length) return;
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => { clearTimeout(timer); document.removeEventListener('keydown', handleKeyDown); previousFocus?.focus?.(); };
+      }, [isOpen]);
+    };
+
+    function App() {
+      const [isAdmin, setIsAdmin] = useState(() => {
+        try { return !!getAdminToken() && Number(sessionStorage.getItem('sjkc_admin_expires_at')) > Date.now(); } catch { return false; }
+      });
+
+      const [clickCount, setClickCount] = useState(0);
+      const clickTimeoutRef = useRef(null);
+      const [showPinModal, setShowPinModal] = useState(false);
+      const [pinInput, setPinInput] = useState('');
+      const [pinError, setPinError] = useState(false);
+      const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+      const endAdminSession = () => {
+        sessionStorage.removeItem('sjkc_admin_token');
+        sessionStorage.removeItem('sjkc_admin_expires_at');
+        setIsAdmin(false);
+      };
+
+      useEffect(() => {
+        if (!isAdmin) return;
+        const expiresAt = Number(sessionStorage.getItem('sjkc_admin_expires_at'));
+        const timer = setTimeout(endAdminSession, Math.max(0, expiresAt - Date.now()));
+        return () => clearTimeout(timer);
+      }, [isAdmin]);
+
+      const handleLogoClick = () => {
+        if (isAdmin) { endAdminSession(); return; }
+        setClickCount(prev => prev + 1);
+        if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = setTimeout(() => setClickCount(0), 1000);
+      };
+
+      useEffect(() => { if (clickCount >= 5) { setShowPinModal(true); setClickCount(0); } }, [clickCount]);
+
+      const handlePinSubmit = async (e) => {
+        e.preventDefault();
+        setIsAuthenticating(true);
+        try {
+          const session = await server.authenticateAdmin(pinInput);
+          if (!session?.token || !session?.expiresAt) throw new Error('Invalid session response');
+          sessionStorage.setItem('sjkc_admin_token', session.token);
+          sessionStorage.setItem('sjkc_admin_expires_at', String(new Date(session.expiresAt).getTime()));
+          setIsAdmin(true); setShowPinModal(false); setPinInput(''); setPinError(false); vibrate(50);
+        } catch (error) {
+          setPinError(true); setPinInput(''); vibrate([30,50,30]);
+        } finally { setIsAuthenticating(false); }
+      };
+
+      const [apps, setApps] = useState([]);
+      const [announcement, setAnnouncement] = useState({ active: false, zh: '', ms: '' });
+      const [schoolEvent, setSchoolEvent] = useState({ active: false, zh: '', ms: '', date: '' });
+      const [loading, setLoading] = useState(true);
+      const [isSyncing, setIsSyncing] = useState(false);
+      const [syncError, setSyncError] = useState('');
+      const [lastSyncedAt, setLastSyncedAt] = useState(() => localStorage.getItem('sjkc_last_synced_at') || '');
+      const [refreshNonce, setRefreshNonce] = useState(0);
+      const [appUpdateStatus, setAppUpdateStatus] = useState(navigator.onLine ? 'checking' : 'offline');
+      const [appUpdateCheckedAt, setAppUpdateCheckedAt] = useState('');
+      const updateRegistrationRef = useRef(null);
+      const reloadAfterUpdateRef = useRef(false);
+      
+      const [lang, setLang] = useState(() => {
+        try { return localStorage.getItem('sjkc_language') || 'zh'; } catch { return 'zh'; }
+      });
+      const [isDarkMode, setIsDarkMode] = useState(() => {
+        try { return localStorage.getItem('sjkc_dark_mode') === 'true'; } catch { return false; }
+      });
+      const [activePage, setActivePage] = useState('home');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [activeTab, setActiveTab] = useState('all');
+      
+      const currentDateTimeStr = useSmartClock(lang);
+
+      const [viewMode, setViewMode] = useState(() => {
+        try { return localStorage.getItem('sjkc_view_mode') || 'grid'; } catch { return 'grid'; }
+      });
+      useEffect(() => { localStorage.setItem('sjkc_view_mode', viewMode); }, [viewMode]);
+
+      const [isOffline, setIsOffline] = useState(!navigator.onLine);
+      useEffect(() => {
+        const handleOnline = () => { setIsOffline(false); checkForAppUpdate(); };
+        const handleOffline = () => { setIsOffline(true); setAppUpdateStatus('offline'); };
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+        return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
+      }, []);
+
+      const [recentIds, setRecentIds] = useState(() => {
+        try { return JSON.parse(localStorage.getItem('sjkc_recent_apps') || '[]'); } catch { return []; }
+      });
+
+      const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
+      const showToast = (message, type = 'success') => {
+        vibrate(type === 'error' ? [30, 50, 30] : 30);
+        setToast({ visible: true, message, type });
+        setTimeout(() => setToast(t => ({ ...t, visible: false })), 3000);
+      };
+
+      const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+      const [isIOS, setIsIOS] = useState(false);
+      const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+      const [pinnedIds, setPinnedIds] = useState(() => {
+        try { const saved = localStorage.getItem('sjkc_superapp_pinned'); return saved ? JSON.parse(saved) : []; } catch { return []; }
+      });
+      useEffect(() => { localStorage.setItem('sjkc_superapp_pinned', JSON.stringify(pinnedIds)); }, [pinnedIds]);
+
+      const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+      const [isAnnModalOpen, setIsAnnModalOpen] = useState(false);
+      const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+      const [isDataModalOpen, setIsDataModalOpen] = useState(false); 
+      const [qrApp, setQrApp] = useState(null);
+      
+      const [isFabOpen, setIsFabOpen] = useState(false);
+      
+      const [editingApp, setEditingApp] = useState(null);
+      const [formData, setFormData] = useState({ url: '', icon: 'Settings', category: 'admin', zhTitle: '', zhDesc: '', msTitle: '', msDesc: '' });
+      const [isCustomIcon, setIsCustomIcon] = useState(false);
+      const [isSaving, setIsSaving] = useState(false);
+
+      const [shortcutKey, setShortcutKey] = useState('⌘K');
+      useEffect(() => {
+        if (navigator.userAgent.indexOf('Win') !== -1 || navigator.userAgent.indexOf('Linux') !== -1) {
+          setShortcutKey('Ctrl+K');
+        } else {
+          setShortcutKey('⌘K');
+        }
+      }, []);
+
+      const currentT = t[lang];
+      const appVersionLabel = !navigator.onLine || appUpdateStatus === 'offline' ? currentT.appVersionOffline
+        : appUpdateStatus === 'available' ? currentT.appVersionAvailable
+        : appUpdateStatus === 'checking' ? currentT.appVersionChecking
+        : appUpdateStatus === 'error' ? currentT.appVersionError
+        : currentT.appVersionCurrent;
+
+      useEffect(() => {
+        document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : 'ms';
+        localStorage.setItem('sjkc_language', lang);
+      }, [lang]);
+
+      const searchInputRef = useRef(null);
+      const [isSearchFocused, setIsSearchFocused] = useState(false);
+      const [kbIndex, setKbIndex] = useState(-1);
+
+      const filteredApps = useMemo(() => {
+        const s = searchQuery.toLowerCase();
+        if (!s) return apps;
+        return apps.filter(app => app.zhTitle?.toLowerCase().includes(s) || app.msTitle?.toLowerCase().includes(s) || app.zhDesc?.toLowerCase().includes(s) || app.msDesc?.toLowerCase().includes(s));
+      }, [apps, searchQuery]);
+
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); searchInputRef.current?.focus(); return; }
+          
+          if (isSearchFocused && searchQuery) {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setKbIndex(prev => Math.min(prev + 1, filteredApps.length - 1));
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setKbIndex(prev => Math.max(prev - 1, 0));
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              if (kbIndex >= 0 && filteredApps[kbIndex]) {
+                const targetApp = filteredApps[kbIndex];
+                handleAppClick(null, targetApp);
+                window.open(targetApp.url, '_blank');
+              }
+            }
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [isSearchFocused, searchQuery, filteredApps, kbIndex]);
+
+      useEffect(() => { setKbIndex(searchQuery ? 0 : -1); }, [searchQuery]);
+
+      useEffect(() => {
+        if (isDarkMode) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+        localStorage.setItem('sjkc_dark_mode', String(isDarkMode));
+      }, [isDarkMode]);
+
+      useEffect(() => {
+        const cachedData = localStorage.getItem('sjkc_staff_cache');
+        if (cachedData) {
+          try {
+            const parsed = JSON.parse(cachedData);
+            setApps(parsed.apps || []);
+            if (parsed.settings) {
+              if (parsed.settings.announcement) setAnnouncement(parsed.settings.announcement);
+              if (parsed.settings.event) setSchoolEvent(parsed.settings.event);
+            }
+            setLoading(false); setIsSyncing(true); 
+          } catch(e) {}
+        }
+
+        if (!isOffline) {
+          setIsSyncing(true);
+          setSyncError('');
+          server.getInitialData().then(res => {
+            let loadedApps = res.apps || [];
+            loadedApps.sort((a, b) => (a.order || 0) - (b.order || 0));
+            loadedApps = loadedApps.map(a => ({
+              ...a, zh: { title: a.zhTitle, desc: a.zhDesc }, ms: { title: a.msTitle, desc: a.msDesc }, clicks: parseInt(a.clicks) || 0
+            }));
+            setApps(loadedApps);
+            if (res.settings) {
+              if (res.settings.announcement) setAnnouncement(res.settings.announcement);
+              if (res.settings.event) setSchoolEvent(res.settings.event);
+            }
+            setLoading(false); setIsSyncing(false);
+            localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps: loadedApps, settings: res.settings }));
+            const syncedAt = new Date().toISOString();
+            setLastSyncedAt(syncedAt);
+            localStorage.setItem('sjkc_last_synced_at', syncedAt);
+          }).catch(err => {
+            console.error("无法连接到云端数据库:", err);
+            setLoading(false); setIsSyncing(false);
+            setSyncError(lang === 'zh' ? '无法连接云端，正在显示上次保存的内容。' : 'Unable to reach the cloud. Showing your last saved content.');
+          });
+        }
+
+        const isIosDevice = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        if (isIosDevice && !window.navigator.standalone && !localStorage.getItem('sjkc_pwa_ios')) {
+          setIsIOS(true); setShowInstallPrompt(true);
+        }
+        const handleBeforeInstallPrompt = (e) => { e.preventDefault(); setDeferredPrompt(e); setShowInstallPrompt(true); };
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      }, [isOffline, refreshNonce]);
+
+      const checkForAppUpdate = async () => {
+        if (!navigator.onLine) { setAppUpdateStatus('offline'); return; }
+        if (!('serviceWorker' in navigator)) { setAppUpdateStatus('error'); return; }
+        setAppUpdateStatus('checking');
+        try {
+          let registration = updateRegistrationRef.current || await navigator.serviceWorker.getRegistration();
+          if (!registration) registration = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' });
+          updateRegistrationRef.current = registration;
+          if (registration.waiting) {
+            reloadAfterUpdateRef.current = true;
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            return;
+          }
+          await registration.update();
+          if (registration.waiting) {
+            reloadAfterUpdateRef.current = true;
+            registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+            return;
+          }
+          setAppUpdateCheckedAt(new Date().toISOString());
+          setAppUpdateStatus('current');
+          setRefreshNonce(value => value + 1);
+        } catch (error) {
+          console.warn('App update check failed:', error);
+          setAppUpdateStatus('error');
+        }
+      };
+
+      useEffect(() => {
+        if (!('serviceWorker' in navigator)) { setAppUpdateStatus('error'); return; }
+        let active = true;
+        const onControllerChange = () => {
+          if (reloadAfterUpdateRef.current) window.location.reload();
+        };
+        navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(registration => {
+          if (!active) return;
+          updateRegistrationRef.current = registration;
+          const inspectWorker = () => {
+            if (registration.waiting && navigator.serviceWorker.controller) setAppUpdateStatus('available');
+          };
+          registration.addEventListener('updatefound', () => {
+            const installing = registration.installing;
+            installing?.addEventListener('statechange', inspectWorker);
+          });
+          inspectWorker();
+          if (navigator.onLine) registration.update().then(() => {
+            inspectWorker();
+            if (!registration.waiting && active) {
+              setAppUpdateCheckedAt(new Date().toISOString());
+              setAppUpdateStatus('current');
+            }
+          }).catch(() => { if (active) setAppUpdateStatus('error'); });
+          else setAppUpdateStatus('offline');
+        }).catch(error => {
+          console.warn('Service worker registration failed:', error);
+          if (active) setAppUpdateStatus('error');
+        });
+        return () => { active = false; navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange); };
+      }, []);
+
+      const handleInstallClick = async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') setShowInstallPrompt(false);
+          setDeferredPrompt(null);
+        } else if (isIOS) {
+          setShowInstallPrompt(false);
+          localStorage.setItem('sjkc_superapp_ios_prompted', 'true');
+        }
+      };
+
+      const handleDismissPrompt = () => {
+        setShowInstallPrompt(false);
+        if (isIOS) localStorage.setItem('sjkc_superapp_ios_prompted', 'true');
+      };
+
+      const togglePin = (e, appId) => {
+        e.preventDefault(); e.stopPropagation(); vibrate(20);
+        const isPinned = pinnedIds.includes(appId);
+        setPinnedIds(prev => isPinned ? prev.filter(id => id !== appId) : [...prev, appId]);
+        showToast(isPinned ? currentT.toastUnpinned : currentT.toastPinned, 'info');
+      };
+
+      const handleAppClick = (e, app) => {
+        setRecentIds(prev => {
+          const newRecent = [app.id, ...prev.filter(id => id !== app.id)].slice(0, 4);
+          localStorage.setItem('sjkc_recent_apps', JSON.stringify(newRecent));
+          return newRecent;
+        });
+
+        if (!isOffline) {
+          setApps(apps.map(a => a.id === app.id ? { ...a, clicks: a.clicks + 1 } : a));
+          server.recordClick(app.id);
+        }
+      };
+
+      // 🔥 新增：底层兼容的复制链接函数
+      const handleCopyUrl = (url) => {
+        vibrate(20);
+        try {
+          const textArea = document.createElement("textarea");
+          textArea.value = url;
+          // 防止手机屏幕滚动
+          textArea.style.top = "0";
+          textArea.style.left = "0";
+          textArea.style.position = "fixed";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          const successful = document.execCommand('copy');
+          document.body.removeChild(textArea);
+          if (successful) {
+             showToast(currentT.copied, 'success');
+          } else {
+             showToast(currentT.copyFailed, 'error');
+          }
+        } catch (err) {
+          showToast(currentT.copyFailed, 'error');
+        }
+      };
+
+      const ConfirmModal = ({ isOpen, onClose, onConfirm, title, desc }) => {
+        if (!isOpen) return null;
+        return (
+          <div role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={onClose}>
+            <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-100'}`} onClick={e=>e.stopPropagation()}>
+              <div className="w-16 h-16 rounded-[1.5rem] bg-rose-500/10 text-rose-500 flex items-center justify-center mb-6 shadow-inner"><i className="ph-fill ph-trash text-3xl"></i></div>
+              <h3 className={`text-[1.35rem] font-extrabold tracking-tight mb-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
+              <p className={`text-[0.875rem] font-medium text-center mb-8 leading-relaxed opacity-80 ${isDarkMode ? 'text-slate-300' : 'text-slate-500'}`}>{desc}</p>
+              <div className="flex gap-3 w-full">
+                <button onClick={onClose} className={`flex-1 py-3.5 font-bold rounded-[1rem] transition-colors ${isDarkMode ? 'bg-slate-700 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>{currentT.cancel}</button>
+                <button onClick={() => { vibrate(40); onConfirm(); }} className="flex-1 py-3.5 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-[1rem] shadow-lg shadow-rose-500/30 active:scale-95 transition-all">确认删除</button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+      
+      const [appToDelete, setAppToDelete] = useState(null);
+      const isAnyModalOpen = showPinModal || isAppModalOpen || isAnnModalOpen || isEventModalOpen || isDataModalOpen || !!qrApp || !!appToDelete;
+      useModalKeyboard(isAnyModalOpen, () => {
+        if (showPinModal) setShowPinModal(false);
+        else if (appToDelete) setAppToDelete(null);
+        else if (qrApp) setQrApp(null);
+        else if (isAppModalOpen) setIsAppModalOpen(false);
+        else if (isAnnModalOpen) setIsAnnModalOpen(false);
+        else if (isEventModalOpen) setIsEventModalOpen(false);
+        else if (isDataModalOpen) setIsDataModalOpen(false);
+      });
+      const handleDeleteConfirm = async () => {
+        if (appToDelete) {
+          setApps(apps.filter(a => a.id !== appToDelete));
+          setPinnedIds(prev => prev.filter(pId => pId !== appToDelete));
+          if(!isOffline) server.deleteApp(appToDelete);
+          showToast(currentT.toastDeleted, 'error');
+          setAppToDelete(null);
+        }
+      };
+
+      const [draggedApp, setDraggedApp] = useState(null);
+      const handleDragStart = (e, app) => {
+        if (!isAdmin) return; vibrate(20);
+        setDraggedApp(app); e.dataTransfer.effectAllowed = 'move';
+        setTimeout(() => { e.target.style.opacity = '0.5'; e.target.style.transform = 'scale(0.95)'; }, 0);
+      };
+      const handleDragEnd = (e) => { 
+        e.target.style.opacity = '1'; e.target.style.transform = 'scale(1)'; setDraggedApp(null); 
+      };
+      const handleDrop = async (e, targetApp) => {
+        e.preventDefault();
+        if (!isAdmin || !draggedApp || draggedApp.id === targetApp.id || draggedApp.category !== targetApp.category) return;
+        vibrate(30);
+        const categoryApps = apps.filter(a => a.category === targetApp.category);
+        const draggedIdx = categoryApps.findIndex(a => a.id === draggedApp.id);
+        const targetIdx = categoryApps.findIndex(a => a.id === targetApp.id);
+        const newCategoryApps = [...categoryApps];
+        newCategoryApps.splice(draggedIdx, 1);
+        newCategoryApps.splice(targetIdx, 0, draggedApp);
+        const newApps = apps.map(a => {
+           if(a.category !== targetApp.category) return a;
+           const newOrderIndex = newCategoryApps.findIndex(na => na.id === a.id);
+           return { ...a, order: newOrderIndex };
+        }).sort((a, b) => a.order - b.order);
+        
+        setApps(newApps);
+        if(!isOffline) {
+          const orders = newCategoryApps.map((a, idx) => ({ id: a.id, order: idx }));
+          server.updateAppOrders(orders);
+        }
+      };
+
+      const handleSaveApp = async (e) => {
+        e.preventDefault(); setIsSaving(true);
+        const newId = editingApp ? editingApp.id : Date.now().toString();
+        const appData = { ...formData, id: newId, order: editingApp ? editingApp.order : apps.filter(a => a.category === formData.category).length, clicks: editingApp ? editingApp.clicks : 0, createdAt: editingApp ? editingApp.createdAt : Date.now() };
+        const frontendApp = { ...appData, zh: { title: appData.zhTitle, desc: appData.zhDesc }, ms: { title: appData.msTitle, desc: appData.msDesc } };
+        try {
+          if(!isOffline) await server.saveApp(appData);
+          const nextApps = editingApp ? apps.map(a => a.id === newId ? frontendApp : a) : [...apps, frontendApp];
+          setApps(nextApps);
+          localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps: nextApps, settings: { announcement, event: schoolEvent } }));
+          setIsAppModalOpen(false); setIsFabOpen(false);
+          showToast(currentT.toastSaved, 'success');
+        } catch (error) {
+          console.error('Unable to save app:', error);
+          showToast(lang === 'zh' ? '保存失败，请检查网络后重试。' : 'Save failed. Check your connection and try again.', 'error');
+        } finally { setIsSaving(false); }
+      };
+
+      const handleSaveSetting = async (e, type, data, setModal) => {
+        e.preventDefault(); setIsSaving(true);
+        try {
+          if(!isOffline) await server.saveSettings(type, data);
+          localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps, settings: { announcement, event: schoolEvent } }));
+          setModal(false); setIsFabOpen(false); showToast(currentT.toastSaved, 'success');
+        } catch (error) {
+          console.error('Unable to save setting:', error);
+          showToast(lang === 'zh' ? '保存失败，请检查网络后重试。' : 'Save failed. Check your connection and try again.', 'error');
+        } finally { setIsSaving(false); }
+      };
+
+      const handleExportCSV = () => {
+        vibrate(20);
+        const headers = ['ID', 'Category', 'Chinese Title', 'Malay Title', 'Total Clicks'];
+        const csvContent = [headers.join(','), ...apps.map(a => `${a.id},${a.category},"${a.zh?.title || ''}","${a.ms?.title || ''}",${a.clicks || 0}`)].join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.setAttribute("href", URL.createObjectURL(blob));
+        link.setAttribute("download", `Ladang_Grisek_Analytics_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      const groupedApps = useMemo(() => {
+        return { 
+          pinned: filteredApps.filter(a => pinnedIds.includes(a.id)),
+          admin: filteredApps.filter(a => a.category === 'admin'), 
+          kurikulum: filteredApps.filter(a => a.category === 'kurikulum'), 
+          hem: filteredApps.filter(a => a.category === 'hem'), 
+          koko: filteredApps.filter(a => a.category === 'koko'), 
+          other: filteredApps.filter(a => a.category === 'other') 
+        };
+      }, [filteredApps, pinnedIds]);
+
+      const recentAppsList = useMemo(() => {
+        return recentIds.map(id => apps.find(a => a.id === id)).filter(Boolean);
+      }, [recentIds, apps]);
+
+      const eventStatus = useMemo(() => {
+        if (!schoolEvent.active || !schoolEvent.date) return null;
+        const diff = new Date(schoolEvent.date).setHours(0,0,0,0) - new Date().setHours(0,0,0,0);
+        const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        if (days > 0) return { num: days, text: currentT.daysLeft, color: 'text-blue-500 dark:text-blue-400' };
+        if (days === 0) return { num: '', text: currentT.todayIs, color: 'text-rose-500 dark:text-rose-400' };
+        return { num: '', text: currentT.passed, color: 'text-slate-500' };
+      }, [schoolEvent, currentT]);
+
+      const dashboardStats = useMemo(() => {
+        const totalApps = apps.length;
+        const totalVisits = apps.reduce((sum, app) => sum + (app.clicks || 0), 0);
+        const sortedApps = [...apps].sort((a, b) => (b.clicks || 0) - (a.clicks || 0)).slice(0, 5);
+        const maxClicks = sortedApps.length > 0 ? sortedApps[0].clicks : 1; 
+        const catMap = { 'admin':0, 'kurikulum':0, 'hem':0, 'koko':0, 'other':0 };
+        apps.forEach(a => { if(catMap[a.category] !== undefined) catMap[a.category] += (a.clicks || 0); });
+        return { totalApps, totalVisits, topApps: sortedApps, maxClicks, catMap };
+      }, [apps]);
+
+      const ambientClasses = getAmbientClasses(isDarkMode);
+      const compactAppUpdateControl = (
+        <div className="fixed bottom-3 left-3 z-[90] pointer-events-none">
+          <div className={`pointer-events-auto max-w-[calc(100vw-1.5rem)] flex items-center gap-2 px-3 py-2 rounded-2xl shadow-lg border backdrop-blur-xl ${isDarkMode ? 'bg-slate-900/95 border-slate-700 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-600'}`}>
+            <span className={`w-2 h-2 rounded-full shrink-0 ${appUpdateStatus === 'current' && navigator.onLine ? 'bg-emerald-500' : appUpdateStatus === 'available' ? 'bg-blue-500' : 'bg-amber-500'}`}></span>
+            <span className="text-[0.65rem] font-semibold truncate max-w-[58vw]" aria-live="polite">{appVersionLabel}</span>
+            <button type="button" onClick={checkForAppUpdate} disabled={appUpdateStatus === 'checking'} aria-label={currentT.appUpdateAria} className="min-w-10 min-h-10 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-300 disabled:opacity-60">
+              <i className={`ph-bold text-lg ${appUpdateStatus === 'checking' ? 'ph-spinner-gap animate-spin' : appUpdateStatus === 'available' ? 'ph-download-simple' : 'ph-arrows-clockwise'}`}></i>
+            </button>
+          </div>
+        </div>
+      );
+
+      const renderAppCard = (app, index, isPinnedSection = false, isSearchList = false) => {
+        const isPinned = pinnedIds.includes(app.id);
+        const showNewBadge = (Date.now() - app.createdAt) < (7 * 24 * 60 * 60 * 1000);
+        const isList = viewMode === 'list' || isSearchList;
+        const isKeyboardFocused = isSearchList && index === kbIndex;
+
+        const handleMouseMove = (e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+          e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+        };
+
+        return (
+          <div 
+            onMouseMove={handleMouseMove} key={isPinnedSection ? `pinned-${app.id}` : app.id}
+            draggable={isAdmin && !isPinnedSection && activeTab === 'all' && !isSearchList} 
+            onDragStart={(e) => (!isPinnedSection && activeTab === 'all' && !isSearchList) && handleDragStart(e, app)}
+            onDragEnd={(!isPinnedSection && activeTab === 'all' && !isSearchList) ? handleDragEnd : undefined}
+            onDragOver={(e) => { e.preventDefault(); }}
+            onDrop={(e) => (!isPinnedSection && activeTab === 'all' && !isSearchList) && handleDrop(e, app)}
+            className={`group spotlight-card relative transition-all duration-300 overflow-hidden outline outline-1 outline-transparent animate-waterfall
+              ${isList ? 'flex flex-row items-center px-4 sm:px-5 py-3.5 sm:py-4 rounded-[1.2rem]' : 'flex flex-col items-center justify-start text-center p-3 sm:p-4 rounded-2xl h-full'}
+              ${(isAdmin && !isPinnedSection && activeTab === 'all' && !isSearchList) ? 'cursor-grab active:cursor-grabbing' : ''} 
+              ${isDarkMode ? 'bg-slate-800/50 backdrop-blur-2xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)]' : 'bg-white/80 backdrop-blur-xl shadow-[0_2px_15px_rgb(0,0,0,0.03),inset_0_1px_1px_rgba(255,255,255,0.8)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]'}
+              ${isKeyboardFocused ? 'ring-2 ring-blue-500 shadow-xl scale-[1.02]' : isDarkMode ? 'hover:ring-1 hover:ring-slate-600' : 'hover:ring-1 hover:ring-blue-100/50'}
+              ${!isList && 'hover:-translate-y-1 active:scale-[0.98]'} 
+              ${isList && !isKeyboardFocused && 'hover:scale-[1.01] active:scale-[0.99]'}`}
+            style={{ animationDelay: `${index * 30}ms` }}
+          >
+            <a href={app.url} target="_blank" rel="noopener noreferrer" aria-label={`${app[lang]?.title || 'App'} — ${app[lang]?.desc || 'Open app'} (opens in a new tab)`} onClick={(e) => handleAppClick(e, app)} className={`flex-1 flex cursor-pointer z-10 no-underline w-full ${isList ? 'flex-row items-center gap-4 sm:gap-5 pr-10 sm:pr-0' : 'flex-col items-center justify-start gap-2 sm:gap-3'}`}>
+              <div className={`${isList ? 'w-12 h-12 rounded-[0.9rem]' : 'w-11 h-11 sm:w-14 sm:h-14 rounded-xl'} flex items-center justify-center relative shadow-sm transition-transform duration-300 group-hover:scale-105 group-active:scale-95 shrink-0
+                ${isDarkMode ? 'bg-gradient-to-b from-slate-700 to-slate-800 border border-slate-600 text-blue-400 group-hover:border-blue-500 group-hover:text-blue-300 group-hover:shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'bg-gradient-to-b from-white to-blue-50/50 border border-blue-100/50 text-blue-600 group-hover:border-blue-200 group-hover:shadow-blue-500/20'}`}>
+                {renderIcon(app.icon, isList)}
+                {showNewBadge && <span className="absolute -top-1 -right-1 sm:-top-1.5 sm:-right-1.5 bg-rose-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-md animate-pulse flex items-center gap-0.5 border border-white dark:border-slate-800"><i className="ph-fill ph-sparkle"></i></span>}
+              </div>
+              
+              <div className={`flex-1 min-w-0 flex flex-col justify-center w-full ${isList ? 'text-left' : 'text-center items-center mt-1 sm:mt-2'}`}>
+                <div className={`flex items-center gap-2 ${isList ? 'justify-start' : 'justify-center w-full'}`}>
+                  <h3 className={`font-extrabold tracking-tight ${isList ? 'text-[1.05rem] mb-0.5' : 'text-[0.7rem] sm:text-[0.8rem] leading-tight line-clamp-2'} w-full ${isDarkMode ? 'text-slate-100 group-hover:text-blue-400' : 'text-slate-800 group-hover:text-blue-600'}`}>{app[lang]?.title || ''}</h3>
+                  {isKeyboardFocused && isList && <span className="hidden sm:flex text-[0.6rem] font-bold px-1.5 py-0.5 rounded bg-blue-500 text-white animate-pulse shrink-0">↵ Enter</span>}
+                </div>
+                {isList && <p className={`text-[0.85rem] font-medium leading-relaxed opacity-75 mt-0.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-500'}`}>{app[lang]?.desc || ''}</p>}
+              </div>
+            </a>
+            
+            {/* 列表模式下的控制区 (包含置顶和QR) */}
+            {isList && (
+              <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4 sm:opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                <button onClick={(e) => togglePin(e, app.id)} aria-label={isPinned ? `Remove ${app[lang]?.title || 'app'} from pinned` : `Pin ${app[lang]?.title || 'app'}`} aria-pressed={isPinned} className={`p-2.5 rounded-xl transition-colors ${isPinned ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/30' : 'text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-700'}`}><i aria-hidden="true" className={`ph-fill ph-star text-[1.1rem] sm:text-lg ${isPinned ? 'drop-shadow-sm' : ''}`}></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(20); setQrApp(app); }} aria-label={`Show QR code for ${app[lang]?.title || 'app'}`} className="p-2.5 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-bold ph-qr-code text-[1.1rem] sm:text-lg"></i></button>
+                {isAdmin && !isPinnedSection && (
+                  <div className="hidden sm:flex items-center gap-1 pl-3 border-l border-slate-200 dark:border-slate-700">
+                    <button onClick={(e) => { e.preventDefault(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} aria-label={`Edit ${app[lang]?.title || 'app'}`} className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-fill ph-pencil-simple text-lg"></i></button>
+                    <button onClick={(e) => { e.preventDefault(); vibrate(40); setAppToDelete(app.id); }} aria-label={`Delete ${app[lang]?.title || 'app'}`} className="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 transition-colors"><i aria-hidden="true" className="ph-fill ph-trash text-lg"></i></button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 网格模式下管理员编辑按钮（手机常显，电脑悬停） */}
+            {!isList && isAdmin && !isPinnedSection && (
+              <div className={`flex absolute -top-1 -right-1 sm:top-1 sm:right-1 items-center gap-1 opacity-100 sm:opacity-0 group-hover:opacity-100 p-1 rounded-xl z-20 shadow-sm backdrop-blur-xl ${isDarkMode ? 'bg-slate-800/95 border-slate-600' : 'bg-white/95 border-slate-100'}`}>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditingApp(app); setFormData({...app, zhTitle: app.zh?.title, zhDesc: app.zh?.desc, msTitle: app.ms?.title, msDesc: app.ms?.desc, icon: app.icon||'Settings'}); setIsCustomIcon(!iconMap[app.icon||'Settings']); setIsAppModalOpen(true); }} aria-label={`Edit ${app[lang]?.title || 'app'}`} className="p-1 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-colors"><i aria-hidden="true" className="ph-fill ph-pencil-simple text-[1rem] sm:text-sm"></i></button>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); vibrate(40); setAppToDelete(app.id); }} aria-label={`Delete ${app[lang]?.title || 'app'}`} className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 dark:hover:text-rose-400 transition-colors"><i aria-hidden="true" className="ph-fill ph-trash text-[1rem] sm:text-sm"></i></button>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      if (activePage === 'assessment-2026') {
+        return <><YearEndAssessmentPage
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode} lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />{compactAppUpdateControl}</>;
+      }
+      if (activePage === 'mpt4-hub') {
+        return <><MPT4Hub
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          onOpenPrep={() => { setActivePage('mpt4-prep'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          onOpenGuide={() => { setActivePage('mpt4-guide'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />{compactAppUpdateControl}</>;
+      }
+      if (activePage === 'mpt4-prep') {
+        return <><MPT4PrepPage
+          onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />{compactAppUpdateControl}</>;
+      }
+      if (activePage === 'mpt4-guide') {
+        return <><MPT4Page
+          onBack={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onLangToggle={() => setLang(lang === 'zh' ? 'ms' : 'zh')}
+        />{compactAppUpdateControl}</>;
+      }
+      if (activePage === 'duty-roster') {
+        return <><DutyRosterPage
+          onBack={() => { setActivePage('home'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+        />{compactAppUpdateControl}</>;
+      }
+
+      return (
+        <div className="min-h-screen relative overflow-x-hidden flex flex-col">
+          <Toast {...toast} />
+          <ConfirmModal isOpen={!!appToDelete} onClose={() => setAppToDelete(null)} onConfirm={handleDeleteConfirm} title="删除系统" desc="确定要从云端删除此系统卡片吗？该操作不可恢复。" />
+
+          {/* 隐藏的管理员密码输入框 */}
+          {showPinModal && (
+            <div role="dialog" aria-modal="true" aria-label={currentT.pinTitle} className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md transition-all animate-in fade-in">
+              <div className={`rounded-[2rem] shadow-2xl w-full max-w-sm p-8 animate-in zoom-in-95 duration-200 ${isDarkMode ? 'bg-slate-800 border border-slate-700 text-white' : 'bg-white border border-slate-100 text-slate-800'}`}>
+                <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-blue-500"><i className="ph-bold ph-lock-key text-[2rem]"></i></div>
+                <h2 className="text-xl font-extrabold text-center mb-6">{currentT.pinTitle}</h2>
+                <form onSubmit={handlePinSubmit}>
+                  <input type="password" inputMode="numeric" pattern="[0-9]{6,12}" autoComplete="current-password" autoFocus required value={pinInput} onChange={e => {setPinInput(e.target.value.replace(/\D/g, '').slice(0, 12)); setPinError(false);}} aria-describedby={pinError ? 'admin-pin-error' : undefined} className={`w-full text-center tracking-[0.45em] text-2xl font-black border-2 rounded-2xl py-4 focus:outline-none transition-all ${pinError ? 'border-rose-500 bg-rose-500/10 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : isDarkMode ? 'bg-slate-900/50 border-slate-700 focus:border-blue-500 text-white' : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:bg-white shadow-inner'}`} placeholder="••••••" minLength={6} maxLength={12} />
+                  {pinError && <p id="admin-pin-error" role="alert" className="text-rose-500 text-[0.85rem] text-center mt-3 font-bold animate-bounce">{currentT.pinError}</p>}
+                  <div className="flex gap-3 mt-8">
+                    <button type="button" disabled={isAuthenticating} onClick={() => {setShowPinModal(false); setPinError(false); setPinInput('');}} className={`flex-1 py-3.5 font-bold rounded-xl transition-colors ${isDarkMode ? 'bg-slate-700/50 hover:bg-slate-600 text-slate-300' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'}`}>{currentT.cancel}</button>
+                    <button type="submit" disabled={isAuthenticating} className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-60">{isAuthenticating ? <i className="ph-bold ph-spinner ph-spin text-xl" aria-label="Signing in"></i> : currentT.unlock}</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          <div className={`fixed inset-0 z-[-1] pointer-events-none overflow-hidden transition-all duration-700 ${isSearchFocused && searchQuery ? 'bg-slate-900/60 backdrop-blur-[5px] z-[30]' : ''}`}>
+            <div className={`absolute -top-[10%] -left-[10%] w-[70vw] h-[70vw] rounded-full mix-blend-multiply blur-[100px] sm:blur-[120px] animate-float-slow transition-colors duration-1000 ${ambientClasses[0]}`}></div>
+            <div className={`absolute top-[20%] -right-[10%] w-[60vw] h-[60vw] rounded-full mix-blend-multiply blur-[100px] sm:blur-[120px] animate-float-delayed transition-colors duration-1000 ${ambientClasses[1]}`}></div>
+          </div>
+
+          {isOffline && (
+            <div className="flex justify-center pt-2 px-4 absolute w-full top-0 z-[60] pointer-events-none animate-in slide-in-from-top-full duration-500">
+              <div className="pointer-events-auto flex items-center gap-2 px-4 py-1.5 rounded-full shadow-lg border backdrop-blur-md bg-rose-500/90 border-rose-500/50 text-white text-xs font-bold"><i className="ph-bold ph-wifi-slash"></i> {currentT.offlineMsg}</div>
+            </div>
+          )}
+
+          {announcement.active && (announcement[lang] || announcement.zh) && (
+            <div className={`flex justify-center px-4 absolute w-full z-50 pointer-events-none transition-all duration-300 ${isOffline ? 'top-10' : 'top-4 sm:top-6'}`}>
+              <div className={`pointer-events-auto flex items-center gap-2.5 px-5 py-2.5 rounded-full shadow-lg border backdrop-blur-2xl max-w-2xl w-max animate-in slide-in-from-top-4 duration-500 ${isDarkMode ? 'bg-amber-500/20 border-amber-500/30 text-amber-300' : 'bg-white/80 border-amber-100 text-amber-700'}`}>
+                <i className="ph-fill ph-bell text-base animate-bounce shrink-0"></i>
+                <span className="text-[0.85rem] font-bold tracking-wide truncate">{announcement[lang] || announcement.zh}</span>
+              </div>
+            </div>
+          )}
+
+          <header className={`sticky top-0 z-40 pt-safe-top transition-all duration-300 ${(announcement.active && (announcement[lang] || announcement.zh)) || isOffline ? 'pt-16 sm:pt-20' : ''}`}>
+            <div className={`backdrop-blur-2xl border-b transition-colors duration-500 ${isDarkMode ? 'bg-slate-900/80 border-slate-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' : 'bg-white/60 border-slate-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.03)]'}`}>
+              <div className="max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 w-full">
+                <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+                  <div className="flex items-center gap-4 select-none transition-transform cursor-pointer group" onClick={handleLogoClick}>
+                    <div className={`w-12 h-12 sm:w-14 sm:h-14 bg-white rounded-2xl shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border p-1 flex items-center justify-center shrink-0 transition-transform group-active:scale-95 ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+                      <img src="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png" alt="Logo" className="w-full h-full object-contain" />
+                    </div>
+                    <div className="flex flex-col justify-center">
+                      <h1 className={`text-xl sm:text-[1.6rem] font-extrabold tracking-tight leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{lang === 'zh' ? '新廊华小' : 'SJK (C) Ladang Grisek'}</h1>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap sm:flex-nowrap">
+                        <p className="text-[0.8rem] font-bold text-blue-500 flex items-center gap-1 uppercase tracking-widest opacity-90 shrink-0">{currentT.appTitle}</p>
+                        <span className={`text-[0.65rem] sm:text-[0.8rem] font-medium inline-block px-1.5 sm:px-2 border-l border-slate-300 dark:border-slate-600 whitespace-nowrap ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{currentDateTimeStr}</span>
+                        {isSyncing && !isOffline && <i className="ph-bold ph-arrows-clockwise text-blue-400 animate-spin text-[0.7rem]" title="后台同步中"></i>}
+                        {!isSyncing && lastSyncedAt && <span className={`hidden lg:inline text-[0.7rem] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} title={new Date(lastSyncedAt).toLocaleString()}>{lang === 'zh' ? '已同步' : 'Synced'}</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="sm:hidden flex gap-1.5">
+                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400' : 'bg-white/80 border-slate-200 text-blue-600'}`}><i aria-hidden="true" className={`ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
+                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} aria-label={`Switch to ${lang === 'zh' ? 'Bahasa Melayu' : 'Chinese'}`} className={`w-11 h-11 rounded-full font-bold text-[0.8rem] border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-white/80 border-slate-200 text-slate-600'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
+                    <button onClick={() => { vibrate(20); setIsDarkMode(!isDarkMode); }} aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`} aria-pressed={isDarkMode} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm active:scale-90 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400' : 'bg-white/80 border-slate-200 text-slate-600'}`}><i aria-hidden="true" className={isDarkMode ? "ph-fill ph-moon text-lg" : "ph-fill ph-sun text-lg"}></i></button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                  <div className="flex items-center gap-2">
+                    {recentAppsList.length > 0 && !searchQuery && (
+                      <div className={`hidden lg:flex items-center gap-1.5 pl-2 border-l ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`} title={currentT.recentAccess}>
+                        {recentAppsList.map((app, i) => (
+                          <a href={app.url} target="_blank" key={`recent-${app.id}`} className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm transition-transform hover:scale-110 active:scale-90 animate-in zoom-in duration-300 ${isDarkMode ? 'bg-slate-800 text-blue-400 border border-slate-700 hover:bg-slate-700' : 'bg-white text-blue-600 border border-slate-200 hover:bg-slate-50'}`} style={{animationDelay: `${i*100}ms`}}>
+                            {renderIcon(app.icon, true)}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={`relative flex-1 max-w-full sm:w-56 lg:w-72 sm:max-w-none group transition-all duration-300 z-40 ${isSearchFocused ? 'sm:w-80 scale-105 shadow-2xl' : ''}`}>
+                    <i className={`ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[1.1rem] transition-colors ${isSearchFocused ? 'text-blue-500' : 'text-slate-400'}`}></i>
+                    <input 
+                      ref={searchInputRef} type="text" placeholder={currentT.searchPlaceholder} value={searchQuery} 
+                      onChange={(e) => setSearchQuery(e.target.value)} onFocus={() => setIsSearchFocused(true)} onBlur={() => setIsSearchFocused(false)}
+                      aria-label={currentT.searchPlaceholder}
+                      className={`w-full pl-11 pr-12 py-2.5 rounded-full text-[0.95rem] outline-none font-medium appearance-none transition-all shadow-inner focus:ring-4 focus:ring-blue-500/15 ${isDarkMode ? 'bg-slate-900/80 border border-slate-700/50 text-white placeholder-slate-500 focus:border-blue-500' : 'bg-slate-100 border border-slate-200/60 text-slate-800 focus:bg-white focus:border-blue-400'}`} 
+                    />
+                    {searchQuery && <button onMouseDown={(e)=>{e.preventDefault(); setSearchQuery('');}} aria-label="Clear search" className="absolute right-10 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"><i aria-hidden="true" className="ph-fill ph-x-circle"></i></button>}
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 opacity-50 pointer-events-none">
+                      <span className={`text-[0.6rem] font-bold border rounded px-1.5 py-0.5 ${isDarkMode ? 'border-slate-600 text-slate-300' : 'border-slate-300 text-slate-500'}`}>{shortcutKey}</span>
+                    </div>
+                  </div>
+
+                  <div className="hidden sm:flex gap-2 shrink-0">
+                    <button onClick={() => { vibrate(20); setViewMode(prev => prev === 'grid' ? 'list' : 'grid'); }} aria-label={`Switch to ${viewMode === 'grid' ? 'list' : 'grid'} view`} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-blue-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-blue-600 hover:bg-white'}`} title="切换视图模式"><i aria-hidden="true" className={`text-xl ph-bold ${viewMode === 'grid' ? 'ph-list-dashes' : 'ph-squares-four'} text-lg`}></i></button>
+                    <button onClick={() => setLang(lang === 'zh' ? 'ms' : 'zh')} aria-label={`Switch to ${lang === 'zh' ? 'Bahasa Melayu' : 'Chinese'}`} className={`w-11 h-11 rounded-full font-bold text-sm border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}>{lang === 'zh' ? '中' : 'BM'}</button>
+                    <button onClick={() => setIsDarkMode(!isDarkMode)} aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`} aria-pressed={isDarkMode} className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-sm hover:scale-105 active:scale-95 transition-transform ${isDarkMode ? 'bg-slate-800 border-slate-700 text-yellow-400 hover:bg-slate-700' : 'bg-white/80 border-slate-200 text-slate-600 hover:bg-white'}`}><i aria-hidden="true" className={`text-xl ph-fill ${isDarkMode ? "ph-moon" : "ph-sun"}`}></i></button>
+                  </div>
+                </div>
+              </div>
+              
+              {!searchQuery && (
+                <div className="w-full max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 pb-3 overflow-x-auto hide-scrollbar mt-1 animate-in fade-in duration-300">
+                  <div className="flex gap-2 sm:gap-3 w-max min-w-full" role="tablist" aria-label="Application categories">
+                    {['all', 'pinned', 'admin', 'kurikulum', 'hem', 'koko', 'other'].map(tab => (
+                      <button key={tab} role="tab" aria-selected={activeTab === tab} onClick={() => { vibrate(15); setActiveTab(tab); }} className={`px-4 sm:px-5 py-2 rounded-full text-[0.85rem] sm:text-[0.9rem] font-bold whitespace-nowrap flex items-center gap-1.5 outline outline-1 outline-transparent transition-all duration-300 ${activeTab === tab ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20 outline-blue-500/50 scale-105' : isDarkMode ? 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'bg-slate-100/70 text-slate-500 hover:bg-white hover:text-slate-800 hover:shadow-sm'}`}>
+                        {tab === 'pinned' && <i className={`ph-fill ph-star ${activeTab === tab ? '' : 'text-amber-400'}`}></i>}
+                        {currentT.tabs[tab]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className={`max-w-[80rem] mx-auto px-4 sm:px-6 lg:px-8 pb-3 flex items-center justify-between gap-3 text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className="flex items-center gap-2 min-w-0" aria-live="polite">
+                  <span className={`w-2 h-2 rounded-full shrink-0 ${appUpdateStatus === 'current' && navigator.onLine ? 'bg-emerald-500' : appUpdateStatus === 'available' ? 'bg-blue-500' : 'bg-amber-500'}`}></span>
+                  <span className="truncate">{appVersionLabel}{appUpdateStatus === 'current' && appUpdateCheckedAt ? ` · ${new Date(appUpdateCheckedAt).toLocaleTimeString(lang === 'zh' ? 'zh-CN' : 'ms-MY', { hour: '2-digit', minute: '2-digit' })}` : ''}</span>
+                </span>
+                <button type="button" onClick={checkForAppUpdate} disabled={appUpdateStatus === 'checking'} className={`shrink-0 min-h-11 px-3 rounded-xl border font-bold inline-flex items-center gap-2 transition-colors disabled:opacity-60 ${isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-white border-slate-200 text-blue-700 hover:bg-blue-50'}`}>
+                  <i className={`ph-bold ${appUpdateStatus === 'checking' ? 'ph-spinner-gap animate-spin' : appUpdateStatus === 'available' ? 'ph-download-simple' : 'ph-arrows-clockwise'}`}></i>
+                  <span>{appUpdateStatus === 'checking' ? currentT.updateChecking : appUpdateStatus === 'available' ? currentT.applyUpdate : currentT.checkUpdate}</span>
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <main className={`flex-1 max-w-[80rem] w-full mx-auto px-4 sm:px-6 lg:px-8 mt-5 sm:mt-7 pb-24 sm:pb-12 relative transition-all duration-500 ${isSearchFocused && searchQuery ? 'z-50' : 'z-10'}`}>
+            {syncError && !isOffline && (
+              <section role="alert" className={`mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border ${isDarkMode ? 'bg-rose-950/30 border-rose-900/60 text-rose-200' : 'bg-rose-50 border-rose-100 text-rose-800'}`}>
+                <div className="flex items-center gap-3 text-sm font-semibold"><i className="ph-fill ph-warning-circle text-xl shrink-0"></i><span>{syncError}</span></div>
+                <button onClick={() => setRefreshNonce(value => value + 1)} className="shrink-0 min-h-11 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm active:scale-95 transition-transform">{lang === 'zh' ? '重新连接' : 'Retry'}</button>
+              </section>
+            )}
+
+            {activeTab === 'all' && !searchQuery && (
+              <section aria-label={lang === 'zh' ? '重点页面' : 'Halaman utama'} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 mb-5 sm:mb-7">
+                <button type="button" onClick={() => { setActivePage('duty-roster'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full min-h-[6.5rem] p-4 sm:p-5 rounded-3xl border text-left flex items-center gap-3 sm:gap-4 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-emerald-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-200'}`}>
+                  <span className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}><i className="ph-fill ph-calendar-check text-2xl sm:text-3xl"></i></span>
+                  <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '查看每周值勤地点与教师安排' : 'Semak lokasi dan giliran guru bertugas'}</span></span>
+                  <i className="ph-bold ph-arrow-right text-xl text-emerald-500 shrink-0"></i>
+                </button>
+                <button type="button" onClick={() => { setActivePage('assessment-2026'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full min-h-[6.5rem] p-4 sm:p-5 rounded-3xl border text-left flex items-center gap-3 sm:gap-4 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
+                  <span className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-calendar text-2xl sm:text-3xl"></i></span>
+                  <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '一至六年级 · 10月6日至13日' : 'Tahun 1–6 · 6–13 Oktober 2026'}</span></span>
+                  <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
+                </button>
+                <button type="button" onClick={() => { setActivePage('mpt4-hub'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full min-h-[6.5rem] p-4 sm:p-5 rounded-3xl border text-left flex items-center gap-3 sm:gap-4 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-indigo-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-200'}`}>
+                  <span className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-indigo-500/15 text-indigo-300' : 'bg-indigo-50 text-indigo-700'}`}><i className="ph-fill ph-clipboard-text text-2xl sm:text-3xl"></i></span>
+                  <span className="flex-1 min-w-0"><span className="flex items-center gap-2 flex-wrap"><span className="text-base sm:text-lg font-black">MPT4 2026</span><span className={`px-2 py-0.5 rounded-full text-[0.6rem] font-black tracking-wide ${isDarkMode ? 'bg-emerald-950/50 text-emerald-300' : 'bg-emerald-50 text-emerald-700'}`}>5–8 OKT</span></span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '准备工作与评估期间管理' : 'Persediaan & Panduan Pengurusan'}</span></span>
+                  <i className="ph-bold ph-arrow-right text-xl text-indigo-500 shrink-0"></i>
+                </button>
+              </section>
+            )}
+
+            {isAdmin && !searchQuery && (
+              <div className={`hidden sm:flex mb-10 p-6 rounded-[1.5rem] border shadow-lg backdrop-blur-2xl animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-blue-900/10 border-blue-900/50' : 'bg-white/60 border-blue-100/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]'}`}>
+                <div className="flex flex-row items-center justify-between gap-5 w-full">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-14 h-14 flex items-center justify-center rounded-2xl shadow-inner transition-transform hover:scale-110 ${isDarkMode ? 'bg-blue-900/40 text-blue-400' : 'bg-blue-50 text-blue-600'}`}><i className="ph-fill ph-shield-check text-[1.75rem]"></i></div>
+                    <div><span className={`font-extrabold tracking-tight block text-lg ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>{currentT.adminActive}</span><span className="text-[0.85rem] opacity-70 flex items-center gap-1 mt-0.5 font-medium"><i className="ph-bold ph-arrows-out-line-vertical"></i> {activeTab === 'all' && viewMode === 'list' ? currentT.dragInfo : '在“全部”标签+列表视图下可拖拽排序'}</span></div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => setIsDataModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-purple-900/20 text-purple-400 border-purple-800/40 hover:bg-purple-900/40' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'}`}><i className="ph-fill ph-chart-pie-slice text-xl"></i> {lang === 'zh' ? '数据' : 'Data'}</button>
+                    <button onClick={() => setIsAnnModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-amber-900/20 text-amber-400 border-amber-800/40 hover:bg-amber-900/40' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'}`}><i className="ph-fill ph-megaphone text-xl"></i> {lang === 'zh' ? '通知' : 'Notis'}</button>
+                    <button onClick={() => setIsEventModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-emerald-900/20 text-emerald-400 border-emerald-800/40 hover:bg-emerald-900/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}><i className="ph-fill ph-calendar text-xl"></i> {lang === 'zh' ? '活动' : 'Event'}</button>
+                    <button onClick={() => { setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); }} className="flex justify-center items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl shadow-lg shadow-blue-600/20 font-bold active:scale-95 transition-transform text-[0.95rem]"><i className="ph-bold ph-plus text-xl"></i> {currentT.addApp}</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {schoolEvent.active && eventStatus && activeTab === 'all' && !searchQuery && (
+              <div className={`mb-8 sm:mb-10 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2rem] border overflow-hidden relative shadow-sm sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-waterfall ${isDarkMode ? 'bg-slate-800/50 backdrop-blur-2xl border-slate-700' : 'bg-white/60 backdrop-blur-2xl border-slate-100 sm:shadow-[inset_0_1px_1px_rgba(255,255,255,1)]'}`}>
+                <div className={`absolute -right-10 -top-10 w-32 h-32 sm:w-48 sm:h-48 rounded-full blur-[60px] sm:blur-[80px] opacity-30 pointer-events-none ${isDarkMode ? 'bg-blue-600' : 'bg-blue-400'}`}></div>
+                <div className="flex flex-row items-center justify-between gap-3 sm:gap-6 relative z-10">
+                  <div className="flex items-center gap-3 sm:gap-5 w-auto text-left">
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.2rem] flex items-center justify-center shrink-0 border shadow-inner ${isDarkMode ? 'bg-slate-700 text-blue-400 border-slate-600' : 'bg-gradient-to-br from-white to-blue-50 text-blue-600 border-blue-100'}`}><i className="ph-bold ph-calendar-star text-2xl sm:text-[2rem]"></i></div>
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-[0.65rem] sm:text-[0.8rem] font-bold tracking-widest uppercase mb-0.5 sm:mb-1.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{currentT.countdown}</p>
+                      <h3 className={`text-base sm:text-[1.7rem] font-extrabold tracking-tight leading-tight truncate sm:mb-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{schoolEvent[lang] || schoolEvent.zh}</h3>
+                      <p className={`hidden sm:block text-[0.9rem] font-medium ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{schoolEvent.date}</p>
+                    </div>
+                  </div>
+                  <div className={`text-center px-4 sm:px-10 py-2 sm:py-4 rounded-xl sm:rounded-[1.5rem] border min-w-[70px] sm:min-w-[140px] shadow-inner shrink-0 ${isDarkMode ? 'bg-slate-900/80 border-slate-700/80' : 'bg-slate-50/80 border-slate-200/60'}`}>
+                    <span className={`block text-2xl sm:text-5xl font-black tabular-nums tracking-tighter leading-none ${eventStatus.color}`}><AnimatedNumber value={eventStatus.num}/></span>
+                    <span className={`block text-[0.6rem] sm:text-[0.85rem] font-bold mt-1 sm:mt-1.5 opacity-80 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{eventStatus.text}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {loading ? (
+              <div className={`gap-3 sm:gap-4 lg:gap-5 animate-pulse ${viewMode === 'list' ? 'flex flex-col' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8'}`}>
+                {[1,2,3,4,5,6,7,8,9,10,11,12].map(i => (
+                  <div key={i} className={`p-3 sm:p-5 rounded-2xl sm:rounded-[1.5rem] border ${isDarkMode ? 'bg-slate-800/40 border-slate-700/50' : 'bg-white/40 border-slate-100'} flex ${viewMode === 'list' ? 'flex-row items-center gap-4' : 'flex-col items-center justify-start gap-2 sm:gap-3 h-24 sm:h-32'}`}>
+                    <div className={`shrink-0 ${viewMode === 'list' ? 'w-14 h-14' : 'w-11 h-11 sm:w-14 sm:h-14'} rounded-xl ${isDarkMode ? 'bg-slate-700/50' : 'bg-slate-200/50'}`}></div>
+                    <div className={`flex-1 flex flex-col gap-2 w-full ${viewMode === 'list' ? 'justify-center' : 'items-center mt-1'}`}>
+                      <div className={`h-2.5 ${viewMode === 'list' ? 'w-1/3' : 'w-3/4'} rounded-full ${isDarkMode ? 'bg-slate-700/50' : 'bg-slate-200/50'}`}></div>
+                      {viewMode === 'list' && <div className={`h-2 w-full rounded-full mt-1 ${isDarkMode ? 'bg-slate-700/50' : 'bg-slate-200/50'}`}></div>}
+                      {viewMode === 'list' && <div className={`h-2 w-2/3 rounded-full ${isDarkMode ? 'bg-slate-700/50' : 'bg-slate-200/50'}`}></div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredApps.length === 0 ? (
+              <div className={`text-center py-20 rounded-[2rem] border-2 border-dashed flex flex-col items-center justify-center animate-in fade-in ${isDarkMode ? 'bg-slate-800/20 border-slate-700/50' : 'bg-white/40 border-slate-200'}`}>
+                <i className="ph-fill ph-ghost text-[4rem] text-slate-400 mb-4 opacity-50"></i>
+                <h3 className="text-lg font-extrabold text-slate-500 mb-2">{searchQuery ? currentT.noResult : currentT.emptyState}</h3>
+                {searchQuery && <button onClick={() => setSearchQuery('')} className="mt-2 min-h-11 px-5 rounded-xl font-bold text-sm bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-transform">{lang === 'zh' ? '清除搜索' : 'Clear search'}</button>}
+                {isAdmin && !searchQuery && (
+                  <button onClick={() => { setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); }} className="mt-4 px-5 py-2.5 rounded-full font-bold text-sm bg-blue-600 text-white shadow-lg active:scale-95 transition-transform flex items-center gap-2"><i className="ph-bold ph-plus"></i> {currentT.addApp}</button>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-7 sm:space-y-10 relative z-10">
+                {searchQuery ? (
+                  <section>
+                    <div className="flex items-center justify-between mb-5 sm:mb-6 pl-2">
+                      <h2 className="text-lg sm:text-[1.35rem] font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-magnifying-glass text-blue-500"></i> {currentT.searchResults}</h2>
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}>{filteredApps.length} Results</span>
+                    </div>
+                    <div className={`${viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 lg:gap-5'}`}>{filteredApps.map((app, index) => renderAppCard(app, index, false, true))}</div>
+                  </section>
+                ) : (
+                  <>
+                    {(activeTab === 'all' || activeTab === 'pinned') && groupedApps.pinned.length > 0 && (
+                      <section>
+                        <div className="flex items-center gap-4 mb-5 sm:mb-6 pl-2"><h2 className="text-lg sm:text-[1.35rem] font-extrabold tracking-tight text-amber-500 flex items-center gap-2"><i className="ph-fill ph-star"></i> {currentT.categories.pinned}</h2><div className={`h-[2px] flex-1 rounded-full bg-gradient-to-r to-transparent ${isDarkMode ? 'from-amber-900/40' : 'from-amber-200'}`}></div></div>
+                        <div className={`${viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 lg:gap-5'}`}>{groupedApps.pinned.map((app, index) => renderAppCard(app, index, true))}</div>
+                      </section>
+                    )}
+                    {Object.entries(groupedApps).map(([catKey, catApps]) => {
+                      if (catKey === 'pinned' || (activeTab !== 'all' && activeTab !== catKey)) return null;
+                      if (catApps.length === 0) return null; 
+                      return (
+                        <section key={catKey}>
+                          <div className="flex items-center gap-4 mb-5 sm:mb-6 pl-2"><h2 className={`text-lg sm:text-[1.35rem] font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{currentT.categories[catKey]}</h2><div className={`h-[2px] flex-1 rounded-full bg-gradient-to-r to-transparent ${isDarkMode ? 'from-slate-700' : 'from-slate-200'}`}></div></div>
+                          <div className={`${viewMode === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 sm:gap-4 lg:gap-5'}`}>{catApps.map((app, index) => renderAppCard(app, index, false))}</div>
+                        </section>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            )}
+          </main>
+
+          {isAdmin && (
+            <div className="fixed bottom-6 right-6 z-[90] sm:hidden flex flex-col items-end gap-3">
+              <div className={`flex flex-col gap-3 transition-all duration-300 origin-bottom ${isFabOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'}`}>
+                <button onClick={() => { vibrate(20); setIsDataModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-purple-900/90 text-purple-400 border-purple-700/50 backdrop-blur-md' : 'bg-purple-50 text-purple-700 border-purple-200'}`}>Data Board <i className="ph-fill ph-chart-pie-slice text-xl"></i></button>
+                <button onClick={() => { vibrate(20); setIsAnnModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-amber-900/90 text-amber-400 border-amber-700/50 backdrop-blur-md' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>Notis <i className="ph-fill ph-megaphone text-xl"></i></button>
+                <button onClick={() => { vibrate(20); setIsEventModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-emerald-900/90 text-emerald-400 border-emerald-700/50 backdrop-blur-md' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>Event <i className="ph-fill ph-calendar text-xl"></i></button>
+                <button onClick={() => { vibrate(20); setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); setIsFabOpen(false); }} disabled={isOffline} className="flex items-center justify-end gap-3 px-5 py-3.5 bg-blue-600 text-white rounded-[1.2rem] font-bold shadow-lg shadow-blue-600/30 disabled:opacity-50">Tambah App <i className="ph-bold ph-plus text-xl"></i></button>
+              </div>
+              <button onClick={() => { vibrate(20); setIsFabOpen(!isFabOpen); }} className={`w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-600/30 transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`}>
+                <i className="ph-bold ph-plus text-2xl"></i>
+              </button>
+            </div>
+          )}
+          {isFabOpen && <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[80] sm:hidden" onClick={() => setIsFabOpen(false)}></div>}
+
+          <footer className={`mt-auto border-t py-12 px-4 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}>
+            <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-8">
+              <div className="flex items-center gap-3 select-none opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
+                <img src="https://raw.githubusercontent.com/chengyang365/ClassMovementLog/refs/heads/main/logo.png" alt="Logo" className="w-9 h-9" />
+                <span className="font-bold text-sm tracking-widest uppercase">{currentT.schoolName}</span>
+              </div>
+              
+              <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4">
+                <a href="tel:011-76208821" className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-95 ${isDarkMode ? 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700' : 'bg-slate-50 text-slate-600 hover:bg-slate-100 border border-slate-200'}`}>
+                  <i className="ph-fill ph-phone text-lg text-blue-500"></i> 011-7620 8821
+                </a>
+                <a href="https://facebook.com/SJKCLG" target="_blank" rel="noreferrer" className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-95 ${isDarkMode ? 'bg-blue-900/30 text-blue-400 hover:bg-blue-900/50 border border-blue-800/30' : 'bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-100'}`}>
+                  <i className="ph-fill ph-facebook-logo text-lg"></i> Facebook
+                </a>
+                <a href="https://t.me/joinchat/AAAAAFO_CLf9jCQbFIq_Lg" target="_blank" rel="noreferrer" className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all active:scale-95 ${isDarkMode ? 'bg-cyan-900/30 text-cyan-400 hover:bg-cyan-900/50 border border-cyan-800/30' : 'bg-cyan-50 text-cyan-600 hover:bg-cyan-100 border border-cyan-100'}`}>
+                  <i className="ph-fill ph-telegram-logo text-lg"></i> Telegram Channel
+                </a>
+              </div>
+
+              <p className={`text-xs font-medium opacity-40 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                &copy; {new Date().getFullYear()} SJK(C) Ladang Grisek. Hak Cipta Terpelihara.
+              </p>
+            </div>
+          </footer>
+
+          {/* 🔥 改进的 QR 码弹窗 - 包含一键复制功能 */}
+          {qrApp && (
+            <div role="dialog" aria-modal="true" aria-label="QR code" className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200" onClick={() => setQrApp(null)}>
+              <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center relative animate-in zoom-in-95 duration-300 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`} onClick={e => e.stopPropagation()}>
+                <button onClick={() => setQrApp(null)} className={`absolute top-5 right-5 p-2 rounded-full ${isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}><i className="ph-bold ph-x text-lg"></i></button>
+                <div className={`w-20 h-20 rounded-[1.5rem] flex items-center justify-center mb-5 shadow-sm border ${isDarkMode ? 'bg-slate-900 border-slate-700 text-blue-400' : 'bg-gradient-to-br from-white to-blue-50 border-blue-100 text-blue-600'}`}>
+                  {renderIcon(qrApp.icon, true)}
+                </div>
+                <h2 className="text-xl font-extrabold tracking-tight text-center mb-2 leading-tight px-4">{qrApp.zh?.title || currentT.qrTitle}</h2>
+                <div className="p-5 bg-white rounded-3xl shadow-inner border border-slate-100 mt-4"><img src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrApp.url)}&margin=0`} alt="QR" className="w-52 h-52 object-contain mix-blend-multiply" /></div>
+                
+                {/* 带有一键复制按钮的链接栏 */}
+                <div className={`mt-8 w-full p-2 rounded-2xl flex items-center justify-between font-bold text-sm border shadow-inner ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="flex items-center gap-2 overflow-hidden px-3 text-blue-500">
+                    <i className="ph-bold ph-link text-lg shrink-0"></i>
+                    <span className="truncate">{qrApp.url.replace(/^https?:\/\//,'')}</span>
+                  </div>
+                  <button onClick={() => handleCopyUrl(qrApp.url)} className={`shrink-0 p-2.5 rounded-xl transition-all active:scale-90 ${isDarkMode ? 'bg-slate-800 text-blue-400 hover:bg-slate-700 border border-slate-700' : 'bg-white text-blue-600 shadow-sm border border-slate-200 hover:bg-blue-50'}`} title="一键复制链接">
+                    <i className="ph-bold ph-copy text-lg"></i>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          )}
+
+          {isDataModalOpen && (
+            <div role="dialog" aria-modal="true" aria-label="Analytics" className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-200 bottom-sheet">
+              <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-4xl p-6 sm:p-8 relative animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh] ${isDarkMode ? 'bg-[#090E17] border border-slate-800' : 'bg-slate-50 border border-slate-200'}`}>
+                <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-6 sm:hidden shrink-0"></div>
+                <div className="flex justify-between items-center mb-6 shrink-0">
+                  <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-chart-pie-slice text-purple-500 text-3xl"></i> Global Analytics</h2>
+                  <div className="flex items-center gap-2">
+                    <button onClick={handleExportCSV} className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-transform active:scale-95 ${isDarkMode ? 'bg-purple-900/50 text-purple-400 hover:bg-purple-800/80' : 'bg-purple-50 text-purple-600 hover:bg-purple-100'}`}><i className="ph-bold ph-download-simple"></i> <span className="hidden sm:inline">Export CSV</span></button>
+                    <button onClick={() => setIsDataModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-white hover:bg-slate-100 shadow-sm'}`}><i className="ph-bold ph-x text-lg"></i></button>
+                  </div>
+                </div>
+                
+                <div className="overflow-y-auto hide-scrollbar flex-1 pb-safe">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-5">
+                    <div className={`col-span-2 md:col-span-2 p-6 sm:p-8 rounded-[2rem] border relative overflow-hidden ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
+                      <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-blue-500/20 blur-3xl rounded-full"></div>
+                      <p className="text-[0.75rem] font-bold uppercase tracking-wider opacity-60 mb-2">Total Visits (总访问量)</p>
+                      <h3 className="text-4xl sm:text-5xl font-black tabular-nums tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-indigo-500"><AnimatedNumber value={dashboardStats.totalVisits} /></h3>
+                    </div>
+                    <div className={`col-span-1 md:col-span-1 p-6 sm:p-8 rounded-[2rem] border flex flex-col justify-between ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
+                      <i className="ph-fill ph-squares-four text-[2rem] text-purple-500 mb-4 opacity-50"></i>
+                      <div><p className="text-[0.75rem] font-bold uppercase tracking-wider opacity-60 mb-1">Total Apps</p><h3 className="text-3xl font-black tabular-nums"><AnimatedNumber value={dashboardStats.totalApps} /></h3></div>
+                    </div>
+                    <div className={`col-span-1 md:col-span-1 p-6 sm:p-8 rounded-[2rem] border flex flex-col justify-between ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
+                      <i className="ph-fill ph-users text-[2rem] text-emerald-500 mb-4 opacity-50"></i>
+                      <div><p className="text-[0.75rem] font-bold uppercase tracking-wider opacity-60 mb-1">Access</p><h3 className="text-xl mt-1 font-black tabular-nums">Staff Only</h3></div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className={`md:col-span-2 p-6 sm:p-8 rounded-[2rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
+                      <h3 className="text-base font-extrabold tracking-tight mb-6 flex items-center gap-2"><i className="ph-fill ph-fire text-orange-500"></i> Top 5 Most Used</h3>
+                      <div className="space-y-6">
+                        {dashboardStats.topApps.map((app, idx) => (
+                          <div key={app.id} className="relative">
+                            <div className="flex justify-between text-sm font-bold mb-2.5"><span>{idx+1}. {app.zh?.title}</span><span className="opacity-60">{app.clicks}</span></div>
+                            <div className={`w-full h-3 rounded-full overflow-hidden ${isDarkMode ? 'bg-slate-900' : 'bg-slate-100 shadow-inner'}`}>
+                              <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 animate-grow" style={{'--target-width': `${(app.clicks / dashboardStats.maxClicks) * 100}%`}}></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={`md:col-span-1 p-6 sm:p-8 rounded-[2rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
+                      <h3 className="text-base font-extrabold tracking-tight mb-6 flex items-center gap-2"><i className="ph-fill ph-chart-donut text-purple-500"></i> Distribution</h3>
+                      <div className="space-y-4">
+                        {Object.entries(dashboardStats.catMap).sort((a,b)=>b[1]-a[1]).map(([cat, clicks]) => {
+                          const pct = dashboardStats.totalVisits > 0 ? Math.round((clicks / dashboardStats.totalVisits) * 100) : 0;
+                          return (
+                            <div key={cat} className={`flex items-center justify-between p-3.5 rounded-[1rem] border ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
+                              <span className="text-[0.75rem] font-bold opacity-80 uppercase tracking-wide">{currentT.tabs[cat]}</span>
+                              <span className="font-black text-sm">{pct}%</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <style>{`@media (max-width: 640px) { .bottom-sheet { align-items: flex-end !important; padding: 0 !important; } .bottom-sheet > div { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; max-height: 92vh; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important; } @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } } }`}</style>
+          
+          {isAppModalOpen && (
+            <div role="dialog" aria-modal="true" aria-label={editingApp ? currentT.editApp : currentT.addApp} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+              <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-2xl p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 flex flex-col ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
+                <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden shrink-0"></div>
+                <div className="flex justify-between items-center mb-6 shrink-0"><h2 className="text-xl font-extrabold tracking-tight">{editingApp ? currentT.editApp : currentT.addApp}</h2><button onClick={() => setIsAppModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
+                <div className="overflow-y-auto hide-scrollbar pb-safe">
+                  <form onSubmit={handleSaveApp} className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4 sm:gap-5">
+                      <div className="space-y-2">
+                        <label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">Category</label>
+                        <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 font-bold outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                          <option value="admin">{currentT.categories.admin}</option>
+                          <option value="kurikulum">{currentT.categories.kurikulum}</option>
+                          <option value="hem">{currentT.categories.hem}</option>
+                          <option value="koko">{currentT.categories.koko}</option>
+                          <option value="other">{currentT.categories.other}</option>
+                        </select>
+                      </div>
+                      
+                      <div className="space-y-2 z-50">
+                        <div className="flex justify-between items-center ml-1">
+                          <label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider">Icon</label>
+                          <button type="button" onClick={() => { vibrate(15); setIsCustomIcon(!isCustomIcon); }} className="text-[0.7rem] font-bold text-blue-500 hover:text-blue-600 transition-colors">
+                            {isCustomIcon ? '使用预设图标' : '自定义图片 / Emoji'}
+                          </button>
+                        </div>
+                        {isCustomIcon ? (
+                          <input type="text" value={formData.icon} onChange={e => setFormData({...formData, icon: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 font-medium outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'}`} placeholder="输入 Emoji 或图片 URL" />
+                        ) : (
+                          <CustomIconSelect value={iconMap[formData.icon] ? formData.icon : 'Settings'} onChange={(val) => setFormData({...formData, icon: val})} isDarkMode={isDarkMode} />
+                        )}
+                      </div>
+                      
+                      <div className="col-span-2 space-y-2">
+                        <label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">App URL</label>
+                        <input type="url" required value={formData.url} onChange={e => setFormData({...formData, url: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 font-medium outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`} placeholder="https://" />
+                      </div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div className={`space-y-4 p-6 rounded-[1.5rem] border ${isDarkMode ? 'bg-blue-900/10 border-blue-900/30' : 'bg-blue-50/50 border-blue-100/50'}`}>
+                        <h3 className="font-extrabold text-sm flex items-center gap-2">🇨🇳 中文</h3>
+                        <input required value={formData.zhTitle} onChange={e => setFormData({...formData, zhTitle: e.target.value})} className={`w-full border rounded-[1rem] px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="标题" />
+                        <textarea required value={formData.zhDesc} onChange={e => setFormData({...formData, zhDesc: e.target.value})} className={`w-full border rounded-[1rem] px-4 py-3 font-medium outline-none focus:ring-2 focus:ring-blue-500 resize-none ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="描述" rows={2}/>
+                      </div>
+                      <div className={`space-y-4 p-6 rounded-[1.5rem] border ${isDarkMode ? 'bg-indigo-900/10 border-indigo-900/30' : 'bg-indigo-50/50 border-indigo-100/50'}`}>
+                        <h3 className="font-extrabold text-sm flex items-center gap-2">🇲🇾 Bahasa Melayu</h3>
+                        <input required value={formData.msTitle} onChange={e => setFormData({...formData, msTitle: e.target.value})} className={`w-full border rounded-[1rem] px-4 py-3 font-bold outline-none focus:ring-2 focus:ring-indigo-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="Tajuk" />
+                        <textarea required value={formData.msDesc} onChange={e => setFormData({...formData, msDesc: e.target.value})} className={`w-full border rounded-[1rem] px-4 py-3 font-medium outline-none focus:ring-2 focus:ring-indigo-500 resize-none ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="Penerangan" rows={2}/>
+                      </div>
+                    </div>
+                    <button type="submit" disabled={isSaving || isOffline} className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-95 flex justify-center items-center gap-2 text-[1rem] disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isSaving ? <i className="ph-bold ph-spinner ph-spin text-xl"></i> : currentT.save}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {isAnnModalOpen && (
+            <div role="dialog" aria-modal="true" aria-label={currentT.announcementSetup} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+              <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
+                <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden"></div>
+                <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-megaphone text-amber-500 text-2xl"></i> {currentT.announcementSetup}</h2><button onClick={() => setIsAnnModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
+                <form onSubmit={(e) => handleSaveSetting(e, 'announcement', announcement, setIsAnnModalOpen)} className="space-y-6 pb-safe">
+                  <label className={`flex items-center gap-3 p-5 border rounded-[1.5rem] cursor-pointer ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}><input type="checkbox" checked={announcement.active} onChange={e => { vibrate(20); setAnnouncement({...announcement, active: e.target.checked});}} className="w-5 h-5 accent-amber-500" /><span className="font-bold">{currentT.annActive}</span></label>
+                  <div className="space-y-4">
+                    <div className="space-y-2"><label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">{currentT.annZh}</label><input type="text" value={announcement.zh} onChange={e => setAnnouncement({...announcement, zh: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 outline-none font-medium focus:ring-2 focus:ring-amber-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} /></div>
+                    <div className="space-y-2"><label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">{currentT.annMs}</label><input type="text" value={announcement.ms} onChange={e => setAnnouncement({...announcement, ms: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 outline-none font-medium focus:ring-2 focus:ring-amber-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} /></div>
+                  </div>
+                  <button type="submit" disabled={isSaving || isOffline} className="w-full py-4 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-2xl mt-8 shadow-lg shadow-amber-500/20 active:scale-95 flex justify-center items-center gap-2 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">{isSaving ? <i className="ph-bold ph-spinner ph-spin text-xl"></i> : currentT.save}</button>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {isEventModalOpen && (
+            <div role="dialog" aria-modal="true" aria-label={currentT.eventSetup} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md bottom-sheet animate-in fade-in">
+              <div className={`rounded-[2.5rem] shadow-2xl w-full max-w-lg p-6 sm:p-8 relative animate-in zoom-in-95 sm:zoom-in-100 duration-300 ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
+                <div className="w-12 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full mx-auto mb-6 sm:hidden"></div>
+                <div className="flex justify-between items-center mb-6"><h2 className="text-xl font-extrabold tracking-tight flex items-center gap-2"><i className="ph-fill ph-calendar text-emerald-500 text-2xl"></i> {currentT.eventSetup}</h2><button onClick={() => setIsEventModalOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}><i className="ph-bold ph-x text-lg"></i></button></div>
+                <form onSubmit={(e) => handleSaveSetting(e, 'event', schoolEvent, setIsEventModalOpen)} className="space-y-6 pb-safe">
+                  <label className={`flex items-center gap-3 p-5 border rounded-[1.5rem] cursor-pointer ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-slate-50 border-slate-200'}`}><input type="checkbox" checked={schoolEvent.active} onChange={e => { vibrate(20); setSchoolEvent({...schoolEvent, active: e.target.checked});}} className="w-5 h-5 accent-emerald-500" /><span className="font-bold">启用倒计时 / Aktifkan Countdown</span></label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2"><label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">{currentT.eventTitleZh}</label><input type="text" value={schoolEvent.zh} onChange={e => setSchoolEvent({...schoolEvent, zh: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 outline-none font-medium focus:ring-2 focus:ring-emerald-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="如: UASA 考试" /></div>
+                    <div className="space-y-2"><label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">{currentT.eventTitleMs}</label><input type="text" value={schoolEvent.ms} onChange={e => setSchoolEvent({...schoolEvent, ms: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 outline-none font-medium focus:ring-2 focus:ring-emerald-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`} placeholder="Cth: Peperiksaan UASA" /></div>
+                    <div className="col-span-2 space-y-2"><label className="text-[0.7rem] font-bold opacity-60 uppercase tracking-wider ml-1">{currentT.eventDate}</label><input type="date" value={schoolEvent.date} onChange={e => setSchoolEvent({...schoolEvent, date: e.target.value})} className={`w-full border rounded-2xl px-5 py-4 outline-none font-bold focus:ring-2 focus:ring-emerald-500 ${isDarkMode ? 'bg-slate-900/50 border-slate-700 [color-scheme:dark]' : 'bg-white border-slate-200 shadow-sm'}`} /></div>
+                  </div>
+                  <button type="submit" disabled={isSaving || isOffline} className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl mt-8 shadow-lg shadow-emerald-500/20 active:scale-95 flex justify-center items-center gap-2 transition-transform disabled:opacity-50 disabled:cursor-not-allowed">{isSaving ? <i className="ph-bold ph-spinner ph-spin text-xl"></i> : currentT.save}</button>
                 </form>
               </div>
             </div>
