@@ -380,13 +380,11 @@
         'Bersedia di tangga berhampiran bilik pentaksiran selepas setiap instrumen pentaksiran selesai untuk membawa murid kembali ke dewan.',
         'Murid masuk ke bilik pentaksiran mengikut arahan dan prosedur yang ditetapkan. Guru bertugas tidak perlu mengiringi murid masuk ke dalam bilik pentaksiran.'
       ],
-      documents: { guideUrl: '', infographicUrl: '' },
       ui: {
         pageName: 'Panduan Pengurusan MPT4', version: 'Versi Terkini / 最新版本',
         nav: ['Utama', 'Timeline', 'Panduan', 'Guru Bertugas'],
-        sectionTitles: ['Maklumat Penting', 'Pengurusan Murid Tahun 4', 'Panduan Lengkap', 'Waktu Bertugas', 'Tugas Guru Bertugas', 'Dokumen & Infografik'],
-        primaryStaff: 'Petugas Utama', supportingStaff: 'Guru Membantu',
-        guideTitle: 'Panduan Lengkap', guideAction: 'Lihat / Muat Turun PDF', infographicTitle: 'Infografik Ringkas', infographicAction: 'Lihat Infografik', unavailable: 'Belum tersedia'
+        sectionTitles: ['Maklumat Penting', 'Pengurusan Murid Tahun 4', 'Panduan Lengkap', 'Waktu Bertugas', 'Tugas Guru Bertugas'],
+        primaryStaff: 'Petugas Utama', supportingStaff: 'Guru Membantu'
       },
       footer: 'Kerjasama dan perhatian semua guru amat dihargai bagi memastikan pentaksiran MPT4 berjalan dengan lancar dan teratur serta gangguan kepada calon dapat diminimumkan.'
     };
@@ -476,13 +474,11 @@
         '每项评估结束后，在考场附近的楼梯口等候，并带领学生返回礼堂。',
         '学生须按照既定指示及程序自行进入考场；值勤老师无须陪同学生进入考场。'
       ],
-      documents: MPT4_DATA.documents,
       ui: {
         pageName: 'MPT4 管理指南', version: '最新版本 / Versi Terkini',
         nav: ['重点', '时间表', '完整指南', '值勤老师'],
-        sectionTitles: ['重要资讯', '四年级学生集合及移动安排', '完整指南', '值勤时间', '值勤老师职责', '文件与信息图'],
-        primaryStaff: '主要负责人', supportingStaff: '协助老师',
-        guideTitle: '完整指南', guideAction: '查看／下载 PDF', infographicTitle: '简要信息图', infographicAction: '查看信息图', unavailable: '尚未提供'
+        sectionTitles: ['重要资讯', '四年级学生集合及移动安排', '完整指南', '值勤时间', '值勤老师职责'],
+        primaryStaff: '主要负责人', supportingStaff: '协助老师'
       },
       footer: '感谢全体老师的配合与关注，以确保 MPT4 评估顺利、有序进行，并尽量减少对考生的干扰。'
     };
@@ -966,9 +962,6 @@
 
             <section className="pt-12" aria-labelledby="mpt4-duties"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 5</p><h2 id="mpt4-duties" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[4]}</h2></div><div className={`p-5 sm:p-7 rounded-3xl border ${isDarkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}><ul className="space-y-5">{data.duties.map((duty,index) => <li key={index} className="flex gap-3 text-sm sm:text-base leading-7"><i className="ph-fill ph-check-square text-xl text-emerald-500 mt-0.5 shrink-0"></i><span>{duty}</span></li>)}</ul></div></section>
 
-            <section className="pt-12" aria-labelledby="mpt4-documents"><div className="mb-6"><p className="text-xs font-black text-blue-600 tracking-widest">SECTION 6</p><h2 id="mpt4-documents" className="mt-1 text-2xl font-black">{data.ui.sectionTitles[5]}</h2></div><div className="grid sm:grid-cols-2 gap-3">
-              {[{title:data.ui.guideTitle,label:data.ui.guideAction,url:data.documents.guideUrl,icon:'ph-file-pdf'},{title:data.ui.infographicTitle,label:data.ui.infographicAction,url:data.documents.infographicUrl,icon:'ph-image'}].map(doc => <div key={doc.title} className={`p-5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200'}`}><i className={`ph-fill ${doc.icon} text-2xl text-blue-500`}></i><h3 className="mt-3 font-extrabold">{doc.title}</h3>{doc.url ? <a href={doc.url} target="_blank" rel="noopener noreferrer" className="mt-4 min-h-11 inline-flex items-center px-4 rounded-xl bg-blue-600 text-white font-bold text-sm">{doc.label}</a> : <button type="button" disabled className="mt-4 min-h-11 px-4 rounded-xl bg-slate-200 dark:bg-slate-700 opacity-60 font-bold text-sm cursor-not-allowed">{doc.label} · {data.ui.unavailable}</button>}</div>)}
-            </div></section>
 
             <footer className={`mt-12 p-6 sm:p-8 rounded-3xl text-center border ${isDarkMode ? 'bg-blue-950/20 border-blue-900/40' : 'bg-blue-50 border-blue-100'}`}><i className="ph-fill ph-hands-clapping text-2xl text-blue-500"></i><p className="mt-3 text-sm sm:text-base leading-7 font-semibold opacity-80">{data.footer}</p></footer>
             <MPT4Acknowledgement pageId="mpt4-guide-2026" isDarkMode={isDarkMode} lang={lang} />
