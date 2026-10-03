@@ -132,7 +132,7 @@
       recordClick: (id) => apiRequest('recordClick', { id }),
       updateAppOrders: (orders) => apiRequest('updateAppOrders', { orders }),
       saveSettings: (key, val) => apiRequest('saveSettings', { key, val }),
-      getMpt4Teachers: () => apiRequest('getMpt4Teachers', {}),
+      getMpt4Teachers: (pageId, pageVersion) => apiRequest('getMpt4Teachers', { pageId, pageVersion }),
       submitMpt4Acknowledgement: (data) => apiRequest('submitMpt4Acknowledgement', data)
     };
 
@@ -773,16 +773,27 @@
       const isZh = lang === 'zh';
       const [teachers, setTeachers] = useState([]);
       const [teachersLoading, setTeachersLoading] = useState(true);
+      const [submittedCount, setSubmittedCount] = useState(0);
+      const [totalCount, setTotalCount] = useState(0);
       const [teacherId, setTeacherId] = useState('');
       const [checked, setChecked] = useState(false);
       const [submitting, setSubmitting] = useState(false);
       const [savedAt, setSavedAt] = useState('');
       const [error, setError] = useState('');
       const card = isDarkMode ? 'bg-slate-800/70 border-slate-700' : 'bg-white border-slate-200 shadow-sm';
+      const applyTeacherStatus = result => {
+        // Allow the current name-only API response to keep the form usable until GAS is redeployed.
+        const status = Array.isArray(result)
+          ? { teachers: result, submittedCount: 0, totalCount: result.length }
+          : (result || {});
+        setTeachers(Array.isArray(status.teachers) ? status.teachers : []);
+        setSubmittedCount(Number(status.submittedCount) || 0);
+        setTotalCount(Number(status.totalCount) || 0);
+      };
       useEffect(() => {
         let active = true;
-        server.getMpt4Teachers()
-          .then(items => { if (active) setTeachers(Array.isArray(items) ? items : []); })
+        server.getMpt4Teachers(pageId, 'v1')
+          .then(result => { if (active) applyTeacherStatus(result); })
           .catch(() => { if (active) setError(isZh ? '无法读取 Users 教师名单，请检查网络后重试。' : 'Tidak dapat memuatkan senarai guru daripada Users. Sila semak Internet dan cuba lagi.'); })
           .finally(() => { if (active) setTeachersLoading(false); });
         return () => { active = false; };
@@ -791,6 +802,7 @@
         title: '教师阅读确认', prompt: '请确认您已阅读并了解本页面内容。', select: '请选择您的姓名',
         confirm: '我已阅读并了解本页面内容', submit: '提交阅读确认', saving: '提交中…',
         success: '确认已记录', time: '记录时间', required: '请选择姓名并勾选确认后再提交。',
+        submitted: '已提交', alreadySubmitted: '此页面的阅读确认已提交，无需重复提交。', countLabel: '本页已提交', countSuffix: '位老师',
         failure: '提交失败。请检查网络连接后重试；您的选择仍会保留。',
         noTeachers: 'Users 表中没有可用的教师姓名。',
         note: '请以本人名义提交。系统记录教师姓名、页面版本和提交时间。'
@@ -799,6 +811,7 @@
         select: 'Pilih nama anda', confirm: 'Saya telah membaca dan memahami kandungan halaman ini',
         submit: 'Hantar Pengesahan', saving: 'Menghantar…', success: 'Pengesahan direkodkan', time: 'Masa rekod',
         required: 'Sila pilih nama dan tandakan pengesahan sebelum menghantar.',
+        submitted: 'Telah dihantar', alreadySubmitted: 'Pengesahan untuk halaman ini telah dihantar. Tidak perlu hantar sekali lagi.', countLabel: 'Telah dihantar', countSuffix: 'orang guru',
         failure: 'Penghantaran gagal. Semak sambungan Internet dan cuba lagi; pilihan anda dikekalkan.',
         noTeachers: 'Tiada nama guru yang boleh dipilih dalam helaian Users.',
         note: 'Sila hantar atas nama sendiri. Nama guru, versi halaman dan masa penghantaran akan direkodkan.'
@@ -811,8 +824,17 @@
         try {
           const result = await server.submitMpt4Acknowledgement({ pageId, pageVersion: 'v1', teacherId: Number(teacherId), language: lang });
           setSavedAt(result.confirmedAt || new Date().toISOString());
+          setTeachers(current => current.map(person => String(person.id) === String(teacherId) ? { ...person, submitted: true } : person));
+          setSubmittedCount(Number(result.submittedCount) || submittedCount + 1);
+          setTotalCount(Number(result.totalCount) || totalCount);
         } catch (e) {
-          setError(copy.failure);
+          if (e.message === 'ALREADY_SUBMITTED') {
+            setError(copy.alreadySubmitted);
+            try {
+              const latest = await server.getMpt4Teachers(pageId, 'v1');
+              applyTeacherStatus(latest);
+            } catch (_) {}
+          } else setError(copy.failure);
         } finally {
           setSubmitting(false);
         }
@@ -821,12 +843,12 @@
         <div className={`rounded-3xl border p-5 sm:p-7 ${card}`}>
           <div className="flex items-start gap-3"><span className="w-11 h-11 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0"><i className="ph-fill ph-read-cv-logo text-2xl"></i></span><div><h2 id={`${pageId}-ack-title`} className="text-xl font-black">{copy.title}</h2><p className="mt-1 text-sm leading-6 opacity-70">{copy.prompt}</p></div></div>
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-            <label className="block"><span className="sr-only">{copy.select}</span><select value={teacherId} onChange={e => { setTeacherId(e.target.value); setSavedAt(''); }} required disabled={teachersLoading || teachers.length === 0} className={`min-h-12 w-full px-4 rounded-xl border font-semibold outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}><option value="">{teachersLoading ? (isZh ? '正在读取教师名单…' : 'Memuatkan senarai guru…') : copy.select}</option>{teachers.map(person => <option key={person.id} value={person.id}>{isZh && person.nameZh ? `${person.nameZh}（${person.nameMs}）` : person.nameMs}</option>)}</select></label>
+            <label className="block"><span className="sr-only">{copy.select}</span><select value={teacherId} onChange={e => { setTeacherId(e.target.value); setSavedAt(''); }} required disabled={teachersLoading || teachers.length === 0} className={`min-h-12 w-full px-4 rounded-xl border font-semibold outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-60 ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}><option value="">{teachersLoading ? (isZh ? '正在读取教师名单…' : 'Memuatkan senarai guru…') : copy.select}</option>{teachers.map(person => { const name = isZh && person.nameZh ? `${person.nameZh}（${person.nameMs}）` : person.nameMs; return <option key={person.id} value={person.id} disabled={person.submitted}>{person.submitted ? `${name} · ${copy.submitted}` : name}</option>; })}</select></label>
             {!teachersLoading && teachers.length === 0 && !error && <p role="status" className="text-sm font-semibold opacity-70">{copy.noTeachers}</p>}
             <label className="flex items-start gap-3 p-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 cursor-pointer"><input type="checkbox" checked={checked} onChange={e => { setChecked(e.target.checked); setSavedAt(''); }} className="mt-1 w-5 h-5 accent-blue-600 shrink-0"/><span className="text-sm font-bold leading-6">{copy.confirm}</span></label>
             {error && <p role="alert" className="text-sm font-bold text-rose-600 dark:text-rose-300">{error}</p>}
             {savedAt && <p role="status" className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-200 text-sm font-bold"><i className="ph-bold ph-check-circle mr-2"></i>{copy.success} · {copy.time}: {new Date(savedAt).toLocaleString(isZh ? 'zh-CN' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur' })}</p>}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3"><button type="submit" disabled={submitting || teachersLoading || teachers.length === 0} className="min-h-12 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-extrabold">{submitting ? copy.saving : copy.submit}</button><p className="text-xs leading-5 opacity-60">{copy.note}</p></div>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3"><div className="shrink-0"><button type="submit" disabled={submitting || teachersLoading || teachers.length === 0 || teachers.find(person => String(person.id) === String(teacherId))?.submitted} className="min-h-12 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-extrabold">{submitting ? copy.saving : copy.submit}</button><p className="mt-2 text-xs font-bold text-emerald-700 dark:text-emerald-300" role="status">{copy.countLabel} {submittedCount}{totalCount ? ` / ${totalCount}` : ''} {copy.countSuffix}</p></div><p className="text-xs leading-5 opacity-60">{copy.note}</p></div>
           </form>
         </div>
       </section>;
