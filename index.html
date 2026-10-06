@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.03.11';
+    const APP_BUILD_ID = '2026.10.06.14';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -302,18 +302,20 @@
       highlights: [
         { kicker: 'ARAS 3', title: 'KAWASAN LARANGAN', icon: 'ph-prohibit', tone: 'warning', description: 'Selain petugas pentaksiran MPT4, guru dan murid tidak dibenarkan melalui kawasan bilik pentaksiran atau menggunakan tandas di Aras 3.' },
         { kicker: 'TANGGA TENGAH', title: 'LALUAN KHAS', icon: 'ph-stairs', tone: 'info', description: 'Untuk petugas pentaksiran dan murid Tahun 4 sahaja.' },
-        { kicker: 'WAKTU REHAT', title: '9:45 – 10:15 PAGI', icon: 'ph-fork-knife', tone: 'neutral', description: 'Waktu rehat bagi semua murid sepanjang pentaksiran MPT4.' },
+        { kicker: 'WAKTU REHAT', title: '9:45 – 10:15 PAGI', icon: 'ph-fork-knife', tone: 'neutral', description: 'Waktu rehat murid Tahun 3, 5 dan 6. Murid Tahun 4 boleh berehat selepas kembali ke dewan dan mengambil barang selepas pentaksiran selesai.' },
         { kicker: 'JAGA KETENTERAMAN', title: 'SUASANA SENYAP', icon: 'ph-speaker-slash', tone: 'neutral', description: 'Pastikan pergerakan dan aktiviti PdP tidak mengganggu pentaksiran.' }
       ],
       timeline: [
-        { time: '7:00 PAGI', title: 'Berkumpul di Dewan' },
-        { time: '7:25 PAGI', title: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas', secondary: true },
-        { time: '7:40 PAGI', title: 'Murid Tahun 4 mula beratur menuju ke Bilik Pentaksiran' },
-        { time: '9:30 PAGI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' },
-        { time: '9:45 – 10:15 PAGI', title: 'Waktu Rehat' },
-        { time: '10:15 PAGI', title: 'Berkumpul dan beratur di Dewan' },
-        { time: '10:25 PAGI', title: 'Bergerak ke Bilik Pentaksiran' },
-        { time: '12:15 TENGAH HARI', title: 'Kembali ke Dewan', note: 'Selepas instrumen pentaksiran selesai.' }
+        { time: '7:00 PAGI', title: 'Semua murid berkumpul di dewan' },
+        { time: '7:35 PAGI', title: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas', note: 'Murid Tahun 4 mula ke tandas.' },
+        { time: '7:50 PAGI', title: 'Murid Tahun 4 mula beratur menuju ke bilik pentaksiran', note: 'Dipimpin oleh Cikgu Chong Cheng Yang.' },
+        { time: '9:30 PAGI', title: 'Murid Tahun 4 kembali ke dewan', note: 'Cikgu Chong Wei Ni memimpin murid kembali selepas instrumen pentaksiran selesai. Murid mengambil barang dan boleh pergi berehat.' },
+        { time: '9:45 – 10:15 PAGI', title: 'Waktu rehat murid Tahun 3, 5 dan 6', note: 'Murid membawa bahan ulang kaji untuk mata pelajaran pentaksiran yang seterusnya.' },
+        { time: '10:15 PAGI', title: 'Semua murid berkumpul di dewan' },
+        { time: '10:30 PAGI', title: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas', note: 'Murid Tahun 4 mula ke tandas.' },
+        { time: '10:45 PAGI', title: 'Murid Tahun 4 mula beratur menuju ke bilik pentaksiran', note: 'Dipimpin oleh Cikgu Hanan.' },
+        { time: '12:15 TENGAH HARI', title: 'Murid Tahun 4 kembali ke dewan', note: 'Cikgu Rosmaliza memimpin murid selepas instrumen pentaksiran selesai.' },
+        { time: '12:25 TENGAH HARI', title: 'Murid Tahun 3, 5 dan 6 dibawa oleh guru untuk berkumpul di dewan' }
       ],
       accordions: [
         {
@@ -342,10 +344,10 @@
               'Guru hendaklah memastikan murid sentiasa tertib dan kelas berada dalam keadaan senyap agar tidak mengganggu pentaksiran yang sedang dijalankan.',
               'Aktiviti yang menghasilkan bunyi bising, termasuk bacaan kuat atau bacaan beramai-ramai, hendaklah dielakkan.'
             ]},
-            { title: '3. Pengurusan Waktu Rehat', lead: 'Sepanjang pentaksiran MPT4, waktu rehat bagi semua murid ialah:', emphasis: '9:45 pagi – 10:15 pagi', items: [
+            { title: '3. Pengurusan Waktu Rehat', lead: 'Sepanjang pentaksiran MPT4, waktu rehat murid Tahun 3, 5 dan 6 ialah:', emphasis: '9:45 pagi – 10:15 pagi', items: [
               'Guru waktu ke-5 hendaklah mengiringi murid ke kantin.',
-              'Selepas rehat, murid hendaklah berbaris di dewan.',
-              'Guru waktu ke-6 hendaklah berada di dewan tepat pada 10:15 pagi untuk membawa murid kembali ke bilik darjah.'
+              'Selepas pentaksiran selesai dan kembali ke dewan, murid Tahun 4 mengambil barang sebelum pergi berehat.',
+              'Murid berkumpul di dewan sehingga 10:30 pagi sebelum kembali ke kelas. Guru waktu ke-7 hendaklah masuk ke kelas tepat pada masanya.'
             ]}
           ]
         },
@@ -353,14 +355,17 @@
           id: 'C', title: 'PENGURUSAN DAN PERGERAKAN MURID TAHUN 4',
           intro: 'Rujuk garis masa di atas untuk jadual pergerakan penuh murid Tahun 4.',
           groups: [{ items: [
-            '7:00 pagi — Berkumpul di dewan.',
-            '7:40 pagi — Mula beratur menuju ke bilik pentaksiran.',
-            '9:30 pagi — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.',
-            '9:45 pagi – 10:15 pagi — Waktu rehat.',
-            '10:15 pagi — Berkumpul dan beratur di dewan selepas waktu rehat.',
-            '10:25 pagi — Mula beratur menuju ke bilik pentaksiran.',
-            '12:15 tengah hari — Berkumpul semula di dewan selepas instrumen pentaksiran selesai.'
-          ], emphasis: 'Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas pada 7:25 pagi. Guru waktu ke-2 hendaklah masuk ke kelas tepat pada masa.' }]
+            '7:00 pagi — Semua murid berkumpul di dewan.',
+            '7:35 pagi — Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas; murid Tahun 4 mula ke tandas.',
+              '7:50 pagi — Murid Tahun 4 mula beratur menuju ke bilik pentaksiran, dipimpin oleh Cikgu Chong Cheng Yang.',
+              '9:30 pagi — Cikgu Chong Wei Ni memimpin murid Tahun 4 kembali ke dewan selepas instrumen pentaksiran selesai; murid mengambil barang dan boleh pergi berehat.',
+              '9:45 pagi – 10:15 pagi — Waktu rehat murid Tahun 3, 5 dan 6; murid membawa bahan ulang kaji untuk mata pelajaran pentaksiran yang seterusnya.',
+            '10:15 pagi — Semua murid berkumpul di dewan.',
+            '10:30 pagi — Murid Tahun 3, 5 dan 6 mula beratur masuk ke kelas; murid Tahun 4 mula ke tandas.',
+              '10:45 pagi — Murid Tahun 4 mula beratur menuju ke bilik pentaksiran, dipimpin oleh Cikgu Hanan.',
+              '12:15 tengah hari — Cikgu Rosmaliza memimpin murid Tahun 4 kembali ke dewan selepas instrumen pentaksiran selesai.',
+            '12:25 tengah hari — Murid Tahun 3, 5 dan 6 dibawa oleh guru untuk berkumpul di dewan.'
+          ], emphasis: 'Guru waktu ke-2 hendaklah masuk ke kelas tepat pada masa.' }]
         },
       ],
       dutySection: {
@@ -402,18 +407,20 @@
       highlights: [
         { kicker: '三楼', title: '禁区', icon: 'ph-prohibit', tone: 'warning', description: '除 MPT4 评估工作人员外，其他老师及学生不得经过考场区域，也不得使用三楼厕所。' },
         { kicker: '中央楼梯', title: '专用通道', icon: 'ph-stairs', tone: 'info', description: '仅供评估工作人员及四年级学生使用。' },
-        { kicker: '下课时间', title: '上午 9:45 – 10:15', icon: 'ph-fork-knife', tone: 'neutral', description: 'MPT4 评估期间全体学生统一下课时间。' },
+        { kicker: '下课时间', title: '上午 9:45 – 10:15', icon: 'ph-fork-knife', tone: 'neutral', description: '三、五及六年级学生下课；四年级学生完成评估、返回礼堂并拿取物品后可去下课。' },
         { kicker: '保持安静', title: '安静环境', icon: 'ph-speaker-slash', tone: 'neutral', description: '确保学生流动及教学活动不会干扰正在进行的评估。' }
       ],
       timeline: [
-        { time: '上午 7:00', title: '在礼堂集合' },
-        { time: '上午 7:25', title: '三、五及六年级学生开始列队返回课室', secondary: true },
-        { time: '上午 7:40', title: '四年级学生开始列队前往考场' },
-        { time: '上午 9:30', title: '返回礼堂', note: '完成评估项目后。' },
-        { time: '上午 9:45 – 10:15', title: '下课时间' },
-        { time: '上午 10:15', title: '在礼堂集合及列队' },
-        { time: '上午 10:25', title: '前往考场' },
-        { time: '中午 12:15', title: '返回礼堂', note: '完成评估项目后。' }
+        { time: '上午 7:00', title: '所有学生在礼堂集合' },
+        { time: '上午 7:35', title: '三、五及六年级学生开始列队返回课室', note: '四年级学生开始上厕所。' },
+        { time: '上午 7:50', title: '四年级学生开始列队前往考场', note: '由张政扬老师带领。' },
+        { time: '上午 9:30', title: '四年级学生返回礼堂', note: '评估结束后由张玮倪老师带领返回礼堂；拿取物品后即可去下课。' },
+        { time: '上午 9:45 – 10:15', title: '三、五及六年级学生下课时间', note: '携带下一项评估科目的复习资料。' },
+        { time: '上午 10:15', title: '所有学生在礼堂集合' },
+        { time: '上午 10:30', title: '三、五及六年级学生开始列队返回课室', note: '四年级学生开始上厕所。' },
+        { time: '上午 10:45', title: '四年级学生开始列队前往考场', note: '由 Hanan 老师带领。' },
+        { time: '中午 12:15', title: '四年级学生返回礼堂', note: '评估结束后由 Rosmaliza 老师带领返回礼堂。' },
+        { time: '中午 12:25', title: '三、五及六年级学生由老师带到礼堂集合' }
       ],
       accordions: [
         {
@@ -441,24 +448,27 @@
               '老师须确保学生遵守秩序，并保持课室安静，以免干扰正在进行的评估。',
               '应避免进行会产生较大声响的活动，包括大声朗读或集体朗读。'
             ]},
-            { title: '3. 下课时间安排', lead: 'MPT4 评估期间，所有学生的下课时间统一为：', emphasis: '上午 9:45 至 10:15', items: [
+            { title: '3. 下课时间安排', lead: '三、五及六年级学生的下课时间为：', emphasis: '上午 9:45 至 10:15', items: [
               '第五节课老师须带领学生前往食堂。',
-              '下课后，学生须在礼堂列队。',
-              '第六节课老师须于上午 10:15 准时到礼堂，带领学生返回课室。'
+              '四年级学生完成评估并返回礼堂拿取物品后，可前往下课。',
+              '学生在礼堂集合至上午 10:30 才返回课室，第七节课老师须准时进班。'
             ]}
           ]
         },
         {
           id: 'C', title: '四年级学生集合及移动安排', intro: '请参阅上方时间表，了解四年级学生完整移动安排。',
           groups: [{ items: [
-            '上午 7:00 — 在礼堂集合。',
-            '上午 7:40 — 开始列队前往考场。',
-            '上午 9:30 — 完成评估项目后，返回礼堂集合。',
-            '上午 9:45 至 10:15 — 下课时间。',
-            '上午 10:15 — 下课后在礼堂集合及列队。',
-            '上午 10:25 — 开始列队前往考场。',
-            '中午 12:15 — 完成评估项目后，返回礼堂集合。'
-          ], emphasis: '三、五及六年级学生于上午 7:25 开始列队返回课室。第二节课的老师须准时进入课室。' }]
+            '上午 7:00 — 所有学生在礼堂集合。',
+            '上午 7:35 — 三、五及六年级学生开始列队返回课室；四年级学生开始上厕所。',
+            '上午 7:50 — 四年级学生开始列队前往考场，由张政扬老师带领。',
+            '上午 9:30 — 评估项目结束后，由张玮倪老师带领四年级学生返回礼堂；拿取物品后即可去下课。',
+            '上午 9:45 至 10:15 — 三、五及六年级学生下课时间，并携带下一项评估科目的复习资料。',
+            '上午 10:15 — 所有学生在礼堂集合。',
+            '上午 10:30 — 三、五及六年级学生开始列队返回课室；四年级学生开始上厕所。',
+            '上午 10:45 — 四年级学生开始列队前往考场，由 Hanan 老师带领。',
+            '中午 12:15 — 评估项目结束后，由 Rosmaliza 老师带领四年级学生返回礼堂。',
+            '中午 12:25 — 三、五及六年级学生由老师带到礼堂集合。'
+          ], emphasis: '第二节课的老师须准时进入课室。' }]
         },
       ],
       dutySection: {
