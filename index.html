@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.06.15';
+    const APP_BUILD_ID = '2026.10.06.16';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -675,8 +675,8 @@
       [
         6,
         "PSV",
-        "16:00",
-        "17:00"
+        "16:35",
+        "17:35"
       ],
       [
         7,
@@ -687,8 +687,8 @@
       [
         7,
         "PM/PI",
-        "16:00",
-        "17:00"
+        "16:35",
+        "17:35"
       ],
       [
         8,
@@ -699,8 +699,8 @@
       [
         8,
         "PJPK",
-        "16:00",
-        "17:00"
+        "16:35",
+        "17:35"
       ],
       [
         12,
@@ -711,8 +711,8 @@
       [
         12,
         "MT",
-        "16:00",
-        "17:15"
+        "16:35",
+        "17:50"
       ]
     ]
   },
@@ -932,7 +932,8 @@
           <nav aria-label={zh ? '年级' : 'Tahun'} className="flex flex-wrap gap-2">{YEAR_END_2026.map(group => <a key={group.label} href={`#assessment-year-${group.years[0]}`} className={`min-h-11 inline-flex items-center px-4 rounded-full border font-bold text-sm ${surface}`}>{zh ? `${group.years.join('–')}年级` : group.label}</a>)}</nav>
           {YEAR_END_2026.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
             <h2 className="text-2xl font-black mb-4">{zh ? `${group.years.join('–')}年级` : group.label}</h2>
-            {group.mpt4 && <p className={`mb-5 p-4 rounded-2xl border text-base leading-7 ${isDarkMode ? 'bg-amber-950/30 border-amber-800 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>{zh ? '10月6日至8日：BM、BI、BC、SN、MT 以 MPT4 2026 正式时间表为准。以下列出校内年终评估安排。' : '6–8 Oktober: BM, BI, BC, SN dan MT mengikut jadual rasmi MPT4 2026. Jadual di bawah adalah untuk pentaksiran akhir tahun sekolah.'}</p>}
+            {group.years[0] === 3 && <p className="mb-4 text-sm font-semibold text-blue-600">{lang === 'zh' ? '🎵 音乐：由老师安排' : '🎵 Muzik: mengikut ketetapan guru'}</p>}
+          {group.mpt4 && <p className={`mb-5 p-4 rounded-2xl border text-base leading-7 ${isDarkMode ? 'bg-amber-950/30 border-amber-800 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>{zh ? '10月6日至8日：BM、BI、BC、SN、MT 以 MPT4 2026 正式时间表为准。以下列出校内年终评估安排。' : '6–8 Oktober: BM, BI, BC, SN dan MT mengikut jadual rasmi MPT4 2026. Jadual di bawah adalah untuk pentaksiran akhir tahun sekolah.'}</p>}
             <div className="space-y-5">{[...new Set(group.rows.map(row => row[0]))].map(day => <div key={day}>
               <h3 className="text-base font-extrabold mb-2">{String(day).padStart(2, '0')}-10-2026 · {weekdays[day][zh ? 0 : 1]}</h3>
               <ul className="space-y-2">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
