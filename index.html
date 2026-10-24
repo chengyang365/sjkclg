@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.06.17';
+    const APP_BUILD_ID = '2026.10.06.18';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -691,28 +691,28 @@
         "17:35"
       ],
       [
-        8,
+        26,
         "BC",
         "13:30",
         "14:45"
       ],
       [
-        8,
-        "PJPK",
-        "16:35",
-        "17:35"
+        26,
+        "SN",
+        "16:00",
+        "17:15"
       ],
       [
-        12,
-        "SN",
+        27,
+        "MT",
         "13:30",
         "14:45"
       ],
       [
-        12,
-        "MT",
-        "16:35",
-        "17:50"
+        27,
+        "PJPK",
+        "16:00",
+        "17:00"
       ]
     ]
   },
@@ -747,28 +747,28 @@
         "12:00"
       ],
       [
-        8,
+        26,
         "BC",
-        "08:15",
-        "09:30"
+        "08:00",
+        "09:15"
       ],
       [
-        8,
-        "PJPK",
-        "11:00",
-        "12:00"
-      ],
-      [
-        12,
+        26,
         "SN",
-        "08:15",
-        "09:30"
+        "10:15",
+        "11:30"
       ],
       [
-        12,
+        27,
         "MT",
-        "10:10",
-        "11:25"
+        "07:45",
+        "09:00"
+      ],
+      [
+        27,
+        "PJPK",
+        "10:15",
+        "11:15"
       ]
     ]
   },
@@ -780,40 +780,40 @@
     "mpt4": true,
     "rows": [
       [
-        8,
-        "PJPK",
-        "11:00",
-        "12:00"
-      ],
-      [
-        12,
-        "MZ",
-        "08:15",
+        26,
+        "PM/PI",
+        "08:00",
         "09:15"
       ],
       [
-        12,
+        26,
         "RBT",
-        "10:10",
-        "11:10"
+        "10:15",
+        "11:15"
       ],
       [
-        12,
-        "PM/PI",
-        "11:20",
-        "12:35"
+        26,
+        "MZ",
+        "11:30",
+        "12:30"
       ],
       [
-        13,
-        "SEJ",
-        "08:15",
-        "09:30"
-      ],
-      [
-        13,
+        27,
         "PSV",
-        "10:10",
-        "12:10"
+        "07:15",
+        "09:15"
+      ],
+      [
+        27,
+        "SEJ",
+        "10:15",
+        "11:30"
+      ],
+      [
+        27,
+        "PJPK",
+        "11:40",
+        "12:40"
       ]
     ]
   },
@@ -849,46 +849,46 @@
         "12:00"
       ],
       [
-        8,
+        26,
         "BC",
-        "08:15",
-        "09:30"
+        "08:00",
+        "09:15"
       ],
       [
-        8,
-        "PJPK",
-        "11:00",
-        "12:00"
-      ],
-      [
-        12,
+        26,
         "SN",
-        "08:15",
-        "09:30"
+        "10:15",
+        "11:30"
       ],
       [
-        12,
-        "MT",
-        "10:10",
-        "11:25"
-      ],
-      [
-        12,
-        "PM/PI",
-        "11:30",
-        "12:45"
-      ],
-      [
-        13,
-        "SEJ",
-        "08:15",
-        "09:30"
-      ],
-      [
-        13,
+        27,
         "PSV",
-        "10:10",
-        "12:10"
+        "07:15",
+        "09:15"
+      ],
+      [
+        27,
+        "SEJ",
+        "10:15",
+        "11:30"
+      ],
+      [
+        27,
+        "PJPK",
+        "11:40",
+        "12:40"
+      ],
+      [
+        28,
+        "MT",
+        "07:45",
+        "09:00"
+      ],
+      [
+        28,
+        "PM/PI",
+        "10:15",
+        "11:30"
       ]
     ]
   }
@@ -916,7 +916,7 @@
       const zh = lang === 'zh';
       const surface = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
       const title = zh ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026';
-      const weekdays = { 6: ['星期二', 'SELASA'], 7: ['星期三', 'RABU'], 8: ['星期四', 'KHAMIS'], 12: ['星期一', 'ISNIN'], 13: ['星期二', 'SELASA'] };
+      const weekdays = { 6: ['星期二', 'SELASA'], 7: ['星期三', 'RABU'], 26: ['星期一', 'ISNIN'], 27: ['星期二', 'SELASA'], 28: ['星期三', 'RABU'] };
       const time = value => {
         const [h, m] = value.split(':').map(Number);
         return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a.m.' : 'p.m.'}`;
@@ -928,7 +928,7 @@
           <button type="button" onClick={onLangToggle} aria-label={zh ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${surface}`}>{zh ? 'BM' : '中'}</button>
         </div></header>
         <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-          <p className="text-base font-semibold">{zh ? '2026年10月6、7、8、12及13日 · 一至六年级' : '6, 7, 8, 12 dan 13 Oktober 2026 · Tahun 1–6'}</p>
+          <p className="text-base font-semibold">{zh ? '2026年10月6、7、26、27及28日 · 一至六年级' : '6, 7, 26, 27 dan 28 Oktober 2026 · Tahun 1–6'}</p>
           <nav aria-label={zh ? '年级' : 'Tahun'} className="flex flex-wrap gap-2">{YEAR_END_2026.map(group => <a key={group.label} href={`#assessment-year-${group.years[0]}`} className={`min-h-11 inline-flex items-center px-4 rounded-full border font-bold text-sm ${surface}`}>{zh ? `${group.years.join('–')}年级` : group.label}</a>)}</nav>
           {YEAR_END_2026.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
             <h2 className="text-2xl font-black mb-4">{zh ? `${group.years.join('–')}年级` : group.label}</h2>
@@ -2104,7 +2104,7 @@
                 </button>
                 <button type="button" onClick={() => { setActivePage('assessment-2026'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full min-h-[6.5rem] p-4 sm:p-5 rounded-3xl border text-left flex items-center gap-3 sm:gap-4 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
                   <span className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-calendar text-2xl sm:text-3xl"></i></span>
-                  <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '一至六年级 · 10月6日至13日' : 'Tahun 1–6 · 6–13 Oktober 2026'}</span></span>
+                  <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '一至六年级 · 10月6、7、26至28日' : 'Tahun 1–6 · 6, 7 dan 26–28 Oktober 2026'}</span></span>
                   <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
                 </button>
                 
