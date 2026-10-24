@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.25.01';
+    const APP_BUILD_ID = '2026.10.25.02';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -913,15 +913,10 @@
       return parts.join(zh ? '' : ' ');
     };
     const YearEndAssessmentPage = ({ onBack, isDarkMode, lang, onLangToggle }) => {
-      const [selectedYear, setSelectedYear] = useState('all');
-      const [showTable, setShowTable] = useState(false);
       const zh = lang === 'zh';
       const surface = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
       const title = zh ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026';
       const weekdays = { 6: ['星期二', 'SELASA'], 7: ['星期三', 'RABU'], 26: ['星期一', 'ISNIN'], 27: ['星期二', 'SELASA'], 28: ['星期三', 'RABU'] };
-      const visibleGroups = selectedYear === 'all' ? YEAR_END_2026 : YEAR_END_2026.filter(group => group.years.includes(Number(selectedYear)));
-      const groupTitle = group => zh ? `${group.years.join('–')}年级` : group.label;
-      const dateHeading = day => `${String(day).padStart(2, '0')}-10-2026 · ${weekdays[day][zh ? 0 : 1]}`;
       const time = value => {
         const [h, m] = value.split(':').map(Number);
         return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'a.m.' : 'p.m.'}`;
@@ -933,30 +928,23 @@
           <button type="button" onClick={onLangToggle} aria-label={zh ? 'Tukar ke Bahasa Melayu' : '切换至中文'} className={`min-w-11 h-11 px-3 rounded-full border font-bold ${surface}`}>{zh ? 'BM' : '中'}</button>
         </div></header>
         <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 sm:py-6 space-y-5 sm:space-y-6">
-          <section className={`rounded-3xl border p-4 sm:p-5 ${surface}`}>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div><p className="text-sm font-bold text-blue-600">{zh ? '2026年10月6、7、26、27及28日' : '6, 7, 26, 27 dan 28 Oktober 2026'}</p><p className="text-sm opacity-70">{zh ? '一至六年级 · 选择年级快速查看' : 'Tahun 1–6 · Pilih tahun untuk melihat jadual'}</p></div>
-              <label className="flex items-center gap-2 text-sm font-bold"><span>{zh ? '年级' : 'Tahun'}</span><select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} className={`min-h-11 flex-1 sm:flex-none rounded-xl border px-3 font-bold ${isDarkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-300'}`}><option value="all">{zh ? '所有年级' : 'Semua Tahun'}</option>{[1,2,3,4,5,6].map(year => <option key={year} value={year}>{zh ? `第${year}年级` : `Tahun ${year}`}</option>)}</select></label>
-            </div>
-          </section>
-          {visibleGroups.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
-            <h2 className="text-2xl font-black mb-4">{groupTitle(group)}</h2>
+          <p className="text-base font-semibold">{zh ? '2026年10月6、7、26、27及28日 · 一至六年级' : '6, 7, 26, 27 dan 28 Oktober 2026 · Tahun 1–6'}</p>
+          <nav aria-label={zh ? '年级' : 'Tahun'} className="flex flex-wrap gap-2">{YEAR_END_2026.map(group => <a key={group.label} href={`#assessment-year-${group.years[0]}`} className={`min-h-11 inline-flex items-center px-4 rounded-full border font-bold text-sm ${surface}`}>{zh ? `${group.years.join('–')}年级` : group.label}</a>)}</nav>
+          {YEAR_END_2026.map(group => <section key={group.label} id={`assessment-year-${group.years[0]}`} className={`scroll-mt-28 rounded-3xl border p-4 sm:p-6 ${surface}`}>
+            <h2 className="text-2xl font-black mb-4">{zh ? `${group.years.join('–')}年级` : group.label}</h2>
             {group.years[0] === 3 && <p className="mb-4 text-sm font-semibold text-blue-600">{zh ? '🎵 音乐：由老师安排' : '🎵 Muzik: mengikut ketetapan guru'}</p>}
             {group.mpt4 && <p className={`mb-5 p-4 rounded-2xl border text-base leading-7 ${isDarkMode ? 'bg-amber-950/30 border-amber-800 text-amber-200' : 'bg-amber-50 border-amber-200 text-amber-900'}`}>{zh ? '10月6日至8日：BM、BI、BC、SN、MT 以 MPT4 2026 正式时间表为准。以下列出校内年终评估安排。' : '6–8 Oktober: BM, BI, BC, SN dan MT mengikut jadual rasmi MPT4 2026. Jadual di bawah adalah untuk pentaksiran akhir tahun sekolah.'}</p>}
-            <div className="space-y-5">{[...new Set(group.rows.map(row => row[0]))].map(day => <section key={day} aria-label={dateHeading(day)} className={`rounded-2xl border p-3 sm:p-4 ${isDarkMode ? 'border-slate-700 bg-slate-900/30' : 'border-slate-100 bg-slate-50/60'}`}>
-              <h3 className="text-base sm:text-lg font-extrabold mb-3 flex items-center gap-2"><i className="ph-fill ph-calendar-check text-blue-500"></i>{dateHeading(day)}</h3>
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-4 border flex items-center gap-3 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200 shadow-sm'}`}>
-                <time className="shrink-0 min-w-[6.5rem] text-lg sm:text-xl font-black tabular-nums text-blue-600">{time(start)}<span className="block text-xs font-semibold text-slate-500 dark:text-slate-400">– {time(end)}</span></time>
-                <span className={`w-px self-stretch ${isDarkMode ? 'bg-slate-600' : 'bg-slate-200'}`}></span>
-                <span className="min-w-0 flex-1"><span className="block font-black text-base">{zh ? ASSESSMENT_SUBJECTS[subject][0] : ASSESSMENT_SUBJECTS[subject][1]}</span><span className="block text-sm font-semibold opacity-70">{subject} · {assessmentDuration(assessmentMinutes(start, end), zh)}</span></span>
+            <div className="space-y-5">{[...new Set(group.rows.map(row => row[0]))].map(day => <div key={day}>
+              <h3 className="text-base font-extrabold mb-2">{String(day).padStart(2, '0')}-10-2026 · {weekdays[day][zh ? 0 : 1]}</h3>
+              <ul className="space-y-2">{group.rows.filter(row => row[0] === day).map(([date, subject, start, end]) => <li key={subject} className={`rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${isDarkMode ? 'bg-slate-900/60' : 'bg-slate-50'}`}>
+                <span className="font-bold text-base sm:flex-1">{subject} · {ASSESSMENT_SUBJECTS[subject][zh ? 0 : 1]}</span>
+                <time className="text-base whitespace-nowrap">{time(start)} – {time(end)}</time>
+                <span className="text-sm font-semibold shrink-0 whitespace-nowrap sm:text-right">{assessmentDuration(assessmentMinutes(start, end), zh)}</span>
               </li>)}</ul>
-            </section>)}
+            </div>)}</div>
           </section>)}
-          <section className={`rounded-3xl border overflow-hidden ${surface}`}>
-            <button type="button" aria-expanded={showTable} onClick={() => setShowTable(!showTable)} className="min-h-14 w-full px-4 sm:px-5 py-3 flex items-center justify-between gap-3 text-left font-extrabold"><span>{zh ? '完整表格视图' : 'Paparan jadual penuh'}<span className="block text-xs font-medium opacity-65">{zh ? '适合桌面总览与打印' : 'Sesuai untuk paparan desktop dan cetakan'}</span></span><i className={`ph-bold ph-caret-down transition-transform ${showTable ? 'rotate-180' : ''}`}></i></button>
-            {showTable && <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-sm border-collapse"><thead><tr className={isDarkMode ? 'bg-slate-900/70' : 'bg-slate-100'}><th className="p-3 text-left border-b">{zh ? '年级' : 'Tahun'}</th><th className="p-3 text-left border-b">{zh ? '日期' : 'Tarikh'}</th><th className="p-3 text-left border-b">{zh ? '科目' : 'Mata pelajaran'}</th><th className="p-3 text-left border-b">{zh ? '时间' : 'Masa'}</th><th className="p-3 text-left border-b">{zh ? '时长' : 'Tempoh'}</th></tr></thead><tbody>{visibleGroups.flatMap(group => group.rows.map(([day, subject, start, end], index) => <tr key={group.label + day + subject} className={index % 2 ? (isDarkMode ? 'bg-slate-900/30' : 'bg-slate-50') : ''}><td className="p-3 border-b font-bold">{groupTitle(group)}</td><td className="p-3 border-b whitespace-nowrap">{dateHeading(day)}</td><td className="p-3 border-b font-semibold">{zh ? ASSESSMENT_SUBJECTS[subject][0] : ASSESSMENT_SUBJECTS[subject][1]} ({subject})</td><td className="p-3 border-b whitespace-nowrap">{time(start)} – {time(end)}</td><td className="p-3 border-b whitespace-nowrap">{assessmentDuration(assessmentMinutes(start, end), zh)}</td></tr>))}</tbody></table></div>}
-          </section>
           <aside className={`rounded-3xl border p-5 text-base leading-7 ${surface}`}><h2 className="font-extrabold mb-2">{zh ? '四至六年级共同科目时长' : 'Tempoh mata pelajaran bersama Tahun 4–6'}</h2><p>MZ / RBT / PJPK: {assessmentDuration(60, zh)} · PM/PI / SEJ: {assessmentDuration(75, zh)} · PSV: {assessmentDuration(120, zh)}</p></aside>
+        </main>
       </div>;
     };
 
