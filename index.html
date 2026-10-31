@@ -163,7 +163,7 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.31.01';
+    const APP_BUILD_ID = '2026.10.31.02';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
@@ -1778,9 +1778,18 @@
         } catch (error) {
           console.error('Unable to save app:', error);
           const message = String(error?.message || '');
-          const userMessage = /token|unauthori[sz]ed|admin|session|sesi/i.test(message)
-            ? (lang === 'zh' ? '管理员会话可能已过期，请重新登录后再保存。' : 'Sesi pentadbir mungkin telah tamat. Log masuk semula dan cuba lagi.')
-            : (lang === 'zh' ? '保存失败' : 'Gagal menyimpan') + (message ? `: ${message.slice(0, 120)}` : (lang === 'zh' ? '，请检查网络后重试。' : '. Semak internet dan cuba lagi.'));
+          const unauthorized = /UNAUTHORIZED/i.test(message);
+          if (unauthorized) {
+            endAdminSession();
+            setPinInput('');
+            setPinError(false);
+            setShowPinModal(true);
+          }
+          const userMessage = unauthorized
+            ? (lang === 'zh' ? '管理员登录已失效，请重新输入 PIN；表单内容已保留。' : 'Sesi pentadbir tidak sah. Masukkan PIN semula; kandungan borang dikekalkan.')
+            : /token|unauthori[sz]ed|admin|session|sesi/i.test(message)
+              ? (lang === 'zh' ? '管理员会话可能已过期，请重新登录后再保存。' : 'Sesi pentadbir mungkin telah tamat. Log masuk semula dan cuba lagi.')
+              : (lang === 'zh' ? '保存失败' : 'Gagal menyimpan') + (message ? `: ${message.slice(0, 120)}` : (lang === 'zh' ? '，请检查网络后重试。' : '. Semak internet dan cuba lagi.'));
           showToast(userMessage, 'error');
         } finally { setIsSaving(false); }
       };
