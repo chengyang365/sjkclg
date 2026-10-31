@@ -163,13 +163,13 @@
       );
     };
 
-    const APP_BUILD_ID = '2026.10.25.02';
+    const APP_BUILD_ID = '2026.10.31.01';
     const t = {
       zh: {
         schoolName: '新廊华小', appTitle: '应用中心', searchPlaceholder: '搜索内部系统...', adminActive: '系统管理',
         tabs: { all: '全部应用', pinned: '我的置顶', admin: '行政', kurikulum: '课程', hem: '学生事务', koko: '兼修课程', other: '其他' },
         categories: { pinned: '我的置顶', admin: '行政管理 (Pentadbiran)', kurikulum: '课程与教学 (Kurikulum)', hem: '学生事务 (HEM)', koko: '兼修课程 (Kokurikulum)', other: '其他系统 (Lain-lain)' },
-        addApp: '添加内部系统', editApp: '编辑系统', save: '保存同步', cancel: '取消', emptyState: '此分类下暂无系统', noResult: '未找到匹配的系统',
+        addApp: '添加内部系统', quickActions: '快捷操作', manageData: '数据面板', noticeSettings: '通告设置', eventSettings: '活动设置', addRequiresOnline: '需联网保存应用', editApp: '编辑系统', save: '保存同步', cancel: '取消', emptyState: '此分类下暂无系统', noResult: '未找到匹配的系统',
         announcementSetup: '内部通告设置', annActive: '开启通告横幅', annZh: '中文内容', annMs: '马来文内容',
         eventSetup: '倒计时设置', eventTitleZh: '事件名称 (中)', eventTitleMs: '事件名称 (马)', eventDate: '目标日期',
         countdown: '校务倒计时', daysLeft: '天', todayIs: '就是今天！', passed: '已结束',
@@ -185,7 +185,7 @@
         schoolName: 'SJK (C) Ladang Grisek', appTitle: 'Pusat Aplikasi', searchPlaceholder: 'Cari sistem...', adminActive: 'Tadbir Sistem',
         tabs: { all: 'Semua App', pinned: 'Dipin', admin: 'Pentadbiran', kurikulum: 'Kurikulum', hem: 'HEM', koko: 'Koko', other: 'Lain-lain' },
         categories: { pinned: 'Dipinkan', admin: 'Pentadbiran', kurikulum: 'Kurikulum', hem: 'Hal Ehwal Murid', koko: 'Kokurikulum', other: 'Lain-lain' },
-        addApp: 'Tambah Sistem', editApp: 'Edit Sistem', save: 'Simpan', cancel: 'Batal', emptyState: 'Tiada sistem buat masa ini', noResult: 'Sistem tidak dijumpai',
+        addApp: 'Tambah Sistem', quickActions: 'Tindakan Pantas', manageData: 'Papan Data', noticeSettings: 'Tetapan Notis', eventSettings: 'Tetapan Acara', addRequiresOnline: 'Internet diperlukan untuk menyimpan aplikasi', editApp: 'Edit Sistem', save: 'Simpan', cancel: 'Batal', emptyState: 'Tiada sistem buat masa ini', noResult: 'Sistem tidak dijumpai',
         announcementSetup: 'Tetapan Notis', annActive: 'Aktifkan Banner', annZh: 'Notis (Cina)', annMs: 'Notis (Melayu)',
         eventSetup: 'Tetapan Countdown', eventTitleZh: 'Acara (Cina)', eventTitleMs: 'Acara (Melayu)', eventDate: 'Tarikh',
         countdown: 'Kiraan Detik', daysLeft: 'Hari Lagi', todayIs: 'Hari ini!', passed: 'Telah Berlalu',
@@ -1757,12 +1757,19 @@
       };
 
       const handleSaveApp = async (e) => {
-        e.preventDefault(); setIsSaving(true);
+        e.preventDefault();
+        if (isSaving) return;
+        if (isOffline || !navigator.onLine) {
+          setIsOffline(true);
+          showToast(lang === 'zh' ? '目前离线，无法保存应用。请联网后重试。' : 'Anda di luar talian. Sambung ke internet untuk menyimpan aplikasi.', 'error');
+          return;
+        }
+        setIsSaving(true);
         const newId = editingApp ? editingApp.id : Date.now().toString();
         const appData = { ...formData, id: newId, order: editingApp ? editingApp.order : apps.filter(a => a.category === formData.category).length, clicks: editingApp ? editingApp.clicks : 0, createdAt: editingApp ? editingApp.createdAt : Date.now() };
         const frontendApp = { ...appData, zh: { title: appData.zhTitle, desc: appData.zhDesc }, ms: { title: appData.msTitle, desc: appData.msDesc } };
         try {
-          if(!isOffline) await server.saveApp(appData);
+          await server.saveApp(appData);
           const nextApps = editingApp ? apps.map(a => a.id === newId ? frontendApp : a) : [...apps, frontendApp];
           setApps(nextApps);
           localStorage.setItem('sjkc_staff_cache', JSON.stringify({ apps: nextApps, settings: { announcement, event: schoolEvent } }));
@@ -1770,7 +1777,11 @@
           showToast(currentT.toastSaved, 'success');
         } catch (error) {
           console.error('Unable to save app:', error);
-          showToast(lang === 'zh' ? '保存失败，请检查网络后重试。' : 'Save failed. Check your connection and try again.', 'error');
+          const message = String(error?.message || '');
+          const userMessage = /token|unauthori[sz]ed|admin|session|sesi/i.test(message)
+            ? (lang === 'zh' ? '管理员会话可能已过期，请重新登录后再保存。' : 'Sesi pentadbir mungkin telah tamat. Log masuk semula dan cuba lagi.')
+            : (lang === 'zh' ? '保存失败' : 'Gagal menyimpan') + (message ? `: ${message.slice(0, 120)}` : (lang === 'zh' ? '，请检查网络后重试。' : '. Semak internet dan cuba lagi.'));
+          showToast(userMessage, 'error');
         } finally { setIsSaving(false); }
       };
 
@@ -2102,30 +2113,9 @@
                   <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026年第三学期教师值勤表' : 'Jadual Guru Bertugas Penggal 3 (2026)'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '查看每周值勤地点与教师安排' : 'Semak lokasi dan giliran guru bertugas'}</span></span>
                   <i className="ph-bold ph-arrow-right text-xl text-emerald-500 shrink-0"></i>
                 </button>
-                <button type="button" onClick={() => { setActivePage('assessment-2026'); window.scrollTo({ top: 0, behavior: 'auto' }); }} className={`w-full min-h-[6.5rem] p-4 sm:p-5 rounded-3xl border text-left flex items-center gap-3 sm:gap-4 transition-all hover:-translate-y-0.5 active:scale-[0.99] ${isDarkMode ? 'bg-slate-800/70 border-slate-700 hover:border-blue-700' : 'bg-white/80 border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200'}`}>
-                  <span className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center shrink-0 ${isDarkMode ? 'bg-blue-500/15 text-blue-300' : 'bg-blue-50 text-blue-700'}`}><i className="ph-fill ph-calendar text-2xl sm:text-3xl"></i></span>
-                  <span className="flex-1 min-w-0"><span className="block text-base sm:text-lg font-black leading-snug">{lang === 'zh' ? '2026 年终评估时间表' : 'Jadual Pentaksiran Akhir Tahun 2026'}</span><span className="block mt-1 text-xs sm:text-sm font-semibold opacity-65">{lang === 'zh' ? '一至六年级 · 10月6、7、26至28日' : 'Tahun 1–6 · 6, 7 dan 26–28 Oktober 2026'}</span></span>
-                  <i className="ph-bold ph-arrow-right text-xl text-blue-500 shrink-0"></i>
-                </button>
+
                 
               </section>
-            )}
-
-            {isAdmin && !searchQuery && (
-              <div className={`hidden sm:flex mb-10 p-6 rounded-[1.5rem] border shadow-lg backdrop-blur-2xl animate-in slide-in-from-top-4 duration-300 ${isDarkMode ? 'bg-blue-900/10 border-blue-900/50' : 'bg-white/60 border-blue-100/60 shadow-[inset_0_1px_1px_rgba(255,255,255,0.8)]'}`}>
-                <div className="flex flex-row items-center justify-between gap-5 w-full">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 flex items-center justify-center rounded-2xl shadow-inner transition-transform hover:scale-110 ${isDarkMode ? 'bg-blue-900/40 text-blue-400' : 'bg-blue-50 text-blue-600'}`}><i className="ph-fill ph-shield-check text-[1.75rem]"></i></div>
-                    <div><span className={`font-extrabold tracking-tight block text-lg ${isDarkMode ? 'text-blue-400' : 'text-blue-700'}`}>{currentT.adminActive}</span><span className="text-[0.85rem] opacity-70 flex items-center gap-1 mt-0.5 font-medium"><i className="ph-bold ph-arrows-out-line-vertical"></i> {activeTab === 'all' && viewMode === 'list' ? currentT.dragInfo : '在“全部”标签+列表视图下可拖拽排序'}</span></div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <button onClick={() => setIsDataModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-purple-900/20 text-purple-400 border-purple-800/40 hover:bg-purple-900/40' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'}`}><i className="ph-fill ph-chart-pie-slice text-xl"></i> {lang === 'zh' ? '数据' : 'Data'}</button>
-                    <button onClick={() => setIsAnnModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-amber-900/20 text-amber-400 border-amber-800/40 hover:bg-amber-900/40' : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'}`}><i className="ph-fill ph-megaphone text-xl"></i> {lang === 'zh' ? '通知' : 'Notis'}</button>
-                    <button onClick={() => setIsEventModalOpen(true)} className={`flex justify-center items-center gap-2 px-6 py-3.5 rounded-2xl font-bold border active:scale-95 transition-transform text-[0.95rem] ${isDarkMode ? 'bg-emerald-900/20 text-emerald-400 border-emerald-800/40 hover:bg-emerald-900/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'}`}><i className="ph-fill ph-calendar text-xl"></i> {lang === 'zh' ? '活动' : 'Event'}</button>
-                    <button onClick={() => { setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); }} className="flex justify-center items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl shadow-lg shadow-blue-600/20 font-bold active:scale-95 transition-transform text-[0.95rem]"><i className="ph-bold ph-plus text-xl"></i> {currentT.addApp}</button>
-                  </div>
-                </div>
-              </div>
             )}
 
             {schoolEvent.active && eventStatus && activeTab === 'all' && !searchQuery && (
@@ -2205,19 +2195,21 @@
           </main>
 
           {isAdmin && (
-            <div className="fixed bottom-6 right-6 z-[90] sm:hidden flex flex-col items-end gap-3">
-              <div className={`flex flex-col gap-3 transition-all duration-300 origin-bottom ${isFabOpen ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-90 translate-y-4 pointer-events-none'}`}>
-                <button onClick={() => { vibrate(20); setIsDataModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-purple-900/90 text-purple-400 border-purple-700/50 backdrop-blur-md' : 'bg-purple-50 text-purple-700 border-purple-200'}`}>Data Board <i className="ph-fill ph-chart-pie-slice text-xl"></i></button>
-                <button onClick={() => { vibrate(20); setIsAnnModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-amber-900/90 text-amber-400 border-amber-700/50 backdrop-blur-md' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>Notis <i className="ph-fill ph-megaphone text-xl"></i></button>
-                <button onClick={() => { vibrate(20); setIsEventModalOpen(true); setIsFabOpen(false); }} className={`flex items-center justify-end gap-3 px-5 py-3.5 rounded-[1.2rem] font-bold shadow-lg border ${isDarkMode ? 'bg-emerald-900/90 text-emerald-400 border-emerald-700/50 backdrop-blur-md' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>Event <i className="ph-fill ph-calendar text-xl"></i></button>
-                <button onClick={() => { vibrate(20); setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); setIsFabOpen(false); }} disabled={isOffline} className="flex items-center justify-end gap-3 px-5 py-3.5 bg-blue-600 text-white rounded-[1.2rem] font-bold shadow-lg shadow-blue-600/30 disabled:opacity-50">Tambah App <i className="ph-bold ph-plus text-xl"></i></button>
-              </div>
-              <button onClick={() => { vibrate(20); setIsFabOpen(!isFabOpen); }} className={`w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-600/30 transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`}>
-                <i className="ph-bold ph-plus text-2xl"></i>
+            <div className="fixed bottom-5 right-4 sm:bottom-8 sm:right-8 z-[90] flex flex-col items-end">
+              {isFabOpen && <div id="admin-quick-actions" role="menu" aria-label={currentT.quickActions} className={`mb-3 grid w-[min(20rem,calc(100vw-2rem))] grid-cols-1 sm:grid-cols-2 gap-2 p-3 rounded-3xl border shadow-2xl animate-in slide-in-from-bottom-2 fade-in duration-200 ${isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+                <p className="col-span-full px-2 pt-1 pb-2 text-xs font-extrabold uppercase tracking-wide opacity-60">{currentT.quickActions}</p>
+                <button type="button" role="menuitem" onClick={() => { vibrate(20); setIsDataModalOpen(true); setIsFabOpen(false); }} className={`min-h-12 w-full flex items-center gap-3 rounded-xl border px-3 py-3 text-left text-sm font-bold transition-colors ${isDarkMode ? 'bg-purple-900/20 text-purple-300 border-purple-800/50 hover:bg-purple-900/40' : 'bg-purple-50 text-purple-800 border-purple-200 hover:bg-purple-100'}`}><i aria-hidden="true" className="ph-fill ph-chart-pie-slice text-xl shrink-0"></i><span>{currentT.manageData}</span></button>
+                <button type="button" role="menuitem" onClick={() => { vibrate(20); setIsAnnModalOpen(true); setIsFabOpen(false); }} className={`min-h-12 w-full flex items-center gap-3 rounded-xl border px-3 py-3 text-left text-sm font-bold transition-colors ${isDarkMode ? 'bg-amber-900/20 text-amber-300 border-amber-800/50 hover:bg-amber-900/40' : 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100'}`}><i aria-hidden="true" className="ph-fill ph-megaphone text-xl shrink-0"></i><span>{currentT.noticeSettings}</span></button>
+                <button type="button" role="menuitem" onClick={() => { vibrate(20); setIsEventModalOpen(true); setIsFabOpen(false); }} className={`min-h-12 w-full flex items-center gap-3 rounded-xl border px-3 py-3 text-left text-sm font-bold transition-colors ${isDarkMode ? 'bg-emerald-900/20 text-emerald-300 border-emerald-800/50 hover:bg-emerald-900/40' : 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100'}`}><i aria-hidden="true" className="ph-fill ph-calendar text-xl shrink-0"></i><span>{currentT.eventSettings}</span></button>
+                <button type="button" role="menuitem" onClick={() => { if (isOffline || !navigator.onLine) { showToast(currentT.addRequiresOnline, 'error'); return; } vibrate(20); setEditingApp(null); setFormData({url:'', icon:'Settings', category:'admin', zhTitle:'', zhDesc:'', msTitle:'', msDesc:''}); setIsCustomIcon(false); setIsAppModalOpen(true); setIsFabOpen(false); }} disabled={isOffline} className="min-h-12 w-full flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-600 px-3 py-3 text-left text-sm font-bold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 sm:col-span-2"><i aria-hidden="true" className="ph-bold ph-plus text-xl shrink-0"></i><span>{currentT.addApp}{isOffline && <span className="ml-2 text-xs font-medium text-blue-100">· {currentT.addRequiresOnline}</span>}</span></button>
+                <p className="col-span-full px-2 pt-1 text-xs font-medium opacity-60">{lang === 'zh' ? '可拖放应用卡片调整顺序' : 'Seret kad aplikasi untuk menyusun semula'}</p>
+              </div>}
+              <button type="button" onClick={() => { vibrate(20); setIsFabOpen(!isFabOpen); }} aria-expanded={isFabOpen} aria-controls="admin-quick-actions" aria-label={isFabOpen ? (lang === 'zh' ? '关闭快捷操作' : 'Tutup tindakan pantas') : currentT.quickActions} className={`w-14 h-14 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-xl shadow-blue-600/30 transition-transform duration-300 ${isFabOpen ? 'rotate-45' : ''}`}>
+                <i aria-hidden="true" className="ph-bold ph-plus text-2xl"></i>
               </button>
             </div>
           )}
-          {isFabOpen && <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm z-[80] sm:hidden" onClick={() => setIsFabOpen(false)}></div>}
+          {isFabOpen && <button type="button" aria-label={lang === 'zh' ? '关闭快捷操作菜单' : 'Tutup menu tindakan pantas'} className="fixed inset-0 z-[80] bg-slate-900/20 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none" onClick={() => setIsFabOpen(false)}></button>}
 
           <footer className={`mt-auto border-t py-12 px-4 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}>
             <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-8">
